@@ -34,6 +34,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   AudioPlayer audioPlayer = AudioPlayer();
   bool isPlaying = false;
+  List<String> acceptedAudioExtensions =
+      List.unmodifiable(["m4a", "mp3", "wav"]);
+
   // Duration duration = Duration.zero;
   // Duration position = Duration.zero;
 
@@ -44,9 +47,13 @@ class _MyHomePageState extends State<MyHomePage> {
             {
               for (final file in selectedFile.files)
                 {
-                  if (file.path == null) {throw Exception("invalid file path")},
-                  audioPlayer.play(DeviceFileSource(file.path!)),
-                  isPlaying = true
+                  if (acceptedAudioExtensions.contains(file.extension))
+                    {
+                      audioPlayer.play(DeviceFileSource(file.path!)),
+                      isPlaying = true
+                    }
+                  else
+                    {print("not an audio file")}
                 }
             }
         });
