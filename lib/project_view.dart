@@ -89,6 +89,7 @@ class _ProjectViewState extends State<ProjectView> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         ProjectIconView("Import", _selectFile),
@@ -150,7 +151,10 @@ class _ProjectViewState extends State<ProjectView> {
             )
           ],
         ),
-        isEditing
+        Expanded(
+          child: Container(
+              margin: EdgeInsets.only(top: 24),
+              child: isEditing
             ? TextFormField(
                 onTapOutside: (event) {
                   FocusScope.of(context).unfocus();
@@ -168,9 +172,8 @@ class _ProjectViewState extends State<ProjectView> {
                   });
                 },
               )
-            : Expanded(
-                child: SizedBox(height: 500, child: LyricsView(lyrics)),
-              )
+                  : LyricsView(lyrics)),
+        ),
       ],
     );
   }
