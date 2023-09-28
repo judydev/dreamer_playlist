@@ -19,8 +19,6 @@ class ProjectView extends StatefulWidget {
 class _ProjectViewState extends State<ProjectView> {
   late Project project;
 
-  // _ProjectViewState(this.project);
-
   AudioPlayer audioFilePlayer = AudioPlayer();
   bool isAudioFilePlaying = false;
 
@@ -31,14 +29,17 @@ class _ProjectViewState extends State<ProjectView> {
   Duration position = Duration.zero;
 
   bool isEditing = false;
+  bool isLooping = false;
 
   List<PlatformFile> audioFileList = [];
   String lyrics = "";
 
+  int loopStart = 0;
+  int loopEnd = 0;
+
   @override
   void initState() {
     super.initState();
-
     project = widget.project;
 
     setState(() {
@@ -60,16 +61,29 @@ class _ProjectViewState extends State<ProjectView> {
         });
       });
 
-      // todo: replay the same file
-      // audioFilePlayer.onPlayerComplete.listen((event) {
-      //   audioFilePlayer.play(audioFilePlayer.source!);
-      // });
+      audioFilePlayer.setReleaseMode(ReleaseMode.loop);
     });
   }
 
-  String formatTime(int seconds) {
-    return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
+  loop() {
+    if (isLooping) {
+      setState(() {
+        position = Duration(milliseconds: loopStart);
+        isAudioFilePlaying = true;
+        audioFilePlayer.seek(position);
+        audioFilePlayer.resume();
+      });
+    } else {
+      setState(() {
+        isAudioFilePlaying = false;
+        audioFilePlayer.pause();
+      });
+    }
   }
+
+  // String formatTime(int seconds) {
+  //   return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
+  // }
 
   void _selectFile() {
     FilePicker.platform.pickFiles().then((selectedFile) => {
@@ -108,17 +122,26 @@ class _ProjectViewState extends State<ProjectView> {
         ),
         Slider(
           min: 0.0,
-          max: duration.inSeconds.toDouble(),
-          value: position.inSeconds.toDouble(),
-          onChanged: (value) {
-            final position = Duration(seconds: value.toInt());
-            audioFilePlayer.seek(position);
+          thumbColor: Colors.green,
+          activeColor: Colors.greenAccent,
+          inactiveColor: Colors.lightGreenAccent,
+          max: duration.inMilliseconds.toDouble(),
+          value: position.inMilliseconds.toDouble(),
+          onChanged: ((double value) {
+            Duration newPosition = Duration(milliseconds: value.toInt());
+            audioFilePlayer.seek(newPosition);
             audioFilePlayer.resume();
-          },
+
+            setState(() {
+              position = newPosition;
+            });
+          }),
         ),
+
         Row(
           children: [
             FloatingActionButton(
+              backgroundColor: isAudioFilePlaying ? Colors.pink : Colors.grey,
               onPressed: audioFilePlayer.source == null
                   ? null
                   : () => {
@@ -148,30 +171,42 @@ class _ProjectViewState extends State<ProjectView> {
               heroTag: null,
               tooltip: 'Edit',
               child: Icon(Icons.edit),
-            )
+            ),
+            FloatingActionButton(
+              backgroundColor: isLooping ? Colors.blueAccent : Colors.grey,
+              onPressed: () => {
+                loop(),
+                setState(() {
+                  isLooping = !isLooping;
+                }),
+              },
+              heroTag: null,
+              tooltip: 'Loop',
+              child: Icon(Icons.loop),
+            ),
           ],
         ),
         Expanded(
           child: Container(
               margin: EdgeInsets.only(top: 24),
               child: isEditing
-            ? TextFormField(
-                onTapOutside: (event) {
-                  FocusScope.of(context).unfocus();
-                },
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                initialValue: lyrics,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Add lyrics here',
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    lyrics = value;
-                  });
-                },
-              )
+                  ? TextFormField(
+                      onTapOutside: (event) {
+                        FocusScope.of(context).unfocus();
+                      },
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      initialValue: lyrics,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Add lyrics here',
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          lyrics = value;
+                        });
+                      },
+                    )
                   : LyricsView(lyrics)),
         ),
       ],

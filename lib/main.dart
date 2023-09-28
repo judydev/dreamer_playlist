@@ -33,16 +33,15 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   // AudioCache audioCache = AudioCache(prefix: 'assets/audio/');
   List<Project> projects = [];
-  Project currentProject = Project(isEmpty: true, isNew: true);
-  bool isProjectEmpty = true;
+  Project? currentProject;
 
   setCurrentProjectCallBack() {
     setState(
       () {
-        currentProject.isEmpty = false;
-        isProjectEmpty = false;
+        currentProject ??= Project(isNew: true);
       },
     );
+    print(currentProject != null);
   }
 
   @override
@@ -55,17 +54,16 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 setState(() {
                   currentProject = Project(isEmpty: true);
-                  isProjectEmpty = true;
                 });
               },
               backgroundColor: Colors.amber,
               child: Icon(Icons.menu),
             )),
         resizeToAvoidBottomInset: false,
-        body: currentProject.isEmpty
+        body: currentProject == null
             ? ProjectIconView("New project", setCurrentProjectCallBack)
             : ProjectView(
-                project: currentProject,
+                project: currentProject ?? Project(),
               )      
         );
   }
