@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dreamer_app/helper.dart';
+import 'package:dreamer_app/local_storage.dart';
 import 'package:dreamer_app/lyrics_view.dart';
 import 'package:dreamer_app/project.dart';
 import 'package:dreamer_app/project_icon_view.dart';
@@ -10,7 +11,9 @@ List<String> acceptedAudioExtensions = List.unmodifiable(["m4a", "mp3", "wav"]);
 
 class ProjectView extends StatefulWidget {
   final Project project;
-  ProjectView({required this.project});
+  final LocalStorage storage;
+
+  ProjectView({required this.project, required this.storage});
 
   @override
   State<ProjectView> createState() => _ProjectViewState();
@@ -41,6 +44,14 @@ class _ProjectViewState extends State<ProjectView> {
   void initState() {
     super.initState();
     project = widget.project;
+
+    widget.storage.getLyricsFile(project.name).then(
+      (file) {
+        setState(() {
+          lyrics = file.readAsStringSync();
+        });
+      },
+    );
 
     setState(() {
       audioFilePlayer.onPlayerStateChanged.listen((state) {
@@ -85,7 +96,7 @@ class _ProjectViewState extends State<ProjectView> {
   //   return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
   // }
 
-  void _selectFile() {
+  void _openFilePicker() {
     FilePicker.platform.pickFiles().then((selectedFile) => {
           processSelectedFile(
               context,
@@ -106,7 +117,7 @@ class _ProjectViewState extends State<ProjectView> {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        ProjectIconView("Import", _selectFile),
+        ProjectIconView("Import", _openFilePicker),
         Row(
           children: [
             ...audioFileList.map((file) => FloatingActionButton(
@@ -137,7 +148,6 @@ class _ProjectViewState extends State<ProjectView> {
             });
           }),
         ),
-
         Row(
           children: [
             FloatingActionButton(
@@ -186,29 +196,7 @@ class _ProjectViewState extends State<ProjectView> {
             ),
           ],
         ),
-        Expanded(
-          child: Container(
-              margin: EdgeInsets.only(top: 24),
-              child: isEditing
-                  ? TextFormField(
-                      onTapOutside: (event) {
-                        FocusScope.of(context).unfocus();
-                      },
-                      keyboardType: TextInputType.multiline,
-                      maxLines: null,
-                      initialValue: lyrics,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Add lyrics here',
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          lyrics = value;
-                        });
-                      },
-                    )
-                  : LyricsView(lyrics)),
-        ),
+        LyricsView(lyrics, isEditing),
       ],
     );
   }
@@ -225,7 +213,7 @@ processSelectedFile(context, selectedFile, audioFilePlayer, callback) {
         audioFilePlayer.play(DeviceFileSource(file.path!));
         callback(file);
       } else {
-        showDialogPopup(
+        showAlertDialogPopup(
             context,
             "Warning",
             Text("The file you selected is not an audio file."),
