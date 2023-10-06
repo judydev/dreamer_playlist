@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:dreamer_app/project.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+
+class StorageProvider extends ChangeNotifier {}
 
 class LocalStorage {
   Future<String> get _localPath async {
@@ -26,7 +29,7 @@ class LocalStorage {
     return File('$path/$fileName');
   }
 
-  Future<String> initProject(String projectName) async {
+  Future<void> initProject(String projectName) async {
     try {
       String projectRoot = await getProjectRootDirectory(projectName);
       Directory dir = await Directory(projectRoot).create();
@@ -38,8 +41,16 @@ class LocalStorage {
       print('error when creating project');
       print(e);
     }
+  }
 
-    return projectName;
+  Future<void> deleteProject(String projectName) async {
+    try {
+      String projectRoot = await getProjectRootDirectory(projectName);
+      await Directory(projectRoot).delete(recursive: true);
+    } catch (e) {
+      print('error when deleting project');
+      print(e);
+    }
   }
 
   Future<File> getLyricsFile(String projectName) async {
@@ -47,7 +58,12 @@ class LocalStorage {
     File file = File("$rootDir/lyrics.txt");
     bool fileExists = file.existsSync();
     if (!fileExists) {
-      file.createSync();
+      try {
+        file.createSync();
+      } catch (e) {
+        print('error creating file');
+        print(e);
+      }
     }
     return file;
   }

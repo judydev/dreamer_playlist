@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-displayTextButton(context, String title, {callback}) {
+displayTextButton(BuildContext context, String title, {Function? callback}) {
   return (TextButton(
     child: Text(title),
     onPressed: () {

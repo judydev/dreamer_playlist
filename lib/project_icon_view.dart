@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 class ProjectIconView extends StatelessWidget {
   final String title;
   final Function? callback;
-  // final bool isNew;
 
-  ProjectIconView(this.title, this.callback);
-
+  ProjectIconView(this.title, {this.callback});
+  
   @override
   Widget build(BuildContext context) {
     return (Column(
       children: [
         FloatingActionButton(
-          onPressed: () => {callback!()},
+            onPressed: () => {
+                  if (callback != null) {callback!()}
+                },
             child: Icon(Icons.add)
         ),
         Text(title),

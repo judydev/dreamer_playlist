@@ -11,9 +11,8 @@ List<String> acceptedAudioExtensions = List.unmodifiable(["m4a", "mp3", "wav"]);
 
 class ProjectView extends StatefulWidget {
   final Project project;
-  final LocalStorage storage;
 
-  ProjectView({required this.project, required this.storage});
+  ProjectView({required this.project});
 
   @override
   State<ProjectView> createState() => _ProjectViewState();
@@ -45,7 +44,7 @@ class _ProjectViewState extends State<ProjectView> {
     super.initState();
     project = widget.project;
 
-    widget.storage.getLyricsFile(project.name).then(
+    LocalStorage().getLyricsFile(project.name).then(
       (file) {
         setState(() {
           lyrics = file.readAsStringSync();
@@ -117,7 +116,7 @@ class _ProjectViewState extends State<ProjectView> {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        ProjectIconView("Import", _openFilePicker),
+        ProjectIconView("Import", callback: _openFilePicker),
         Row(
           children: [
             ...audioFileList.map((file) => FloatingActionButton(
