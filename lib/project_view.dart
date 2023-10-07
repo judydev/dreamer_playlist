@@ -4,8 +4,10 @@ import 'package:dreamer_app/local_storage.dart';
 import 'package:dreamer_app/lyrics_view.dart';
 import 'package:dreamer_app/project.dart';
 import 'package:dreamer_app/project_icon_view.dart';
+import 'package:dreamer_app/providers.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 List<String> acceptedAudioExtensions = List.unmodifiable(["m4a", "mp3", "wav"]);
 
@@ -91,10 +93,6 @@ class _ProjectViewState extends State<ProjectView> {
     }
   }
 
-  // String formatTime(int seconds) {
-  //   return '${(Duration(seconds: seconds))}'.split('.')[0].padLeft(8, '0');
-  // }
-
   void _openFilePicker() {
     FilePicker.platform.pickFiles().then((selectedFile) => {
           processSelectedFile(
@@ -116,9 +114,19 @@ class _ProjectViewState extends State<ProjectView> {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        ProjectIconView("Import", callback: _openFilePicker),
+        AppBar(
+            title: Text(project.name),
+            leading: FloatingActionButton(
+              shape: CircleBorder(),
+              onPressed: () {
+                Provider.of<StateProvider>(context, listen: false)
+                    .currentProject = null;
+              },
+              child: Icon(Icons.arrow_back),
+            )),
         Row(
           children: [
+            ProjectIconView("Import an audio file", callback: _openFilePicker),
             ...audioFileList.map((file) => FloatingActionButton(
                   onPressed: () => {
                     audioFilePlayer.play(DeviceFileSource(file.path!)),
@@ -132,9 +140,8 @@ class _ProjectViewState extends State<ProjectView> {
         ),
         Slider(
           min: 0.0,
-          thumbColor: Colors.green,
-          activeColor: Colors.greenAccent,
-          inactiveColor: Colors.lightGreenAccent,
+          thumbColor: Colors.amber,
+          activeColor: Colors.amberAccent,
           max: duration.inMilliseconds.toDouble(),
           value: position.inMilliseconds.toDouble(),
           onChanged: ((double value) {

@@ -41,19 +41,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-            title: Text("Dreamer"),
-            leading: FloatingActionButton(
-              onPressed: () {
-                Provider.of<StateProvider>(context, listen: false)
-                    .currentProject = null;
-              },
-              backgroundColor: Colors.amber,
-              child: Icon(Icons.menu),
-            )),
         resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
+          padding: EdgeInsets.all(32.0),
           child: Provider.of<StateProvider>(context).currentProject == null
               ? ProjectsView()
             : ProjectView(

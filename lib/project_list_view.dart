@@ -5,11 +5,10 @@ import 'package:dreamer_app/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ProjectTileView extends StatelessWidget {
+// TODO: add viewing option on top menu bar to switch between grid and list view
+class ProjectListView extends StatelessWidget {
   final Project project;
-
-  ProjectTileView(this.project);
-
+  ProjectListView(this.project);
 
   @override
   Widget build(BuildContext context) {

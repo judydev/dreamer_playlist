@@ -11,6 +11,7 @@ class ProjectIconView extends StatelessWidget {
     return (Column(
       children: [
         FloatingActionButton(
+            shape: CircleBorder(),
             onPressed: () => {
                   if (callback != null) {callback!()}
                 },
@@ -21,31 +22,4 @@ class ProjectIconView extends StatelessWidget {
       ],
     ));
   }
-}
-
-getNewProjectIcon(String songName, setCurrentProjectCallBack) {
-  return (Column(
-    children: [
-      FloatingActionButton(
-        onPressed: setCurrentProjectCallBack,
-        tooltip: 'New',
-        child: const Icon(Icons.add),
-      ),
-      Text(songName),
-      // Text(lastModifiedDateTime)
-    ],
-  ));
-}
-
-getProjectIcon(String songName) {
-  return (Column(
-    children: [
-      FloatingActionButton(
-        onPressed: () => {},
-        child: const Icon(Icons.audio_file),
-      ),
-      Text(songName),
-      // Text(lastModifiedDateTime)
-    ],
-  ));
 }
