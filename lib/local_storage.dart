@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dreamer_app/project.dart';
+import 'package:dreamer_app/project_view.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -34,9 +35,10 @@ class LocalStorage {
       String projectRoot = await getProjectRootDirectory(projectName);
       Directory dir = await Directory(projectRoot).create();
 
-      File file = await File("${dir.path}/lyrics.txt").create();
+      File lyricsFile = await File("${dir.path}/lyrics.txt").create();
+      File timestampsFile = await File("${dir.path}/timestamps.txt").create();
       print('created lyrics file');
-      print(file);
+      print(lyricsFile);
     } catch (e) {
       print('error when creating project');
       print(e);
@@ -105,6 +107,25 @@ class LocalStorage {
     } catch (e) {
       print(e);
       throw Exception("Error getting projects");
+    }
+  }
+
+  Future<Project> readProject(Project project) async {
+    try {
+      final path = await _localPath;
+      File timestampsFile = File("$path/${project.name}/timestamps.txt");
+      File lyricsFile = File("$path/${project.name}/lyrics.txt");
+
+      List<String> timestampsList = timestampsFile.readAsLinesSync();
+      List<String> lyricsList = lyricsFile.readAsStringSync().split(delimiter);
+
+      project.timestampList = timestampsList.isEmpty ? [""] : timestampsList;
+      project.lyricsList = lyricsList.isEmpty ? [""] : lyricsList;
+
+      return project;
+    } catch (e) {
+      print(e);
+      throw Exception("Error getting project ${project.name}");
     }
   }
 

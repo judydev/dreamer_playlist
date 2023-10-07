@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 const double cardWidth = 240;
 const double cardHeight = 160;
-const double buttonSize = 24;
+const double buttonSize = 32;
 
 class ProjectGridView extends StatelessWidget {
   final Project project;
@@ -29,11 +29,19 @@ class ProjectGridView extends StatelessWidget {
                 onTap: () {
                   stateProvider.currentProject = project;
                 },
-                child: Row(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
+                    SizedBox(
+                      width: 240,
+                      height: 40,
+                    ),
+                    // Padding(padding: EdgeInsets.all(10)),
                     Text(project.name),
-                    Text(project.desription ?? ""),
+                    SizedBox(
+                      width: 240,
+                      height: 40,
+                    ),
                     SizedBox(
                       width: buttonSize,
                       height: buttonSize,
@@ -41,7 +49,9 @@ class ProjectGridView extends StatelessWidget {
                           tooltip: "delete",
                           onPressed: () {
                             deleteProject(context);
-                          }),
+                        },
+                        child: Icon(Icons.delete_outline),
+                      ),
                     ),
                   ],
                 )))));

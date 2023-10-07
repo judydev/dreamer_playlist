@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 List<String> acceptedAudioExtensions = List.unmodifiable(["m4a", "mp3", "wav"]);
-
+const String delimiter = "{:::}";
 class ProjectView extends StatefulWidget {
   final Project project;
 
@@ -32,7 +32,7 @@ class _ProjectViewState extends State<ProjectView> {
   Duration duration = Duration.zero;
   Duration position = Duration.zero;
 
-  bool isEditing = false;
+  bool isEditing = true;
   bool isLooping = false;
 
   List<PlatformFile> audioFileList = [];
@@ -41,10 +41,21 @@ class _ProjectViewState extends State<ProjectView> {
   int loopStart = 0;
   int loopEnd = 0;
 
+  List<double> timestampList = [];
+  List<String> lyricList = [];
+
   @override
   void initState() {
     super.initState();
     project = widget.project;
+
+    LocalStorage().readProject(project).then(
+      (fullProject) {
+        setState(() {
+          project = fullProject;
+        });
+      },
+    );
 
     LocalStorage().getLyricsFile(project.name).then(
       (file) {
@@ -179,6 +190,7 @@ class _ProjectViewState extends State<ProjectView> {
                   : Icon(Icons.play_arrow),
             ),
             FloatingActionButton(
+              backgroundColor: isEditing ? Colors.amberAccent : Colors.grey,
               onPressed: () => {
                 setState(() {
                   isEditing = !isEditing;
@@ -202,14 +214,14 @@ class _ProjectViewState extends State<ProjectView> {
             ),
           ],
         ),
-        LyricsView(lyrics, isEditing),
+        LyricsView(isEditing),
       ],
     );
   }
 }
 
 buildLyricsLineField(lyrics) {
-  return ([for (final line in lyrics.split("\n")) Text(line)]);
+  return ([for (final line in lyrics.split(delimiter)) Text(line)]);
 }
 
 processSelectedFile(context, selectedFile, audioFilePlayer, callback) {
