@@ -19,8 +19,18 @@ class _ProjectsViewState extends State<ProjectsView> {
         .then((value) => {stateProvider.projects = value});
 
     return (Column(children: [
-      // AppBar(),
-      Text("All Projects"), // TODO: add tabs for ["All", "Recent", "Starred"]
+      AppBar(
+        title: Text("All Projects"),
+        actions: [
+          InkWell(
+              onTap: (() {
+                print('select all');
+              }),
+              // child: Icon(Icons.check_box_outline_blank),
+              child: Text('Select All'))
+        ],
+      ),
+      // Text("All Projects"), // TODO: add tabs for ["All", "Recent", "Starred"]
       Wrap(
         direction: Axis.horizontal,
         clipBehavior: Clip.hardEdge,
@@ -30,7 +40,12 @@ class _ProjectsViewState extends State<ProjectsView> {
           NewProjectCardView(),
           ...Provider.of<StateProvider>(context)
               .projects
-              .map((project) => ProjectGridView(project)),
+              .asMap().entries.map(
+              (entry) => ProjectGridView(entry.value, entry.key,
+                      (editedProject, index) {
+                    Provider.of<StateProvider>(context, listen: false)
+                        .projects[index] = editedProject;
+                  })),
         ],
       )
     ]));

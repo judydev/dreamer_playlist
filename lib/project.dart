@@ -1,23 +1,30 @@
 class Project {
+  // String uuid = ""; // TODO
   String name = "";
-  String? desription = "";
-  bool isEmpty;
-  bool isNew;
+  String? description = "";
   List<String>? audioFiles = [];
   List<String>? recordings = [];
-  String? lyrics = "";
   List<String>? timestampList = [];
   List<String>? lyricsList = [""];
+  
+  Map<String, dynamic>? metadata;
 
   Project({
+    // required this.uuid,
     required this.name,
-    this.desription,
+    this.description,
     this.audioFiles,
     this.recordings,
-    this.lyrics,
-    this.isEmpty = true,
-    this.isNew = true,
     this.timestampList,
     this.lyricsList,
+    this.metadata,
   });
 }
+
+// class Metadata {
+//   int? sectionNumber = 1;
+
+//   Metadata({
+//     this.sectionNumber,
+//   });
+// }

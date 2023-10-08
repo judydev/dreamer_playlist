@@ -36,7 +36,6 @@ class _ProjectViewState extends State<ProjectView> {
   bool isLooping = false;
 
   List<PlatformFile> audioFileList = [];
-  String lyrics = "";
 
   int loopStart = 0;
   int loopEnd = 0;
@@ -54,14 +53,10 @@ class _ProjectViewState extends State<ProjectView> {
         setState(() {
           project = fullProject;
         });
-      },
-    );
 
-    LocalStorage().getLyricsFile(project.name).then(
-      (file) {
-        setState(() {
-          lyrics = file.readAsStringSync();
-        });
+        StateProvider stateProvider =
+            Provider.of<StateProvider>(context, listen: false);
+        stateProvider.currentProject = project;
       },
     );
 
@@ -135,6 +130,7 @@ class _ProjectViewState extends State<ProjectView> {
               },
               child: Icon(Icons.arrow_back),
             )),
+        Text(project.description ?? "No Description"),
         Row(
           children: [
             ProjectIconView("Import an audio file", callback: _openFilePicker),

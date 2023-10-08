@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:dreamer_app/project.dart';
 import 'package:dreamer_app/project_view.dart';
@@ -30,24 +31,76 @@ class LocalStorage {
     return File('$path/$fileName');
   }
 
-  Future<void> initProject(String projectName) async {
+  Future<Project> initProject(Project project) async {
     try {
-      String projectRoot = await getProjectRootDirectory(projectName);
+      String projectRoot = await getProjectRootDirectory(project.name);
       Directory dir = await Directory(projectRoot).create();
 
       File lyricsFile = await File("${dir.path}/lyrics.txt").create();
+      lyricsFile.writeAsStringSync("");
+      
       File timestampsFile = await File("${dir.path}/timestamps.txt").create();
-      print('created lyrics file');
-      print(lyricsFile);
+      timestampsFile.writeAsStringSync("");
+
+      File metadataFile = await File("${dir.path}/metadata.txt").create();
+      Map<String, dynamic> metadata = Map.of({});
+      metadata["name"] = project.name;
+      metadata["description"] = project.description;
+      metadata["created"] = DateTime.now().toString();
+      metadata["lastModified"] = DateTime.now().toString();
+      metadata["sectionNumber"] = 1;
+
+      project.metadata = metadata;
+
+      String metadataStr = jsonEncode(metadata);
+      metadataFile.writeAsStringSync(metadataStr);
     } catch (e) {
       print('error when creating project');
+      print(e);
+    }
+
+    return project;
+  }
+
+  Future<Project> editProject(Project project, String oldName) async {
+    String projectRoot = await getProjectRootDirectory(project.name);
+    Directory dir = Directory(projectRoot);
+    if (oldName != project.name) {
+      // rename project
+      String oldProjectRoot = await getProjectRootDirectory(oldName);
+      Directory oldDir = Directory(oldProjectRoot);
+      dir = await oldDir.rename(projectRoot);
+    }
+
+    try {
+      File metadataFile = File("${dir.path}/metadata.txt");
+      writeMetadataFile(metadataFile, "description", project.description!);
+    } catch (e) {
+      print("error when editing project");
+      print(e);
+    }
+
+    return project;
+  }
+
+  void writeMetadataFile(
+      File metadataFile, String propertyName, String propertyValue) {
+    try {
+      String jsonStr = metadataFile.readAsStringSync();
+      Map<String, dynamic> json =
+          jsonStr.isEmpty ? Map.of({}) : jsonDecode(jsonStr);
+      json[propertyName] = propertyValue;
+      String newJsonStr = jsonEncode(json);
+      metadataFile.writeAsStringSync(newJsonStr);
+    } catch (e) {
+      print("error when writing to metadata file");
       print(e);
     }
   }
 
   Future<void> deleteProject(String projectName) async {
     try {
-      String projectRoot = await getProjectRootDirectory(projectName);
+      String projectRoot = await getProjectRootDirectory(projectName); 
       await Directory(projectRoot).delete(recursive: true);
     } catch (e) {
       print('error when deleting project');
@@ -55,9 +108,10 @@ class LocalStorage {
     }
   }
 
-  Future<File> getLyricsFile(String projectName) async {
+  Future<File> getFileByName(String projectName, String fileName) async {
+    // TODO: replace projectName with uuid
     String rootDir = await getProjectRootDirectory(projectName);
-    File file = File("$rootDir/lyrics.txt");
+    File file = File("$rootDir/$fileName");
     bool fileExists = file.existsSync();
     if (!fileExists) {
       try {
@@ -71,8 +125,9 @@ class LocalStorage {
   }
 
   Future<String> getLyrics(String projectName) async {
+    // TODO: replace projectName with uuid
     try {
-      File file = await getLyricsFile(projectName);
+      File file = await getFileByName(projectName, "lyrics.txt");
       return file.readAsStringSync();
     } catch (e) {
       print('error getting lyrics');
@@ -83,10 +138,40 @@ class LocalStorage {
   }
 
   Future<File> writeLyricsToFile(String projectName, String lyrics) async {
-    File file = await getLyricsFile(projectName);
+    File file = await getFileByName(projectName, "lyrics.txt");
 
     // Write the file
-    return file.writeAsString(lyrics);
+    file.writeAsStringSync(lyrics);
+    return file;
+  }
+
+  Future<File> writeToFile(String projectName, String contents) async {
+    File file = await getFileByName(projectName, "metadata.txt");
+    file.writeAsStringSync(contents);
+    return file;
+  }
+
+  Future<File> writeSectionNumberToFile(
+      String projectName, int sectionNumber) async {
+    String rootDir = await getProjectRootDirectory(projectName);
+    File file = File("$rootDir/metadata.txt");
+    bool fileExists = file.existsSync();
+    if (!fileExists) {
+      try {
+        file.createSync();
+      } catch (e) {
+        print('error creating file');
+        print(e);
+      }
+    }
+
+    String str = file.readAsStringSync();
+    Map<String, dynamic> metadata = jsonDecode(str);
+    metadata["sectionNumber"] = sectionNumber;
+    String newMetadata = jsonEncode(metadata);
+    file.writeAsStringSync(newMetadata);
+
+    return file;
   }
 
   Future<List<Project>> readProjects() async {
@@ -98,8 +183,8 @@ class LocalStorage {
       if (dirExists) {
         for (FileSystemEntity entity in dir.listSync()) {
           List<String> strList = entity.path.split("/");
-          String projectName = strList[strList.length - 1];
-          list.add(Project(name: projectName));
+          String name = strList[strList.length - 1];
+          list.add(Project(name: name)); // TODO: replace name with uuid
         }
       }
 
@@ -113,14 +198,23 @@ class LocalStorage {
   Future<Project> readProject(Project project) async {
     try {
       final path = await _localPath;
-      File timestampsFile = File("$path/${project.name}/timestamps.txt");
-      File lyricsFile = File("$path/${project.name}/lyrics.txt");
+      // TODO: replace projectName with uuid
+      String prefix = "$path/${project.name}";
+      File timestampsFile = File("$prefix/timestamps.txt");
+      File lyricsFile = File("$prefix/lyrics.txt");
+      File metadataFile = File("$prefix/metadata.txt");
 
       List<String> timestampsList = timestampsFile.readAsLinesSync();
       List<String> lyricsList = lyricsFile.readAsStringSync().split(delimiter);
+      String jsonStr = metadataFile.readAsStringSync();
 
       project.timestampList = timestampsList.isEmpty ? [""] : timestampsList;
       project.lyricsList = lyricsList.isEmpty ? [""] : lyricsList;
+      Map<String, dynamic> json = jsonDecode(jsonStr);
+      project.metadata?["name"] = json["name"];
+      project.metadata?["description"] = json["description"];
+      project.metadata?["sectionNumber"] = json["sectionNumber"];
+      project.metadata?["lastModified"] = json["lastModified"];
 
       return project;
     } catch (e) {
@@ -128,7 +222,4 @@ class LocalStorage {
       throw Exception("Error getting project ${project.name}");
     }
   }
-
-  // readProject()
-  // saveProject()
 }

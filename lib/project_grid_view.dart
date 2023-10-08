@@ -1,5 +1,6 @@
 import 'package:dreamer_app/helper.dart';
 import 'package:dreamer_app/local_storage.dart';
+import 'package:dreamer_app/popups/edit_project_view.dart';
 import 'package:dreamer_app/project.dart';
 import 'package:dreamer_app/providers.dart';
 import 'package:flutter/material.dart';
@@ -11,13 +12,15 @@ const double buttonSize = 32;
 
 class ProjectGridView extends StatelessWidget {
   final Project project;
+  final int index;
+  final Function setCurrentProjectCallback;
 
-  ProjectGridView(this.project);
+  ProjectGridView(this.project, this.index, this.setCurrentProjectCallback);
 
   @override
   Widget build(BuildContext context) {
-    final stateProvider = Provider.of<StateProvider>(context, listen: false);
-
+    final stateProvider = Provider.of<StateProvider>(context);
+    
     return (SizedBox(
         // width: MediaQuery.of(context).size.width / 5 - 50,
         width: cardWidth,
@@ -32,51 +35,68 @@ class ProjectGridView extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    SizedBox(
-                      width: 240,
-                      height: 40,
-                    ),
+                    // SizedBox(
+                    //   width: 240,
+                    //   height: 40,
+                    // ),
                     // Padding(padding: EdgeInsets.all(10)),
                     Text(project.name),
+                    Text(project.description ?? "No description"),
+                    // SizedBox(
+                    //   width: 240,
+                    //   height: 40,
+                    // ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
                     SizedBox(
-                      width: 240,
-                      height: 40,
-                    ),
+                            width: buttonSize,
+                            height: buttonSize,
+                            child: InkWell(
+                                onTap: () {
+                                  editProject(context, project, index);
+                                },
+                                child: Icon(Icons.edit))),
                     SizedBox(
-                      width: buttonSize,
-                      height: buttonSize,
-                      child: FloatingActionButton(
-                          tooltip: "delete",
-                          onPressed: () {
-                            deleteProject(context);
-                        },
-                        child: Icon(Icons.delete_outline),
-                      ),
+                            width: buttonSize,
+                            height: buttonSize,
+                            child: InkWell(
+                                onTap: () {
+                                  deleteProject(context);
+                                },
+                                child: Icon(Icons.delete_outlined))),
+                      ],
                     ),
                   ],
                 )))));
   }
 
-  editProject(BuildContext context, Project project) {
-    String projectName = project.name;
+  editProject(BuildContext context, Project project, int index) {
+    String oldName = project.name;
+
     showAdaptiveDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Edit Project"),
-          // TODO: consolidate editProject() with createNewProject(), make a form widget
-          content: TextField(),
+          content: EditProjectView(project, (Project proj) {
+            project = proj;
+          }),
           actions: [
             displayTextButton(context, "Cancel"),
             displayTextButton(context, "OK",
                 callback: () => {
-                      LocalStorage().initProject(projectName).then(
-                        (value) {
-                          Provider.of<StateProvider>(context, listen: false)
-                                  .currentProject =
-                              Project(name: projectName, isNew: true);
-                        },
-                      )
+                      if (project.name.isEmpty)
+                        {print("name cannot be empty when editing project")}
+                      else
+                        {
+                          // TODO: add empty input validator, or disable OK button when empty
+                          LocalStorage().editProject(project, oldName).then(
+                            (newProject) {
+                              setCurrentProjectCallback(newProject, index);
+                            },
+                          )
+                        }
                     })
           ],
         );
@@ -107,7 +127,6 @@ class NewProjectCardView extends StatefulWidget {
 }
 
 class _NewProjectCardViewState extends State<NewProjectCardView> {
-  String projectName = "";
 
   @override
   Widget build(BuildContext context) {
@@ -131,35 +150,44 @@ class _NewProjectCardViewState extends State<NewProjectCardView> {
   }
 
   createNewProject(context) {
-    String projectName = "";
+    // String projectName = "";
+    // String description = "";
     StateProvider stateProvider =
         Provider.of<StateProvider>(context, listen: false);
+
+    Project project = Project(name: "");
+
     showAdaptiveDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("New Project"),
-          content: TextField(
-            decoration: InputDecoration(
-              labelText: "Project Name",
-            ),
-            onChanged: (value) {
-              setState(() {
-                projectName = value;
-              });
-            },
-          ),
+          content: EditProjectView(project, (Project proj) {
+            print('New Project showDialog');
+            print(proj.name);
+            print(proj.description);
+            project = proj;
+          }),
           actions: [
             displayTextButton(context, "Cancel"),
             displayTextButton(context, "OK",
                 callback: () => {
-                      // TODO: add empty input validator, or disable OK button when empty
-                      LocalStorage().initProject(projectName).then(
-                        (value) {
-                          stateProvider.currentProject =
-                              Project(name: projectName, isNew: true);
-                        },
-                      )
+                      print(project.name),
+                      print(project.description),
+                      if (project.name.isEmpty)
+                        {
+                          print("name cannot be empty"),
+                        }
+                      else
+                        {
+                          // project.uuid = Uuid().v4(),
+                          // TODO: add empty input validator, or disable OK button when empty
+                          LocalStorage().initProject(project).then(
+                            (newProject) {
+                              stateProvider.currentProject = newProject;
+                            },
+                          )
+                        }
                     })
           ],
         );
