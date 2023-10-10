@@ -150,8 +150,6 @@ class _NewProjectCardViewState extends State<NewProjectCardView> {
   }
 
   createNewProject(context) {
-    // String projectName = "";
-    // String description = "";
     StateProvider stateProvider =
         Provider.of<StateProvider>(context, listen: false);
 
@@ -172,8 +170,6 @@ class _NewProjectCardViewState extends State<NewProjectCardView> {
             displayTextButton(context, "Cancel"),
             displayTextButton(context, "OK",
                 callback: () => {
-                      print(project.name),
-                      print(project.description),
                       if (project.name.isEmpty)
                         {
                           print("name cannot be empty"),

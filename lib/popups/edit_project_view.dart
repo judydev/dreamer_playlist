@@ -1,9 +1,5 @@
-// import 'package:dreamer_app/helper.dart';
-// import 'package:dreamer_app/local_storage.dart';
 import 'package:dreamer_app/project.dart';
-// import 'package:dreamer_app/providers.dart';
 import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
 
 class EditProjectView extends StatefulWidget {
   final Project project;
@@ -16,21 +12,13 @@ class EditProjectView extends StatefulWidget {
 
 class _EditProjectViewState extends State<EditProjectView> {
   late Project project = widget.project;
-  late String name = project.name!;
+  late String name = project.name;
   late String? description = project.description;
 
   @override
   Widget build(BuildContext context) {
-    // projectName = project.name;
-    // projectDescription = "";
-    // final stateProvider = Provider.of<StateProvider>(context);
-    print('editView build');
-    print(project.name);
-    print(project.description);
-
     return (SizedBox(
-      height: 160,
-      width: 500,
+      height: MediaQuery.of(context).size.height / 5,
       child: Column(
         children: [
           TextFormField(
@@ -42,7 +30,6 @@ class _EditProjectViewState extends State<EditProjectView> {
               setState(() {
                 name = value;
               });
-              // widget.callback({"name": value});
 
               project.name = value;
               widget.callback(project);
@@ -50,21 +37,17 @@ class _EditProjectViewState extends State<EditProjectView> {
           ),
           TextFormField(
             decoration: InputDecoration(
-              // labelText: "Description (optional)",
               hintText: "Description (optional)",
-              // hintStyle: TextStyle(),
               border: OutlineInputBorder(),
             ),
             initialValue: project.description,
             onTapOutside: (event) {},
             keyboardType: TextInputType.multiline,
-            maxLines: 3,
-            // expands: true,
+            maxLines: 2,
             onChanged: (value) {
               setState(() {
                 description = value;
               });
-              // widget.callback({"description": value});
 
               project.description = value;
               widget.callback(project);
