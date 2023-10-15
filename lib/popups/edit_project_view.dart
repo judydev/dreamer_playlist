@@ -1,4 +1,4 @@
-import 'package:dreamer_app/project.dart';
+import 'package:dreamer_app/models/project.dart';
 import 'package:flutter/material.dart';
 
 class EditProjectView extends StatefulWidget {
