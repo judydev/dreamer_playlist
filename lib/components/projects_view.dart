@@ -1,8 +1,8 @@
-import 'package:dreamer_app/components/future_builder_wrapper.dart';
-import 'package:dreamer_app/components/project_grid_view.dart';
-import 'package:dreamer_app/providers/project_data_provider.dart';
+import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
+import 'package:dreamer_playlist/components/project_grid_view.dart';
+import 'package:dreamer_playlist/providers/project_data_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:dreamer_app/models/project.dart';
+import 'package:dreamer_playlist/models/project.dart';
 import 'package:provider/provider.dart';
 
 class ProjectsView extends StatefulWidget {

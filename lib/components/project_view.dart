@@ -1,5 +1,5 @@
-import 'package:dreamer_app/models/project.dart';
-import 'package:dreamer_app/providers/app_state_data_provider.dart';
+import 'package:dreamer_playlist/models/project.dart';
+import 'package:dreamer_playlist/providers/app_state_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

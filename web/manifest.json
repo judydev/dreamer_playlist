@@ -1,6 +1,6 @@
 {
-    "name": "dreamer_app",
-    "short_name": "dreamer_app",
+    "name": "dreamer_playlist",
+    "short_name": "dreamer_playlist",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -7,7 +7,7 @@ class DatabaseUtil {
       // Set the path to the database. Note: Using the `join` function from the
       // `path` package is best practice to ensure the path is correctly
       // constructed for each platform.
-      join(await getDatabasesPath(), 'dreamer_app.db'),
+      join(await getDatabasesPath(), 'dreamer_playlist.db'),
       // When the database is first created, create a table to store dogs.
       onCreate: (db, version) {
         db.execute(
@@ -24,7 +24,7 @@ class DatabaseUtil {
 
   static Future<Database> getDatabase() async {
     final database = openDatabase(
-      join(await getDatabasesPath(), 'dreamer_app.db'),
+      join(await getDatabasesPath(), 'dreamer_playlist.db'),
     );
     return await database;
   }

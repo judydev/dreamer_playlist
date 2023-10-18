@@ -1,11 +1,11 @@
-import 'package:dreamer_app/components/future_builder_wrapper.dart';
-import 'package:dreamer_app/models/project.dart';
-import 'package:dreamer_app/components/projects_view.dart';
-import 'package:dreamer_app/providers/app_state_data_provider.dart';
-import 'package:dreamer_app/providers/database_util.dart';
-import 'package:dreamer_app/providers/project_data_provider.dart';
+import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
+import 'package:dreamer_playlist/models/project.dart';
+import 'package:dreamer_playlist/components/projects_view.dart';
+import 'package:dreamer_playlist/providers/app_state_data_provider.dart';
+import 'package:dreamer_playlist/providers/database_util.dart';
+import 'package:dreamer_playlist/providers/project_data_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:dreamer_app/components/project_view.dart';
+import 'package:dreamer_playlist/components/project_view.dart';
 import 'package:provider/provider.dart';
 
 void main() async {

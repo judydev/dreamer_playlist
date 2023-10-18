@@ -1,6 +1,6 @@
-import 'package:dreamer_app/models/project.dart';
-import 'package:dreamer_app/providers/database_util.dart';
-import 'package:dreamer_app/providers/project_data_provider.dart';
+import 'package:dreamer_playlist/models/project.dart';
+import 'package:dreamer_playlist/providers/database_util.dart';
+import 'package:dreamer_playlist/providers/project_data_provider.dart';
 import 'package:flutter/material.dart';
 
 class AppStateDataProvider extends ChangeNotifier {

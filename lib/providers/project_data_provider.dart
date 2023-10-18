@@ -1,5 +1,5 @@
-import 'package:dreamer_app/models/project.dart';
-import 'package:dreamer_app/providers/database_util.dart';
+import 'package:dreamer_playlist/models/project.dart';
+import 'package:dreamer_playlist/providers/database_util.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 

@@ -1,4 +1,4 @@
-package com.example.dreamer_app
+package com.example.dreamer_playlist
 
 import io.flutter.embedding.android.FlutterActivity
 

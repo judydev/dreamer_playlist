@@ -1,8 +1,8 @@
-import 'package:dreamer_app/components/helper.dart';
-import 'package:dreamer_app/components/edit_project_view.dart';
-import 'package:dreamer_app/models/project.dart';
-import 'package:dreamer_app/providers/app_state_data_provider.dart';
-import 'package:dreamer_app/providers/project_data_provider.dart';
+import 'package:dreamer_playlist/components/helper.dart';
+import 'package:dreamer_playlist/components/edit_project_view.dart';
+import 'package:dreamer_playlist/models/project.dart';
+import 'package:dreamer_playlist/providers/app_state_data_provider.dart';
+import 'package:dreamer_playlist/providers/project_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
