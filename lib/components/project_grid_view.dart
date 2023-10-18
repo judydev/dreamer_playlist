@@ -1,5 +1,5 @@
-import 'package:dreamer_app/helpers/helper.dart';
-import 'package:dreamer_app/popups/edit_project_view.dart';
+import 'package:dreamer_app/components/helper.dart';
+import 'package:dreamer_app/components/edit_project_view.dart';
 import 'package:dreamer_app/models/project.dart';
 import 'package:dreamer_app/providers/app_state_data_provider.dart';
 import 'package:dreamer_app/providers/project_data_provider.dart';

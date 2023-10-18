@@ -2,7 +2,6 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseUtil {
-  //extends ChangeNotifier
   static Future<Database> initDatabase() async {
     final database = openDatabase(
       // Set the path to the database. Note: Using the `join` function from the
