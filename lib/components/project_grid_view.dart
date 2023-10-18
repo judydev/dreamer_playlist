@@ -39,7 +39,6 @@ class _ProjectsGridViewState extends State<ProjectGridView> {
   @override
   Widget build(BuildContext context) {    
     return (SizedBox(
-        // width: MediaQuery.of(context).size.width / 5 - 50,
         width: cardWidth,
         height: cardHeight,
         child: Card(
@@ -47,38 +46,14 @@ class _ProjectsGridViewState extends State<ProjectGridView> {
                 borderRadius: BorderRadius.all(Radius.circular(10))),
             child: InkWell(
                 onTap: () {
-                  // getCurrentProjectAppState().then((value) {
-                  //   print('111');
-                  //   print(value);
-                  // });
-
-                  // getAppState().then(
-                  //   (value) {
-                  //     print('22222');
-                  //     print(value);
-                  //   },
-                  // );
-
-                  print('tap');
-                  print(project);
                   Provider.of<AppStateDataProvider>(context, listen: false)
                       .updateCurrentProjectAppState(project.id!);
-                  // setCurrentProjectAppState(); //TODO
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    // SizedBox(
-                    //   width: 240,
-                    //   height: 40,
-                    // ),
-                    // Padding(padding: EdgeInsets.all(10)),
                     Text(project.name),
                     Text(project.description ?? "No description"),
-                    // SizedBox(
-                    //   width: 240,
-                    //   height: 40,
-                    // ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -185,9 +160,6 @@ class _NewProjectCardViewState extends State<NewProjectCardView> {
         return AlertDialog(
           title: Text("New Project"),
           content: EditProjectView(project, (Project proj) {
-            print('New Project showDialog');
-            print(proj.name);
-            print(proj.description);
             project = proj;
           }),
           actions: [

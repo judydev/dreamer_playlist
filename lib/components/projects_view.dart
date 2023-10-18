@@ -27,17 +27,7 @@ class _ProjectsViewState extends State<ProjectsView> {
     return (Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       AppBar(
         title: Text("All Projects"),
-        actions: [
-          InkWell(
-              onTap: (() {
-                print(
-                    'select all'); // TODO: batch select projects to duplicate/delete
-              }),
-              // child: Icon(Icons.check_box_outline_blank),
-              child: Text('Select All'))
-        ],
       ),
-      // Text("All Projects"), // TODO: add tabs for ["All", "Recent", "Starred"]
       FutureBuilder(
           future: _getAllProjects,
           builder: ((context, snapshot) {
@@ -47,7 +37,6 @@ class _ProjectsViewState extends State<ProjectsView> {
               return ErrorView(snapshot.error.toString());
             } else {
               List<Project> projects = snapshot.data ?? [];
-
               return Wrap(
                 direction: Axis.horizontal,
                 clipBehavior: Clip.hardEdge,

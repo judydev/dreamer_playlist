@@ -12,7 +12,7 @@ class FutureBuilderWrapper extends StatelessWidget {
       future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return Text("Loading lyrics...");
+          return Text("Loading...");
         } else if (snapshot.hasError) {
           return ErrorView(snapshot.error.toString());
         } else {

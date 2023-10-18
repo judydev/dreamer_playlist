@@ -4,15 +4,10 @@ class Project {
   late String? id = Uuid().v4();
   late String name;
   late String? description;
-  // final DateTime created;
-  // DateTime lastModified;
-  // bool archived = false;
 
   Project({
     this.id,
     required this.name,
-    // this.created,
-    // this.lastModified,
     this.description,
   });
 

@@ -10,7 +10,7 @@ class ProjectDataProvider extends ChangeNotifier {
     await db.insert(
       'projects',
       project.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace, // replace any previous data
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
     notifyListeners();
@@ -29,7 +29,6 @@ class ProjectDataProvider extends ChangeNotifier {
     });
 
     return projects;
-    // TODO: cache results
   }
 
   Future<Project?> getProjectById(String id) async {
@@ -58,7 +57,6 @@ class ProjectDataProvider extends ChangeNotifier {
   }
 
   Future<void> deleteProject(String id) async {
-    // TODO: mark isArchived as True instead of deleting?
     final db = await DatabaseUtil.getDatabase();
 
     await db.delete(
