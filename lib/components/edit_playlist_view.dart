@@ -22,7 +22,7 @@ class _EditPlaylistViewState extends State<EditPlaylistView> {
         children: [
           TextFormField(
             decoration: InputDecoration(
-              labelText: "Playlist Name",
+              labelText: "Title",
             ),
             initialValue: playlist.name,
             onChanged: (value) {

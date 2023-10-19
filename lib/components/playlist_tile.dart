@@ -1,6 +1,7 @@
 import 'package:dreamer_playlist/components/helper.dart';
-import 'package:dreamer_playlist/components/edit_project_view.dart';
+import 'package:dreamer_playlist/components/edit_playlist_view.dart';
 import 'package:dreamer_playlist/components/list_item_view.dart';
+import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/providers/app_state_data_provider.dart';
 import 'package:dreamer_playlist/providers/playlist_data_provider.dart';
@@ -30,9 +31,6 @@ class _PlaylistTileState extends State<PlaylistTile> {
     playlist = widget.playlist;
     index = widget.index;
     setCurrentPlaylistCallback = widget.setCurrentPlaylistCallback;
-
-    print(playlist.name);
-    print(playlist.id);
   }
 
   @override
@@ -41,41 +39,9 @@ class _PlaylistTileState extends State<PlaylistTile> {
       title: playlist.name!,
       leadingIcon: Icon(Icons.queue_music),
       // trailingIcon: Icon(Icons.arrow_forward_ios_rounded),
-      onTapAction: () {
-        print('select playlist');
-        print(playlist.name);
-        print(playlist.id);
+      onTapCallback: () {
         Provider.of<AppStateDataProvider>(context, listen: false)
-            .updateLastPlayedAppState(playlist.id);
-      },
-    );
-  }
-
-  editPlaylist(BuildContext context, Playlist playlist, int index) {
-    showAdaptiveDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Edit Playlist"),
-          content: EditPlaylistView(playlist, (Playlist updated) {
-            playlist = updated;
-          }),
-          actions: [
-            displayTextButton(context, "Cancel"),
-            displayTextButton(context, "OK",
-                callback: () => {
-                      // TODO: add empty input validator, or disable OK button when empty
-                      if (playlist.name!.isEmpty)
-                        {print("name cannot be empty when editing playlist")}
-                      else
-                        {
-                          Provider.of<PlaylistDataProvider>(context,
-                                  listen: false)
-                              .updatePlaylist(playlist)
-                        }
-                    })
-          ],
-        );
+            .updateAppState(AppStateKey.currentPlaylistId, playlist.id);
       },
     );
   }
@@ -86,8 +52,8 @@ class _PlaylistTileState extends State<PlaylistTile> {
 
     return showAlertDialogPopup(context, "Warning",
         Text("Are you sure you want to delete playlist ${playlist.name}?"), [
-      displayTextButton(context, "Yes", callback: () async {
-        await playlistDataProvider.deletePlaylist(playlist.id!);
+      displayTextButton(context, "Yes", callback: () {
+        playlistDataProvider.deletePlaylist(playlist.id);
       }),
       displayTextButton(context, "No")
     ]);
@@ -131,8 +97,7 @@ class _NewPlaylistTileState extends State<NewPlaylistTile> {
           actions: [
             displayTextButton(context, "Cancel"),
             displayTextButton(context, "OK",
-                callback: () async => {
-                      print(playlist.name),
+                callback: () => {
                       // TODO: add empty input validator, or disable OK button when empty
                       if (playlist.name == null)
                         {
@@ -140,7 +105,7 @@ class _NewPlaylistTileState extends State<NewPlaylistTile> {
                         }
                       else
                         {
-                          await Provider.of<PlaylistDataProvider>(context,
+                          Provider.of<PlaylistDataProvider>(context,
                                   listen: false)
                               .addPlaylist(playlist)
                         }

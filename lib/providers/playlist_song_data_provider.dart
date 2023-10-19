@@ -1,4 +1,3 @@
-import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/models/playlist_song.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:dreamer_playlist/providers/database_util.dart';
@@ -10,7 +9,9 @@ class PlaylistSongDataProvider extends ChangeNotifier {
     final db = await DatabaseUtil.getDatabase();
 
     PlaylistSong relation = PlaylistSong(
-        songId: songId, playlistId: playlistId, added: DateTime.now());
+        songId: songId,
+        playlistId: playlistId,
+        added: DateTime.now().millisecondsSinceEpoch);
     await db.insert(
       DatabaseUtil.playlistSongTableName,
       relation.toMap(),
@@ -22,49 +23,23 @@ class PlaylistSongDataProvider extends ChangeNotifier {
 
   Future<List<Song>> getAllSongsFromPlaylist(String playlistId) async {
     final db = await DatabaseUtil.getDatabase();
-    final List<Map<String, dynamic>> maps = await db.query(
-        DatabaseUtil.playlistSongTableName,
-        where: 'playlistId = "$playlistId"');
+    String sql =
+        'select * from ${DatabaseUtil.songTableName} where id in (select songId from ${DatabaseUtil.playlistSongTableName} where playlistId = "$playlistId")';
+    List<Map<String, dynamic>> maps = await db.rawQuery(sql);
 
-    List<Song> playlistSongs = List.generate(maps.length, (i) {
-      return Song().fromMapEntry(maps[i]);
-    });
-
-    return playlistSongs;
-  }
-
-  Future<Playlist?> getPlaylistById(String id) async {
-    print('id = $id');
-    final db = await DatabaseUtil.getDatabase();
-    final List<Map<String, dynamic>> maps =
-        await db.query(DatabaseUtil.playlistTableName, where: 'id = "$id"');
-    if (maps.isEmpty) {
-      return null;
-    }
-    return Playlist().fromMapEntry(maps[0]);
-  }
-
-  Future<void> updatePlaylist(Playlist playlist) async {
-    final db = await DatabaseUtil.getDatabase();
-
-    await db.update(
-      DatabaseUtil.playlistSongTableName,
-      playlist.toMap(),
-      where: 'id = ?',
-      whereArgs: [playlist.id],
+    List<Song> songs =
+        List.generate(maps.length, (i) => Song().fromMapEntry(maps[i])
     );
 
-    notifyListeners();
+    return songs;
   }
 
-  Future<void> deletePlaylist(String id) async {
+  Future<void> removeSongFromPlaylist(String songId, String playlistId) async {
     final db = await DatabaseUtil.getDatabase();
 
-    await db.delete(
-      DatabaseUtil.playlistSongTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete(DatabaseUtil.playlistSongTableName,
+        where: 'songId = ? AND playlistId = ?',
+        whereArgs: [songId, playlistId]);
 
     notifyListeners();
   }

@@ -1,12 +1,12 @@
 class AppState {
-  String key;
+  AppStateKey key;
   String value;
 
   AppState({required this.key, required this.value});
 
   Map<String, dynamic> toMap() {
     return {
-      key: value,
+      key.toString(): value,
     };
   }
 
@@ -15,3 +15,13 @@ class AppState {
     return 'AppState{$key: $value}';
   }
 }
+
+enum AppStateKey {
+  currentTab,
+  currentPlaylistId,
+  lastPlayed,
+  language,
+  darkMode
+}
+
+enum CurrentTab { library, playlists, favorites, preferences }

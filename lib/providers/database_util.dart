@@ -19,17 +19,21 @@ class DatabaseUtil {
         db.execute(
             'CREATE TABLE $appstateTableName (key TEXT PRIMARY KEY, value TEXT);');
         db.execute(
+            'INSERT INTO $appstateTableName ("key", "value") VALUES("currentTab", "Library")');
+        db.execute(
+            'INSERT INTO $appstateTableName ("key", "value") VALUES("currentPlaylistId", NULL)');
+        db.execute(
             'INSERT INTO $appstateTableName ("key", "value") VALUES("lastPlayed", NULL)');
         db.execute(
             'INSERT INTO $appstateTableName ("key", "value") VALUES("language", "EN")');
         db.execute(
             'INSERT INTO $appstateTableName ("key", "value") VALUES("darkMode", "false")');
         db.execute(
-            'CREATE TABLE $songTableName (id VARCHAR(16) PRIMARY KEY, name TEXT NOT NULL, path TEXT, loved BOOL, added DATETIME, lastPlayed DATETIME);');
+            'CREATE TABLE $songTableName (id VARCHAR(16) PRIMARY KEY, name TEXT NOT NULL, path TEXT, loved BOOL, added INTEGER, lastPlayed INTEGER);');
         db.execute(
-            'CREATE TABLE $playlistTableName (id VARCHAR(16) PRIMARY KEY, name TEXT NOT NULL, loved BOOL, added DATETIME, lastPlayed DATETIME, lastUpdated DATETIME);');
+            'CREATE TABLE $playlistTableName (id VARCHAR(16) PRIMARY KEY, name TEXT NOT NULL, loved BOOL, added INTEGER, lastPlayed INTEGER, lastUpdated INTEGER);');
         db.execute(
-            'CREATE TABLE $playlistSongTableName (id VARCHAR(16) PRIMARY KEY, playlistId VARCHAR(16), songId VARCHAR(16), added DATETIME, lastPlayed DATETIME, FOREIGN KEY (playlistId) REFERENCES Playlist (id), FOREIGN KEY (songId) REFERENCES Song (id));');
+            'CREATE TABLE $playlistSongTableName (id VARCHAR(16) PRIMARY KEY, playlistId VARCHAR(16), songId VARCHAR(16), added INTEGER, lastPlayed INTEGER, FOREIGN KEY (playlistId) REFERENCES Playlist (id) ON DELETE CASCADE, FOREIGN KEY (songId) REFERENCES Song (id) ON DELETE CASCADE);');
 
         return;
       },

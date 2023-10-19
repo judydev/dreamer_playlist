@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 class FutureBuilderWrapper extends StatelessWidget {
   final Future future;
   final Widget Function(BuildContext, AsyncSnapshot<dynamic>) buildFunction;
-  final String loadingText = 'Loading...';
+  final String? loadingText;
 
-  FutureBuilderWrapper(this.future, this.buildFunction, {loadingText});
+  FutureBuilderWrapper(this.future, this.buildFunction, {this.loadingText});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class FutureBuilderWrapper extends StatelessWidget {
       future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return Text(loadingText);
+          return Text(loadingText ?? 'Loading...');
         } else if (snapshot.hasError) {
           return ErrorView(snapshot.error.toString());
         } else {

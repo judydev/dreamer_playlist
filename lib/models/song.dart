@@ -1,23 +1,22 @@
+import 'dart:io';
 import 'package:uuid/uuid.dart';
 
 class Song {
-  late String? id = Uuid().v4();
+  late String id;
   late String? name;
   late String? path;
-  late bool? loved;
-  late DateTime? added;
-  late DateTime? lastPlayed;
+  int? loved = 0;
+  late int? added;
+  int? lastPlayed;
+  File? audioFile;
 
-  Song({this.id, this.name, this.loved, this.added, this.lastPlayed});
+  Song({this.name, this.path, this.added}) : id = Uuid().v4();
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'name': name,
       'path': path,
-      'loved': loved,
-      'added': added,
-      'lastPlayer': lastPlayed
     };
   }
 
@@ -30,17 +29,10 @@ class Song {
     lastPlayed = mapEntry['lastPlayed'];
 
     return this;
-    // return Song(
-    //   id: mapEntry['id'],
-    //   name: mapEntry['name'],
-    //   loved: mapEntry['loved'],
-    //   added: mapEntry['added'],
-    //   lastPlayed: mapEntry['lastPlayed'],
-    // );
   }
 
   @override
   String toString() {
-    return 'Project{id: $id, name: $name, path: $path, loved: $loved, added: $added, lastPlayed: $lastPlayed}';
+    return 'Song{id: $id, name: $name, path: $path, loved: $loved, added: $added, lastPlayed: $lastPlayed}';
   }
 }

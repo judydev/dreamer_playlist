@@ -4,10 +4,11 @@ class PlaylistSong {
   late String? id = Uuid().v4();
   late String? playlistId;
   late String? songId;
-  late DateTime? added;
-  late DateTime? lastPlayed;
+  late int? added;
+  late int? lastPlayed;
+  // Song? song;
 
-  PlaylistSong({this.playlistId, this.songId, this.added, this.lastPlayed})
+  PlaylistSong({this.playlistId, this.songId, this.added})
       : id = Uuid().v4();
 
   Map<String, dynamic> toMap() {
@@ -16,7 +17,6 @@ class PlaylistSong {
       'playlistId': playlistId,
       'songId': songId,
       'added': added,
-      'lastPlayed': lastPlayed
     };
   }
 

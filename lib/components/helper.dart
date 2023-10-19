@@ -1,4 +1,9 @@
+import 'package:dreamer_playlist/models/song.dart';
+import 'package:dreamer_playlist/providers/playlist_song_data_provider.dart';
+import 'package:dreamer_playlist/providers/song_data_provider.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 TextButton displayTextButton(BuildContext context, String title,
     {Function? callback}) {
@@ -26,4 +31,38 @@ Future<void> showAlertDialogPopup(
       );
     },
   );
+}
+
+List<String> acceptedAudioExtensions = List.unmodifiable(["m4a", "mp3", "wav"]);
+
+void openFilePicker(context, playlistId) {
+  Song song;
+  FilePicker.platform.pickFiles().then((selectedFile) async => {
+        if (selectedFile != null)
+          {
+            for (final file in selectedFile.files)
+              {
+                if (acceptedAudioExtensions.contains(file.extension))
+                  {
+                    song = await Provider.of<SongDataProvider>(context,
+                            listen: false)
+                        .addSong(file),
+                    if (playlistId != null)
+                      {
+                        await Provider.of<PlaylistSongDataProvider>(context,
+                                listen: false)
+                            .associateSongToPlaylist(song.id, playlistId),
+                      },
+                  }
+                else
+                  {
+                    showAlertDialogPopup(
+                        context,
+                        "Warning",
+                        Text("The file you selected is not an audio file."),
+                        [displayTextButton(context, "OK")])
+                  }
+              }
+          }
+      });
 }

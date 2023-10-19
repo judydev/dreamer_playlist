@@ -1,17 +1,17 @@
 import 'package:uuid/uuid.dart';
 
 class Playlist {
-  late String? id = Uuid().v4();
+  late String id;
   late String? name;
-  late bool? loved;
-  late DateTime? added;
-  late DateTime? lastPlayed;
-  late DateTime? lastUpdated;
+  int? loved = 0;
+  late int? added;
+  late int? lastPlayed;
+  late int? lastUpdated;
 
   Playlist(
-      {this.name, this.loved, this.added, this.lastPlayed, this.lastUpdated}) {
-    id ??= Uuid().v4();
-  }
+      {this.name, this.lastPlayed, this.lastUpdated})
+      : id = Uuid().v4(),
+        added = DateTime.now().millisecondsSinceEpoch;
 
   Map<String, dynamic> toMap() {
     return {
@@ -19,8 +19,6 @@ class Playlist {
       'name': name,
       'loved': loved,
       'added': added,
-      'lastPlayed': lastPlayed,
-      'lastUpdated': lastUpdated
     };
   }
 

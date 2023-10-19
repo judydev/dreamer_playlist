@@ -4,12 +4,12 @@ class ListItemView extends StatelessWidget {
   final Widget? leadingIcon;
   final Widget? trailingIcon;
   final String title;
-  final void Function()? onTapAction;
+  final void Function()? onTapCallback;
   ListItemView(
       {this.leadingIcon,
       this.trailingIcon,
       required this.title,
-      this.onTapAction});
+      this.onTapCallback});
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +20,6 @@ class ListItemView extends StatelessWidget {
             trailing: trailingIcon,
             title: Text(title),
             contentPadding: EdgeInsets.all(10),
-            onTap: onTapAction));
+            onTap: onTapCallback));
   }
 }

@@ -6,6 +6,7 @@ import 'package:sqflite/sqflite.dart';
 class PlaylistDataProvider extends ChangeNotifier {
   Future<void> addPlaylist(Playlist playlist) async {
     final db = await DatabaseUtil.getDatabase();
+    playlist.added = DateTime.now().millisecondsSinceEpoch;
 
     await db.insert(
       DatabaseUtil.playlistTableName,
@@ -39,14 +40,14 @@ class PlaylistDataProvider extends ChangeNotifier {
     return Playlist().fromMapEntry(maps[0]);
   }
 
-  Future<void> updatePlaylist(Playlist playlist) async {
+  Future<void> updatePlaylistName(String playlistId, String newName) async {
     final db = await DatabaseUtil.getDatabase();
 
     await db.update(
       DatabaseUtil.playlistTableName,
-      playlist.toMap(),
+      {'name': newName},
       where: 'id = ?',
-      whereArgs: [playlist.id],
+      whereArgs: [playlistId],
     );
 
     notifyListeners();
@@ -61,6 +62,28 @@ class PlaylistDataProvider extends ChangeNotifier {
       whereArgs: [id],
     );
 
+    notifyListeners();
+  }
+
+  Future<List<Playlist>> getFavoritePlaylists() async {
+    final db = await DatabaseUtil.getDatabase();
+
+    List<Map<String, dynamic>> maps = await db.query(
+        DatabaseUtil.playlistTableName,
+        where: 'loved = ?',
+        whereArgs: [1]);
+
+    List<Playlist> playlists =
+        List.generate(maps.length, (i) => Playlist().fromMapEntry(maps[i]));
+
+    return playlists;
+  }
+
+  Future<void> updatePlaylistFavorite(String playlistId, bool loved) async {
+    final db = await DatabaseUtil.getDatabase();
+    await db.update(DatabaseUtil.playlistTableName, {'loved': loved ? 1 : 0},
+        where: 'id = ?', whereArgs: [playlistId]);
+    // TODO: handle exceptions when update fails, and display error on UI
     notifyListeners();
   }
 }

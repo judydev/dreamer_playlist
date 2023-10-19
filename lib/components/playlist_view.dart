@@ -1,13 +1,15 @@
+import 'package:dreamer_playlist/components/edit_playlist_view.dart';
 import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
 import 'package:dreamer_playlist/components/helper.dart';
 import 'package:dreamer_playlist/components/song_tile.dart';
+import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:dreamer_playlist/providers/app_state_data_provider.dart';
+import 'package:dreamer_playlist/providers/playlist_data_provider.dart';
 import 'package:dreamer_playlist/providers/playlist_song_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:file_picker/file_picker.dart';
 
 class PlaylistView extends StatefulWidget {
   final Playlist playlist;
@@ -30,7 +32,7 @@ class _PlaylistViewState extends State<PlaylistView> {
 
     playlistSongDataProvider = Provider.of<PlaylistSongDataProvider>(context);
     _getPlaylistSongs =
-        playlistSongDataProvider.getAllSongsFromPlaylist(playlist.id!);
+        playlistSongDataProvider.getAllSongsFromPlaylist(playlist.id);
   }
 
   @override
@@ -45,22 +47,87 @@ class _PlaylistViewState extends State<PlaylistView> {
               icon: Icon(Icons.arrow_back_ios_new),
               onPressed: () {
                 Provider.of<AppStateDataProvider>(context, listen: false)
-                    .updateLastPlayedAppState(null);
+                    .updateAppState(AppStateKey.currentPlaylistId, null);
               },
             )),
-        IconButton(
-            icon: Icon(Icons.add_box_outlined),
-            tooltip: "Add Music",
-            onPressed: () {
-              _openFilePicker();
-            }),
+        Row(
+          children: [
+            IconButton(
+                icon: Icon(Icons.add_box_outlined),
+                tooltip: "Add Music",
+                onPressed: () {
+                  openFilePicker(context, playlist.id);
+                }),
+            IconButton(
+                icon: Icon(Icons.edit),
+                tooltip: "Edit Playlist",
+                onPressed: () {
+                  showAdaptiveDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("Edit Playlist"),
+                        content: EditPlaylistView(playlist, (Playlist updated) {
+                          playlist = updated;
+                        }),
+                        actions: [
+                          displayTextButton(context, "Cancel"),
+                          displayTextButton(context, "OK",
+                              callback: () => {
+                                    // TODO: add empty input validator, or disable OK button when empty
+                                    if (playlist.name == null)
+                                      {
+                                        print("name cannot be empty"),
+                                      }
+                                    else
+                                      {
+                                        Provider.of<PlaylistDataProvider>(
+                                                context,
+                                                listen: false)
+                                            .updatePlaylistName(
+                                                playlist.id, playlist.name!)
+                                      }
+                                  })
+                        ],
+                      );
+                    },
+                  );
+                }),
+            IconButton(
+                icon: Icon(Icons.delete_outline),
+                tooltip: "Delete Playlist",
+                onPressed: () {
+                  showAlertDialogPopup(
+                      context,
+                      "Warning",
+                      Text(
+                          "Are you sure you want to delete playlist ${playlist.name}?"),
+                      [
+                        displayTextButton(context, "Yes", callback: () {
+                          Provider.of<PlaylistDataProvider>(context,
+                                  listen: false)
+                              .deletePlaylist(playlist.id);
+                          Provider.of<AppStateDataProvider>(context,
+                                  listen: false)
+                              .updateAppState(
+                                  AppStateKey.currentPlaylistId, null);
+                        }),
+                        displayTextButton(context, "No")
+                      ]);
+                }),
+          ],
+        ),
         FutureBuilderWrapper(_getPlaylistSongs, loadingText: 'Loading songs...',
             (context, snapshot) {
           List<Song> songs = snapshot.data;
-          print(songs);
           if (songs.isNotEmpty) {
             return Column(
-              children: [...songs.map((song) => SongTile(song))],
+              children: [
+                ...songs.map((song) => SongTile(
+                      song,
+                      currentPlaylistId: playlist.id,
+                    ))
+              ],
             );
           } else {
             return Text("No songs in this playlist.");
@@ -69,32 +136,5 @@ class _PlaylistViewState extends State<PlaylistView> {
       ],
     );
   }
-
-  void _openFilePicker() {
-    FilePicker.platform.pickFiles().then((selectedFile) => {
-          if (selectedFile != null)
-            {
-              for (final file in selectedFile.files)
-                {
-                  if (acceptedAudioExtensions.contains(file.extension))
-                    {
-                      // add song to db
-                      // copy song file to storage
-
-                      // callback(file);
-                    }
-                  else
-                    {
-                      showAlertDialogPopup(
-                          context,
-                          "Warning",
-                          Text("The file you selected is not an audio file."),
-                          [displayTextButton(context, "OK")])
-                    }
-                }
-            }
-        });
-  }
 }
 
-List<String> acceptedAudioExtensions = List.unmodifiable(["m4a", "mp3", "wav"]);
