@@ -1,12 +1,11 @@
-import 'package:dreamer_playlist/models/project.dart';
 import 'package:dreamer_playlist/providers/database_util.dart';
-import 'package:dreamer_playlist/providers/project_data_provider.dart';
 import 'package:flutter/material.dart';
 
 class AppStateDataProvider extends ChangeNotifier {
   Future<Map<String, dynamic>> getAppState() async {
     final db = await DatabaseUtil.getDatabase();
-    final List<Map<String, dynamic>> maps = await db.query('appstate');
+    final List<Map<String, dynamic>> maps =
+        await db.query(DatabaseUtil.appstateTableName);
     Map<String, dynamic> appStates = {};
     for (var state in maps) {
       appStates[state['key']] = state['value'];
@@ -14,28 +13,27 @@ class AppStateDataProvider extends ChangeNotifier {
     return appStates;
   }
 
-  Future<Project?> getCurrentProjectAppState() async {
+  Future<String?> getLastPlayedAppState() async {
     final db = await DatabaseUtil.getDatabase();
-    final List<Map<String, dynamic>> maps = await db.query('appstate',
-        columns: ["value"], where: 'key == "currentProjectId"');
+    final List<Map<String, dynamic>> maps = await db.query(
+        DatabaseUtil.appstateTableName,
+        columns: ["value"],
+        where: 'key = "lastPlayed"');
 
     if (maps.isEmpty) {
       throw Exception("currentProjectId app state missing");
     }
 
-    String? currentProjectId = maps[0]['value'];
-    if (currentProjectId == null) {
-      return null;
-    } else {
-      return ProjectDataProvider().getProjectById(currentProjectId);
-    }
+    String? lastPlayed = maps[0]['value'];
+    return lastPlayed;
   }
 
-  Future<void> updateCurrentProjectAppState(String? currentProjectId) async {
+  Future<void> updateLastPlayedAppState(String? lastPlayedId) async {
     final db = await DatabaseUtil.getDatabase();
 
-    await db.rawUpdate('update appstate SET value = ? WHERE key = ?',
-        [currentProjectId, 'currentProjectId']);
+    await db.rawUpdate(
+        'update ${DatabaseUtil.appstateTableName} SET value = ? WHERE key = ?',
+        [lastPlayedId, 'lastPlayed']);
     notifyListeners();
   }
 }

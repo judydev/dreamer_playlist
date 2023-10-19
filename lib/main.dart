@@ -1,11 +1,13 @@
+import 'package:dreamer_playlist/components/bottom_menu_bar_view.dart';
 import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
-import 'package:dreamer_playlist/models/project.dart';
-import 'package:dreamer_playlist/components/projects_view.dart';
+import 'package:dreamer_playlist/components/playlist_view.dart';
+import 'package:dreamer_playlist/components/playlists_view.dart';
+import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/providers/app_state_data_provider.dart';
 import 'package:dreamer_playlist/providers/database_util.dart';
-import 'package:dreamer_playlist/providers/project_data_provider.dart';
+import 'package:dreamer_playlist/providers/playlist_data_provider.dart';
+import 'package:dreamer_playlist/providers/playlist_song_data_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:dreamer_playlist/components/project_view.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -14,11 +16,14 @@ void main() async {
 
   runApp(
     MultiProvider(providers: [
-      ChangeNotifierProvider<ProjectDataProvider>(
-        create: (context) => ProjectDataProvider(),
-      ),
       ChangeNotifierProvider<AppStateDataProvider>(
         create: (context) => AppStateDataProvider(),
+      ),
+      ChangeNotifierProvider<PlaylistDataProvider>(
+        create: (context) => PlaylistDataProvider(),
+      ),
+      ChangeNotifierProvider<PlaylistSongDataProvider>(
+        create: (context) => PlaylistSongDataProvider(),
       ),
     ], child: MyApp()),
   );
@@ -30,7 +35,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Dreamer',
+      title: 'Dreamer Playlist',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
         useMaterial3: true,
@@ -49,31 +54,35 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late AppStateDataProvider appStateDataProvider;
-  late Future<Project?> _getCurrentProjectAppState;
+  late Future<String?> _getCurrentPlaylistAppState;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     appStateDataProvider = Provider.of<AppStateDataProvider>(context);
-    _getCurrentProjectAppState =
-        appStateDataProvider.getCurrentProjectAppState();
+    _getCurrentPlaylistAppState = appStateDataProvider.getLastPlayedAppState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        bottomNavigationBar: BottomMenuBarView(),
         resizeToAvoidBottomInset: false,
         body: SingleChildScrollView(
-          padding: EdgeInsets.all(32.0),
-            child: FutureBuilderWrapper(_getCurrentProjectAppState,
+            child: FutureBuilderWrapper(_getCurrentPlaylistAppState,
                 (context, snapshot) {
-              Project? currentProject = snapshot.data;
-                    if (currentProject == null) {
-                      return ProjectsView();
-                    } else {
-                      return ProjectView(project: currentProject);
-                    }
-            })));
+          String? currentPlaylistId = snapshot.data;
+          if (currentPlaylistId != null) {
+            return FutureBuilderWrapper(
+                Provider.of<PlaylistDataProvider>(context, listen: false)
+                    .getPlaylistById(currentPlaylistId), (context, snapshot) {
+              Playlist playlist = snapshot.data;
+              return PlaylistView(playlist: playlist);
+            });
+          } else {
+            return PlaylistsView();
+          }
+        })));
   }
 }

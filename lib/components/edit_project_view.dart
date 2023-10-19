@@ -1,19 +1,18 @@
-import 'package:dreamer_playlist/models/project.dart';
+import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:flutter/material.dart';
 
-class EditProjectView extends StatefulWidget {
-  final Project project;
+class EditPlaylistView extends StatefulWidget {
+  final Playlist playlist;
   final Function callback;
-  EditProjectView(this.project, this.callback);
+  EditPlaylistView(this.playlist, this.callback);
 
   @override
-  State<StatefulWidget> createState() => _EditProjectViewState();
+  State<StatefulWidget> createState() => _EditPlaylistViewState();
 }
 
-class _EditProjectViewState extends State<EditProjectView> {
-  late Project project = widget.project;
-  late String name = project.name;
-  late String? description = project.description;
+class _EditPlaylistViewState extends State<EditPlaylistView> {
+  late Playlist playlist = widget.playlist;
+  late String? name = playlist.name;
 
   @override
   Widget build(BuildContext context) {
@@ -23,34 +22,16 @@ class _EditProjectViewState extends State<EditProjectView> {
         children: [
           TextFormField(
             decoration: InputDecoration(
-              labelText: "Project Name",
+              labelText: "Playlist Name",
             ),
-            initialValue: project.name,
+            initialValue: playlist.name,
             onChanged: (value) {
               setState(() {
                 name = value;
               });
 
-              project.name = value;
-              widget.callback(project);
-            },
-          ),
-          TextFormField(
-            decoration: InputDecoration(
-              hintText: "Description (optional)",
-              border: OutlineInputBorder(),
-            ),
-            initialValue: project.description,
-            onTapOutside: (event) {},
-            keyboardType: TextInputType.multiline,
-            maxLines: 2,
-            onChanged: (value) {
-              setState(() {
-                description = value;
-              });
-
-              project.description = value;
-              widget.callback(project);
+              playlist.name = value;
+              widget.callback(playlist);
             },
           ),
         ],
