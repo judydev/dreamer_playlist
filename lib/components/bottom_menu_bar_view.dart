@@ -10,8 +10,8 @@ class BottomMenuBarView extends StatelessWidget {
       color: Colors.white38,
       child: IconTheme(
         data: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
-        child: Flex(
-          direction: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             IconButton(
               style: ButtonStyle(
@@ -51,6 +51,16 @@ class BottomMenuBarView extends StatelessWidget {
               onPressed: () {
                 Provider.of<AppStateDataProvider>(context, listen: false)
                     .updateCurrentTab(CurrentTab.preferences);
+              },
+            ),
+            IconButton(
+              style: ButtonStyle(
+                  iconColor:
+                      MaterialStateColor.resolveWith((states) => Colors.blue)),
+              icon: const Icon(Icons.pause_circle),
+              onPressed: () {
+                Provider.of<AppStateDataProvider>(context, listen: false)
+                    .updateAppState(AppStateKey.currentPlaying, null);
               },
             ),
           ],

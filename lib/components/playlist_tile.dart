@@ -35,7 +35,7 @@ class _PlaylistTileState extends State<PlaylistTile> {
 
   @override
   Widget build(BuildContext context) {
-    return ListItemView(
+    return ListTileView(
       title: playlist.name!,
       leadingIcon: Icon(Icons.queue_music),
       // trailingIcon: Icon(Icons.arrow_forward_ios_rounded),
@@ -107,7 +107,11 @@ class _NewPlaylistTileState extends State<NewPlaylistTile> {
                         {
                           Provider.of<PlaylistDataProvider>(context,
                                   listen: false)
-                              .addPlaylist(playlist)
+                              .addPlaylist(playlist),
+                          Provider.of<AppStateDataProvider>(context,
+                                  listen: false)
+                              .updateAppState(
+                                  AppStateKey.currentPlaylistId, playlist.id),
                         }
                     })
           ],

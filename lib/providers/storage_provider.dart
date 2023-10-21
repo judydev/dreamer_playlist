@@ -15,17 +15,16 @@ class StorageProvider extends ChangeNotifier {
     return dir.path;
   }
 
-  Future<File> getAudioFile(String fileId) async {
-    final path = await getLocalStoragePath();
+  File getAudioFile(String path) {
     File file = File(path);
     if (!file.existsSync()) {
-      // TODO: better handlin this
+      // TODO: better handling this
       throw Exception("Cannot find file");
     }
     return file;
   }
 
-  String _getFilenameFromPlatformFile(String fullname, String extension) {
+  static String getFilenameFromPlatformFile(String fullname, String extension) {
     int index = fullname.lastIndexOf(extension);
     return fullname.substring(0, index - 1);
   }
@@ -33,7 +32,7 @@ class StorageProvider extends ChangeNotifier {
   Future<File> addSongFileToLocalStorage(PlatformFile selectedFile) async {
     String? extension = selectedFile.extension;
     String filename =
-        _getFilenameFromPlatformFile(selectedFile.name, extension!);
+        getFilenameFromPlatformFile(selectedFile.name, extension!);
     
     // copy song to local storage
     final path = await getLocalStoragePath();

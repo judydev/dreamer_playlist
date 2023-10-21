@@ -33,27 +33,31 @@ class _LibraryViewState extends State<LibraryView> {
           title: Text('All Songs'),
         ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             IconButton(
-                icon: Icon(Icons.play_circle_outline),
-                tooltip: "Play",
                 onPressed: () {
-                  print('play');
-                }),
+                  print('batch edit songs (e.g. batch delete)');
+                },
+                icon: Icon(Icons.edit)),
             IconButton(
-                icon: Icon(Icons.shuffle),
-                tooltip: "Shuffle",
                 onPressed: () {
-                  print('shuffle');
-                }),
+                  print('Play current playlist');
+                },
+                icon: Icon(Icons.play_circle, size: 42)),
             IconButton(
-                icon: Icon(Icons.add_box_outlined),
-                tooltip: "Add Music",
                 onPressed: () {
-                  openFilePicker(context, null);
-                }),
+                  print('shuffle play current playlist');
+                },
+                icon: Icon(Icons.shuffle)),
           ],
         ),
+        // ImportMusicTile(null),
+        TextButton(
+            onPressed: () {
+              openFilePicker(context, null);
+            },
+            child: Text("Import local file to Library")),
         FutureBuilderWrapper(_getAllSongs, loadingText: 'Loading all songs...',
             (context, snapshot) {
           List<Song> songs = snapshot.data;

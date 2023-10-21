@@ -1,19 +1,17 @@
-import 'package:dreamer_playlist/components/edit_playlist_view.dart';
-import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
+import 'package:dreamer_playlist/components/add_music_popup.dart';
+import 'package:dreamer_playlist/components/edit_playlist_popup.dart';
 import 'package:dreamer_playlist/components/helper.dart';
-import 'package:dreamer_playlist/components/song_tile.dart';
+import 'package:dreamer_playlist/components/popup_menu_tile.dart';
+import 'package:dreamer_playlist/components/playlist_view_songlist.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
-import 'package:dreamer_playlist/models/song.dart';
 import 'package:dreamer_playlist/providers/app_state_data_provider.dart';
 import 'package:dreamer_playlist/providers/playlist_data_provider.dart';
-import 'package:dreamer_playlist/providers/playlist_song_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class PlaylistView extends StatefulWidget {
   final Playlist playlist;
-
   PlaylistView({required this.playlist});
 
   @override
@@ -22,18 +20,6 @@ class PlaylistView extends StatefulWidget {
 
 class _PlaylistViewState extends State<PlaylistView> {
   late Playlist playlist = widget.playlist;
-
-  late PlaylistSongDataProvider playlistSongDataProvider;
-  late Future<List<Song>> _getPlaylistSongs;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    playlistSongDataProvider = Provider.of<PlaylistSongDataProvider>(context);
-    _getPlaylistSongs =
-        playlistSongDataProvider.getAllSongsFromPlaylist(playlist.id);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,92 +35,129 @@ class _PlaylistViewState extends State<PlaylistView> {
                 Provider.of<AppStateDataProvider>(context, listen: false)
                     .updateAppState(AppStateKey.currentPlaylistId, null);
               },
-            )),
+            )), // TODO: hide when first open
+        Padding(
+          padding: EdgeInsets.all(20),
+          child: Icon(Icons.music_video, size: 64),
+        ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             IconButton(
-                icon: Icon(Icons.add_box_outlined),
-                tooltip: "Add Music",
                 onPressed: () {
-                  openFilePicker(context, playlist.id);
-                }),
+                  Provider.of<PlaylistDataProvider>(context, listen: false)
+                      .updatePlaylistFavorite(playlist);
+                },
+                icon: playlist.loved == 1
+                    ? Icon(Icons.favorite)
+                    : Icon(Icons.favorite_border)),
             IconButton(
-                icon: Icon(Icons.edit),
-                tooltip: "Edit Playlist",
                 onPressed: () {
                   showAdaptiveDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text("Edit Playlist"),
-                        content: EditPlaylistView(playlist, (Playlist updated) {
-                          playlist = updated;
-                        }),
-                        actions: [
-                          displayTextButton(context, "Cancel"),
-                          displayTextButton(context, "OK",
-                              callback: () => {
-                                    // TODO: add empty input validator, or disable OK button when empty
-                                    if (playlist.name == null)
-                                      {
-                                        print("name cannot be empty"),
-                                      }
-                                    else
-                                      {
-                                        Provider.of<PlaylistDataProvider>(
-                                                context,
-                                                listen: false)
-                                            .updatePlaylistName(
-                                                playlist.id, playlist.name!)
-                                      }
-                                  })
-                        ],
-                      );
-                    },
-                  );
-                }),
+                      context: context,
+                      builder: (context) {
+                        return EditPlaylistPopup(playlist);
+                      });
+                },
+                icon: Icon(Icons.edit)),
             IconButton(
-                icon: Icon(Icons.delete_outline),
-                tooltip: "Delete Playlist",
                 onPressed: () {
-                  showAlertDialogPopup(
-                      context,
-                      "Warning",
-                      Text(
-                          "Are you sure you want to delete playlist ${playlist.name}?"),
-                      [
-                        displayTextButton(context, "Yes", callback: () {
-                          Provider.of<PlaylistDataProvider>(context,
-                                  listen: false)
-                              .deletePlaylist(playlist.id);
-                          Provider.of<AppStateDataProvider>(context,
-                                  listen: false)
-                              .updateAppState(
-                                  AppStateKey.currentPlaylistId, null);
-                        }),
-                        displayTextButton(context, "No")
-                      ]);
-                }),
+                  print('Play current playlist');
+                },
+                icon: Icon(Icons.play_circle, size: 42)),
+            IconButton(
+                onPressed: () {
+                  print('shuffle play current playlist');
+                },
+                icon: Icon(Icons.shuffle)),
+            IconButton(
+              onPressed: () {
+                print('playlist more actions');
+              },
+              icon: PopupMenuButton(
+                position: PopupMenuPosition.under,
+                child: Icon(Icons.more_vert),
+                itemBuilder: (context) => _buildMoreActionsMenu(),
+              ),
+            )
           ],
         ),
-        FutureBuilderWrapper(_getPlaylistSongs, loadingText: 'Loading songs...',
-            (context, snapshot) {
-          List<Song> songs = snapshot.data;
-          if (songs.isNotEmpty) {
-            return Column(
-              children: [
-                ...songs.map((song) => SongTile(
-                      song,
-                      currentPlaylistId: playlist.id,
-                    ))
-              ],
-            );
-          } else {
-            return Text("No songs in this playlist.");
-          }
-        })
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            TextButton(
+                onPressed: () {
+                  showAdaptiveDialog(
+                      context: context,
+                      builder: ((context) {
+                        return AddMusicPopup(playlist);
+                      }));
+                },
+                child: Text('Add from library')),
+            TextButton(
+                onPressed: () {
+                  openFilePicker(context, playlist.id);
+                },
+                child: Text('Import local file'))
+          ],
+        ),
+        PlaylistViewSongList(playlist),
       ],
     );
+  }
+
+  List<PopupMenuItem> _buildMoreActionsMenu() {
+    return [
+      PopupMenuItem(
+        child: PopupMenuTile(
+          icon: Icons.playlist_add_rounded,
+          title: 'Add to queue',
+        ),
+        onTap: () {
+          print('add current playlist to queue');
+        },
+      ),
+      PopupMenuItem(
+        child: PopupMenuTile(
+          icon: Icons.copy_rounded,
+          title: 'Add to playlist',
+        ),
+        onTap: () {
+          print('add current playlist to another playlist');
+        },
+      ),
+      PopupMenuItem(
+        child: PopupMenuTile(
+          icon: Icons.delete_outline,
+          title: 'Delete playlist',
+        ),
+        onTap: () {
+          showAlertDialogPopup(
+              context,
+              "Warning",
+              Text(
+                  "Are you sure you want to delete playlist ${playlist.name}?"),
+              [
+                displayTextButton(context, "Yes", callback: () {
+                  Provider.of<PlaylistDataProvider>(context, listen: false)
+                      .deletePlaylist(playlist.id);
+                  Provider.of<AppStateDataProvider>(context, listen: false)
+                      .updateAppState(AppStateKey.currentPlaylistId, null);
+                }),
+                displayTextButton(context, "No")
+              ]);
+        },
+      ),
+      PopupMenuItem(
+        child: PopupMenuTile(
+          icon: Icons.ios_share,
+          title: 'Share',
+        ),
+        onTap: () {
+          print('Share current playlist');
+        },
+      ),
+    ];
   }
 }
 

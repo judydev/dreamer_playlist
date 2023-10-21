@@ -18,6 +18,7 @@ class AppState {
 
 enum AppStateKey {
   currentTab,
+  currentPlaying,
   currentPlaylistId,
   lastPlayed,
   language,

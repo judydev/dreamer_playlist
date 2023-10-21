@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dreamer_playlist/models/playlist_song.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:dreamer_playlist/providers/database_util.dart';
 import 'package:dreamer_playlist/providers/storage_provider.dart';
@@ -36,7 +37,9 @@ class SongDataProvider extends ChangeNotifier {
         await StorageProvider().addSongFileToLocalStorage(selectedFile);
 
     // build a song instance and add to database
-    Song song = Song(name: selectedFile.name, path: songFile.path);
+    String strippedName = StorageProvider.getFilenameFromPlatformFile(
+        selectedFile.name, selectedFile.extension!);
+    Song song = Song(name: strippedName, path: songFile.path);
     await addSongToDb(song);
 
     notifyListeners();
@@ -100,6 +103,45 @@ class SongDataProvider extends ChangeNotifier {
     await db.update(DatabaseUtil.songTableName, {'loved': loved == 1 ? 0 : 1},
         where: 'id = ?', whereArgs: [songId]);
     // TODO: handle exceptions when update fails, and display error on UI
+    notifyListeners();
+  }
+
+  // Playlist Songs
+  Future<void> associateSongToPlaylist(String songId, String playlistId) async {
+    final db = await DatabaseUtil.getDatabase();
+
+    PlaylistSong relation = PlaylistSong(
+        songId: songId,
+        playlistId: playlistId,
+        added: DateTime.now().millisecondsSinceEpoch);
+    await db.insert(
+      DatabaseUtil.playlistSongTableName,
+      relation.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+    notifyListeners();
+  }
+
+  Future<List<Song>> getAllSongsFromPlaylist(String playlistId) async {
+    final db = await DatabaseUtil.getDatabase();
+    String sql =
+        'select * from ${DatabaseUtil.songTableName} where id in (select songId from ${DatabaseUtil.playlistSongTableName} where playlistId = "$playlistId")';
+    List<Map<String, dynamic>> maps = await db.rawQuery(sql);
+
+    List<Song> songs =
+        List.generate(maps.length, (i) => Song().fromMapEntry(maps[i]));
+
+    return songs;
+  }
+
+  Future<void> removeSongFromPlaylist(String songId, String playlistId) async {
+    final db = await DatabaseUtil.getDatabase();
+
+    await db.delete(DatabaseUtil.playlistSongTableName,
+        where: 'songId = ? AND playlistId = ?',
+        whereArgs: [songId, playlistId]);
+
     notifyListeners();
   }
 }

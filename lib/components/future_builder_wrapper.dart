@@ -13,8 +13,13 @@ class FutureBuilderWrapper extends StatelessWidget {
       future: future,
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return Text(loadingText ?? 'Loading...');
-        } else if (snapshot.hasError) {
+          if (loadingText != null) {
+            return Text(loadingText!);
+          } else {
+            return SizedBox.shrink();
+          }
+        }
+        if (snapshot.hasError) {
           return ErrorView(snapshot.error.toString());
         } else {
           return buildFunction(context, snapshot);

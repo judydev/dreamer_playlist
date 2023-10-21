@@ -21,6 +21,8 @@ class DatabaseUtil {
         db.execute(
             'INSERT INTO $appstateTableName ("key", "value") VALUES("currentTab", "Library")');
         db.execute(
+            'INSERT INTO $appstateTableName ("key", "value") VALUES("currentPlaying", NULL)');
+        db.execute(
             'INSERT INTO $appstateTableName ("key", "value") VALUES("currentPlaylistId", NULL)');
         db.execute(
             'INSERT INTO $appstateTableName ("key", "value") VALUES("lastPlayed", NULL)');

@@ -7,26 +7,31 @@ class AppStateDataProvider extends ChangeNotifier {
     final db = await DatabaseUtil.getDatabase();
     final List<Map<String, dynamic>> maps =
         await db.query(DatabaseUtil.appstateTableName);
-    print('getAppStates');
-    print(maps);
     Map<String, dynamic> appStates = {};
     for (var state in maps) {
       appStates[state['key']] = state['value'];
     }
-    print(appStates);
     return appStates;
+  }
+
+  Future<String?> getAppStateByKey(AppStateKey key) async {
+    final db = await DatabaseUtil.getDatabase();
+    final List<Map<String, dynamic>> maps = await db.query(
+        DatabaseUtil.appstateTableName,
+        where: 'key = ?',
+        whereArgs: [key.name]);
+
+    return maps[0]['value'];
   }
 
   Future<void> updateAppState(AppStateKey key, String? value) async {
     final db = await DatabaseUtil.getDatabase();
-
     await db.update(DatabaseUtil.appstateTableName, {'value': value},
         where: 'key = ?', whereArgs: [key.name]);
     notifyListeners();
   }
 
   Future<void> updateCurrentTab(CurrentTab tab) async {
-    print('updateTab');
     final db = await DatabaseUtil.getDatabase();
     await db.update(DatabaseUtil.appstateTableName, {'value': tab.name},
         where: 'key = ?', whereArgs: [AppStateKey.currentTab.name]);

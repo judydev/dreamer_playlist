@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class ListItemView extends StatelessWidget {
+class ListTileView extends StatelessWidget {
   final Widget? leadingIcon;
   final Widget? trailingIcon;
   final String title;
   final void Function()? onTapCallback;
-  ListItemView(
+  ListTileView(
       {this.leadingIcon,
       this.trailingIcon,
       required this.title,

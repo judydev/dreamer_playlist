@@ -79,10 +79,11 @@ class PlaylistDataProvider extends ChangeNotifier {
     return playlists;
   }
 
-  Future<void> updatePlaylistFavorite(String playlistId, bool loved) async {
+  Future<void> updatePlaylistFavorite(Playlist playlist) async {
     final db = await DatabaseUtil.getDatabase();
-    await db.update(DatabaseUtil.playlistTableName, {'loved': loved ? 1 : 0},
-        where: 'id = ?', whereArgs: [playlistId]);
+    await db.update(
+        DatabaseUtil.playlistTableName, {'loved': playlist.loved == 1 ? 1 : 0},
+        where: 'id = ?', whereArgs: [playlist.id]);
     // TODO: handle exceptions when update fails, and display error on UI
     notifyListeners();
   }

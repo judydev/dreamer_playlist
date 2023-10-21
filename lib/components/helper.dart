@@ -1,5 +1,4 @@
 import 'package:dreamer_playlist/models/song.dart';
-import 'package:dreamer_playlist/providers/playlist_song_data_provider.dart';
 import 'package:dreamer_playlist/providers/song_data_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -33,9 +32,10 @@ Future<void> showAlertDialogPopup(
   );
 }
 
-List<String> acceptedAudioExtensions = List.unmodifiable(["m4a", "mp3", "wav"]);
+List<String> acceptedAudioExtensions =
+    List.unmodifiable(["m4a", "mp3", "wav", "aiff"]);
 
-void openFilePicker(context, playlistId) {
+void openFilePicker(context, String? playlistId) {
   Song song;
   FilePicker.platform.pickFiles().then((selectedFile) async => {
         if (selectedFile != null)
@@ -49,7 +49,7 @@ void openFilePicker(context, playlistId) {
                         .addSong(file),
                     if (playlistId != null)
                       {
-                        await Provider.of<PlaylistSongDataProvider>(context,
+                        await Provider.of<SongDataProvider>(context,
                                 listen: false)
                             .associateSongToPlaylist(song.id, playlistId),
                       },
