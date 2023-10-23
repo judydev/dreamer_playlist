@@ -1,12 +1,12 @@
 import 'package:dreamer_playlist/components/add_music_popup.dart';
 import 'package:dreamer_playlist/components/edit_playlist_popup.dart';
-import 'package:dreamer_playlist/components/helper.dart';
+import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/components/popup_menu_tile.dart';
 import 'package:dreamer_playlist/components/playlist_view_songlist.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
-import 'package:dreamer_playlist/providers/app_state_data_provider.dart';
-import 'package:dreamer_playlist/providers/playlist_data_provider.dart';
+import 'package:dreamer_playlist/database/app_state_data_provider.dart';
+import 'package:dreamer_playlist/database/playlist_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -62,12 +62,12 @@ class _PlaylistViewState extends State<PlaylistView> {
                 icon: Icon(Icons.edit)),
             IconButton(
                 onPressed: () {
-                  print('Play current playlist');
+                  print('TODO: Play current playlist');
                 },
                 icon: Icon(Icons.play_circle, size: 42)),
             IconButton(
                 onPressed: () {
-                  print('shuffle play current playlist');
+                  print('TODO: shuffle play current playlist');
                 },
                 icon: Icon(Icons.shuffle)),
             IconButton(
@@ -114,7 +114,7 @@ class _PlaylistViewState extends State<PlaylistView> {
           title: 'Add to queue',
         ),
         onTap: () {
-          print('add current playlist to queue');
+          print('TODO: add current playlist to queue');
         },
       ),
       PopupMenuItem(
@@ -123,7 +123,7 @@ class _PlaylistViewState extends State<PlaylistView> {
           title: 'Add to playlist',
         ),
         onTap: () {
-          print('add current playlist to another playlist');
+          print('TODO: add current playlist to another playlist');
         },
       ),
       PopupMenuItem(
@@ -154,7 +154,7 @@ class _PlaylistViewState extends State<PlaylistView> {
           title: 'Share',
         ),
         onTap: () {
-          print('Share current playlist');
+          print('TODO: Share current playlist');
         },
       ),
     ];

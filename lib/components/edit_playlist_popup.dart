@@ -19,6 +19,8 @@ class _EditPlaylistPopupState extends State<EditPlaylistPopup> {
         TextButton(
             onPressed: () {
               print('done editing playlist, save change and close popup');
+
+              Navigator.of(context).pop();
             },
             child: Text('Done')),
       ]),
@@ -39,7 +41,6 @@ class _EditPlaylistPopupState extends State<EditPlaylistPopup> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [Text('N tracks'), Text('sort')],
         ),
-        Text('N tracks'),
         PlaylistEditSongList(playlist) // cached?
       ]),
     );

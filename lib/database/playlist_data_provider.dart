@@ -1,5 +1,5 @@
 import 'package:dreamer_playlist/models/playlist.dart';
-import 'package:dreamer_playlist/providers/database_util.dart';
+import 'package:dreamer_playlist/database/database_util.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -82,7 +82,7 @@ class PlaylistDataProvider extends ChangeNotifier {
   Future<void> updatePlaylistFavorite(Playlist playlist) async {
     final db = await DatabaseUtil.getDatabase();
     await db.update(
-        DatabaseUtil.playlistTableName, {'loved': playlist.loved == 1 ? 1 : 0},
+        DatabaseUtil.playlistTableName, {'loved': playlist.loved == 0 ? 1 : 0},
         where: 'id = ?', whereArgs: [playlist.id]);
     // TODO: handle exceptions when update fails, and display error on UI
     notifyListeners();

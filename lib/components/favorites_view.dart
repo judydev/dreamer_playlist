@@ -1,7 +1,7 @@
 import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
 import 'package:dreamer_playlist/components/song_tile.dart';
 import 'package:dreamer_playlist/models/song.dart';
-import 'package:dreamer_playlist/providers/song_data_provider.dart';
+import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

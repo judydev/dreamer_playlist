@@ -1,8 +1,8 @@
 import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
-import 'package:dreamer_playlist/components/helper.dart';
+import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/components/song_tile.dart';
 import 'package:dreamer_playlist/models/song.dart';
-import 'package:dreamer_playlist/providers/song_data_provider.dart';
+import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -37,22 +37,21 @@ class _LibraryViewState extends State<LibraryView> {
           children: [
             IconButton(
                 onPressed: () {
-                  print('batch edit songs (e.g. batch delete)');
+                  print('TODO: batch edit songs (e.g. batch delete)');
                 },
                 icon: Icon(Icons.edit)),
             IconButton(
                 onPressed: () {
-                  print('Play current playlist');
+                  print('TODO: Play all songs');
                 },
                 icon: Icon(Icons.play_circle, size: 42)),
             IconButton(
                 onPressed: () {
-                  print('shuffle play current playlist');
+                  print('TODO: shuffle play all songs');
                 },
                 icon: Icon(Icons.shuffle)),
           ],
         ),
-        // ImportMusicTile(null),
         TextButton(
             onPressed: () {
               openFilePicker(context, null);
@@ -63,13 +62,14 @@ class _LibraryViewState extends State<LibraryView> {
           List<Song> songs = snapshot.data;
 
           if (songs.isNotEmpty) {
-            return Column(
+            return Expanded(
+                child: ListView(
               children: [...songs.map((song) => SongTile(song))],
-            );
+            ));
           } else {
             return Text("No songs in the library.");
           }
-        })
+        }),
       ],
     );
   }

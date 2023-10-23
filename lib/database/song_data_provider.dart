@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:dreamer_playlist/models/playlist_song.dart';
 import 'package:dreamer_playlist/models/song.dart';
-import 'package:dreamer_playlist/providers/database_util.dart';
-import 'package:dreamer_playlist/providers/storage_provider.dart';
+import 'package:dreamer_playlist/database/database_util.dart';
+import 'package:dreamer_playlist/database/storage_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
@@ -107,6 +107,18 @@ class SongDataProvider extends ChangeNotifier {
   }
 
   // Playlist Songs
+  Future<bool> checkIfSongExistsInPlaylist(
+      String songId, String playlistId) async {
+    final db = await DatabaseUtil.getDatabase();
+
+    List<Map<String, Object?>> res = await db.query(
+        DatabaseUtil.playlistSongTableName,
+        where: 'songId = ? AND playlistId = ?',
+        whereArgs: [songId, playlistId],
+        limit: 1);
+    return res.isNotEmpty;
+  }
+
   Future<void> associateSongToPlaylist(String songId, String playlistId) async {
     final db = await DatabaseUtil.getDatabase();
 
@@ -121,6 +133,18 @@ class SongDataProvider extends ChangeNotifier {
     );
 
     notifyListeners();
+  }
+
+  Future<List<Song>> getAllSongsFromPlaylist2(String playlistId) async {
+    final db = await DatabaseUtil.getDatabase();
+    String sql =
+        'select * from ${DatabaseUtil.songTableName} where id in (select songId from ${DatabaseUtil.playlistSongTableName} where playlistId = "$playlistId")';
+    List<Map<String, dynamic>> maps = await db.rawQuery(sql);
+
+    List<Song> songs =
+        List.generate(maps.length, (i) => Song().fromMapEntry(maps[i]));
+
+    return songs;
   }
 
   Future<List<Song>> getAllSongsFromPlaylist(String playlistId) async {

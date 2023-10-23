@@ -2,14 +2,14 @@ import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
 import 'package:dreamer_playlist/components/song_tile.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/models/song.dart';
-import 'package:dreamer_playlist/providers/song_data_provider.dart';
+import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 class PlaylistViewSongList extends StatefulWidget {
-  final Playlist? playlist;
+  final Playlist playlist;
   PlaylistViewSongList(this.playlist);
 
   @override
@@ -17,7 +17,7 @@ class PlaylistViewSongList extends StatefulWidget {
 }
 
 class _PlaylistViewSongListState extends State<PlaylistViewSongList> {
-  late Playlist? playlist = widget.playlist;
+  late Playlist playlist = widget.playlist;
   late AudioPlayer _player;
 
   late SongDataProvider songDataProvider;
@@ -28,11 +28,11 @@ class _PlaylistViewSongListState extends State<PlaylistViewSongList> {
     super.didChangeDependencies();
 
     songDataProvider = Provider.of<SongDataProvider>(context);
-    if (playlist != null) {
-      _getSongs = songDataProvider.getAllSongsFromPlaylist(playlist!.id);
-    } else {
-      _getSongs = songDataProvider.getAllSongs();
-    }
+    // if (playlist != null) {
+    _getSongs = songDataProvider.getAllSongsFromPlaylist(playlist.id);
+    // } else {
+    //   _getSongs = songDataProvider.getAllSongs();
+    // }
   }
 
   @override
@@ -44,8 +44,7 @@ class _PlaylistViewSongListState extends State<PlaylistViewSongList> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
+    return 
         FutureBuilderWrapper(_getSongs,
             // loadingText: 'Loading songs...',
             (context, snapshot) {
@@ -67,14 +66,19 @@ class _PlaylistViewSongListState extends State<PlaylistViewSongList> {
             _player.setAudioSource(playlistAudioSource,
                 initialIndex: 0, initialPosition: Duration.zero);
 
-            return Column(
-              children: [...songs.map((song) => SongTile(song))],
+        return Expanded(
+          child: Column(
+            children: [
+              ...songs.map((song) => SongTile(
+                    song,
+                    currentPlaylistId: playlist.id,
+                  ))
+            ],
+          ),
             );
           } else {
             return Text("No songs.");
           }
-        }),
-      ],
-    );
+    });
   }
 }

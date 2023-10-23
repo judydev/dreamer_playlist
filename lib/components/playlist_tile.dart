@@ -1,10 +1,10 @@
-import 'package:dreamer_playlist/components/helper.dart';
+import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/components/edit_playlist_view.dart';
 import 'package:dreamer_playlist/components/list_item_view.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
-import 'package:dreamer_playlist/providers/app_state_data_provider.dart';
-import 'package:dreamer_playlist/providers/playlist_data_provider.dart';
+import 'package:dreamer_playlist/database/app_state_data_provider.dart';
+import 'package:dreamer_playlist/database/playlist_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -40,6 +40,7 @@ class _PlaylistTileState extends State<PlaylistTile> {
       leadingIcon: Icon(Icons.queue_music),
       // trailingIcon: Icon(Icons.arrow_forward_ios_rounded),
       onTapCallback: () {
+        print('playlist_tile onTapCallback');
         Provider.of<AppStateDataProvider>(context, listen: false)
             .updateAppState(AppStateKey.currentPlaylistId, playlist.id);
       },

@@ -13,13 +13,11 @@ class ListTileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-        shape: BeveledRectangleBorder(),
-        child: ListTile(
+    return ListTile(
             leading: leadingIcon,
             trailing: trailingIcon,
             title: Text(title),
             contentPadding: EdgeInsets.all(10),
-            onTap: onTapCallback));
+        onTap: onTapCallback);
   }
 }
