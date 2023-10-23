@@ -1,5 +1,6 @@
 import 'package:dreamer_playlist/components/add_music_popup.dart';
 import 'package:dreamer_playlist/components/edit_playlist_popup.dart';
+import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/components/popup_menu_tile.dart';
 import 'package:dreamer_playlist/components/playlist_view_songlist.dart';
@@ -62,12 +63,15 @@ class _PlaylistViewState extends State<PlaylistView> {
                 icon: Icon(Icons.edit)),
             IconButton(
                 onPressed: () {
-                  print('TODO: Play current playlist');
+                  print('PlaylistView: Play current playlist');
+                  GetitUtil.audioPlayer.play();
                 },
                 icon: Icon(Icons.play_circle, size: 42)),
             IconButton(
                 onPressed: () {
-                  print('TODO: shuffle play current playlist');
+                  print('PlaylistView: shuffle play current playlist');
+                  GetitUtil.audioPlayer.shuffle();
+                  GetitUtil.audioPlayer.play();
                 },
                 icon: Icon(Icons.shuffle)),
             IconButton(
@@ -85,7 +89,9 @@ class _PlaylistViewState extends State<PlaylistView> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            TextButton(
+            Flexible(
+              fit: FlexFit.loose,
+              child: TextButton(
                 onPressed: () {
                   showAdaptiveDialog(
                       context: context,
@@ -93,12 +99,16 @@ class _PlaylistViewState extends State<PlaylistView> {
                         return AddMusicPopup(playlist);
                       }));
                 },
-                child: Text('Add from library')),
-            TextButton(
-                onPressed: () {
-                  openFilePicker(context, playlist.id);
-                },
-                child: Text('Import local file'))
+                  child: Text('Add from library')),
+            ),
+            Flexible(
+              fit: FlexFit.loose,
+              child: TextButton(
+                  onPressed: () {
+                    openFilePicker(context, playlist.id);
+                  },
+                  child: Text('Import local file')),
+            ),
           ],
         ),
         PlaylistViewSongList(playlist),

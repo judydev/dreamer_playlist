@@ -1,6 +1,5 @@
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/components/edit_playlist_view.dart';
-import 'package:dreamer_playlist/components/list_item_view.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/database/app_state_data_provider.dart';
@@ -35,14 +34,13 @@ class _PlaylistTileState extends State<PlaylistTile> {
 
   @override
   Widget build(BuildContext context) {
-    return ListTileView(
+    return ListTileWrapper(
       title: playlist.name!,
-      leadingIcon: Icon(Icons.queue_music),
-      // trailingIcon: Icon(Icons.arrow_forward_ios_rounded),
-      onTapCallback: () {
-        print('playlist_tile onTapCallback');
+      leading: Icon(Icons.queue_music),
+      onTap: () {
         Provider.of<AppStateDataProvider>(context, listen: false)
-            .updateAppState(AppStateKey.currentPlaylistId, playlist.id);
+            .updateAppState(AppStateKey.currentPlaylistId, playlist.id)
+            .catchError((e) => print('Error update state $e'));
       },
     );
   }
@@ -71,17 +69,11 @@ class NewPlaylistTile extends StatefulWidget {
 class _NewPlaylistTileState extends State<NewPlaylistTile> {
   @override
   Widget build(BuildContext context) {
-    return (SizedBox(
-      child: Card(
-        shape: BeveledRectangleBorder(),
-        child: ListTile(
+    return ListTileWrapper(
           leading: Icon(Icons.add),
-          title: Text('New Playlist'),
-          contentPadding: EdgeInsets.all(10),
+      title: 'New Playlist',
           onTap: () => createNewPlaylist(context),
-        ),
-      ),
-    ));
+    );
   }
 
   createNewPlaylist(context) {
@@ -108,7 +100,11 @@ class _NewPlaylistTileState extends State<NewPlaylistTile> {
                         {
                           Provider.of<PlaylistDataProvider>(context,
                                   listen: false)
-                              .addPlaylist(playlist),
+                              .addPlaylist(playlist)
+                              .then((value) {
+                            print(
+                                "TODO: Playlist.addPlaylist handle success and error");
+                          }),
                           Provider.of<AppStateDataProvider>(context,
                                   listen: false)
                               .updateAppState(

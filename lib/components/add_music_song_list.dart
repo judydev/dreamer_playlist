@@ -1,5 +1,5 @@
 import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
-import 'package:dreamer_playlist/components/list_item_view.dart';
+import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:dreamer_playlist/database/song_data_provider.dart';
@@ -45,7 +45,7 @@ class _AddMusicSongListState extends State<AddMusicSongList> {
           List<Song> songs = snapshot.data;
           if (songs.isNotEmpty) {
             return Column(
-              children: [...songs.map((song) => SongTileForAddMusic(song))],
+              children: [...songs.map((song) => _SongTileForAddMusic(song))],
             );
           } else {
             return Text("No songs.");
@@ -56,24 +56,24 @@ class _AddMusicSongListState extends State<AddMusicSongList> {
   }
 }
 
-class SongTileForAddMusic extends StatefulWidget {
+class _SongTileForAddMusic extends StatefulWidget {
   final Song song;
-  SongTileForAddMusic(this.song);
+  _SongTileForAddMusic(this.song);
 
   @override
-  State<SongTileForAddMusic> createState() => _SongTileForAddMusicState();
+  State<_SongTileForAddMusic> createState() => _SongTileForAddMusicState();
 }
 
-class _SongTileForAddMusicState extends State<SongTileForAddMusic> {
+class _SongTileForAddMusicState extends State<_SongTileForAddMusic> {
   late Song song = widget.song;
   bool isSelected = false;
 
   @override
   Widget build(BuildContext context) {
-    return ListTileView(
+    return ListTileWrapper(
         title: song.name!,
-        leadingIcon: Icon(Icons.play_circle_outline),
-        trailingIcon: IconButton(
+        leading: Icon(Icons.play_circle_outline),
+        trailing: IconButton(
           icon: isSelected
               ? Icon(Icons.check_circle)
               : Icon(Icons.add_circle_outline),
@@ -84,6 +84,6 @@ class _SongTileForAddMusicState extends State<SongTileForAddMusic> {
             });
           },
         ),
-        onTapCallback: null);
+        onTap: null);
   }
 }

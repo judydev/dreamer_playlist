@@ -1,6 +1,5 @@
 import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
-import 'package:dreamer_playlist/components/list_item_view.dart';
 import 'package:dreamer_playlist/components/playlist_tile.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/database/playlist_data_provider.dart';
@@ -42,10 +41,10 @@ class _SelectPlaylistPopupState extends State<SelectPlaylistPopup> {
             return Column(
               children: [
                 NewPlaylistTile(),
-                ...playlists.map((playlist) => ListTileView(
+                ...playlists.map((playlist) => ListTileWrapper(
                       title: playlist.name!,
-                    leadingIcon: Icon(Icons.queue_music),
-                      onTapCallback: () {
+                    leading: Icon(Icons.queue_music),
+                    onTap: () {
                         Provider.of<SongDataProvider>(context, listen: false)
                           .checkIfSongExistsInPlaylist(songId, playlist.id)
                           .then((duplicate) {

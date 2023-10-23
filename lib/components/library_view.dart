@@ -1,10 +1,7 @@
-import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
+import 'package:dreamer_playlist/components/playlist_view_songlist.dart';
+import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
-import 'package:dreamer_playlist/components/song_tile.dart';
-import 'package:dreamer_playlist/models/song.dart';
-import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class LibraryView extends StatefulWidget {
   @override
@@ -12,17 +9,6 @@ class LibraryView extends StatefulWidget {
 }
 
 class _LibraryViewState extends State<LibraryView> {
-  late SongDataProvider songDataProvider;
-  late Future<List<Song>> _getAllSongs;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    songDataProvider = Provider.of<SongDataProvider>(context);
-    _getAllSongs = songDataProvider.getAllSongs();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -42,12 +28,21 @@ class _LibraryViewState extends State<LibraryView> {
                 icon: Icon(Icons.edit)),
             IconButton(
                 onPressed: () {
-                  print('TODO: Play all songs');
+                  print('LibraryView.play');
+                  print(GetitUtil.songList);
+                  if (GetitUtil.audioPlayer.audioSource == null) {
+                    return;
+                  }
+
+                  GetitUtil.currentlyPlaying.value = GetitUtil.songList.first;
+                  GetitUtil.audioPlayer.play();
                 },
                 icon: Icon(Icons.play_circle, size: 42)),
             IconButton(
                 onPressed: () {
                   print('TODO: shuffle play all songs');
+                  GetitUtil.audioPlayer.shuffle();
+                  GetitUtil.audioPlayer.play();
                 },
                 icon: Icon(Icons.shuffle)),
           ],
@@ -57,19 +52,7 @@ class _LibraryViewState extends State<LibraryView> {
               openFilePicker(context, null);
             },
             child: Text("Import local file to Library")),
-        FutureBuilderWrapper(_getAllSongs, loadingText: 'Loading all songs...',
-            (context, snapshot) {
-          List<Song> songs = snapshot.data;
-
-          if (songs.isNotEmpty) {
-            return Expanded(
-                child: ListView(
-              children: [...songs.map((song) => SongTile(song))],
-            ));
-          } else {
-            return Text("No songs in the library.");
-          }
-        }),
+        PlaylistViewSongList(null)
       ],
     );
   }

@@ -66,3 +66,29 @@ void openFilePicker(context, String? playlistId) {
           }
       });
 }
+
+class ListTileWrapper extends StatelessWidget {
+  final Widget? leading;
+  final Widget? trailing;
+  final String? title;
+  final void Function()? onTap;
+
+  ListTileWrapper({this.leading, this.trailing, this.title, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      // custom styles
+      shape: Border(
+          bottom: BorderSide(
+        color: Colors.black54,
+      )),
+      contentPadding: EdgeInsets.all(10),
+      // parameters for ListTile
+      title: Text(title ?? ""),
+      leading: leading,
+      trailing: trailing,
+      onTap: onTap,
+    );
+  }
+}

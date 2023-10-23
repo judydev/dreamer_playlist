@@ -6,7 +6,8 @@ import 'package:dreamer_playlist/components/library_view.dart';
 import 'package:dreamer_playlist/components/playlist_view.dart';
 import 'package:dreamer_playlist/components/playlists_view.dart';
 import 'package:dreamer_playlist/components/preferences_view.dart';
-import 'package:dreamer_playlist/helpers/getx_helper.dart';
+import 'package:dreamer_playlist/database/data_util.dart';
+import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/database/app_state_data_provider.dart';
@@ -17,14 +18,12 @@ import 'package:dreamer_playlist/database/storage_provider.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:just_audio/just_audio.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseUtil.initDatabase();
-
-  // getIt.registerSingleton(_audioHandler);
-  getIt.registerSingleton(AudioPlayer());
+  GetitUtil.initRegistration();
+  await DataUtil.loadInitialData();
 
   runApp(
     MultiProvider(providers: [
@@ -70,15 +69,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late AppStateDataProvider appStateDataProvider;
   late PlaylistDataProvider playlistDataProvider;
-  int _selectedTabIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-
-    ValueNotifier<Song?> currentlyPlaying = ValueNotifier(null);
-    getIt.registerSingleton<ValueNotifier<Song?>>(currentlyPlaying);
-  }
+  int _selectedTabIndex = menuTabs.indexOf(GetitUtil.appStates.currentTab!);
 
   @override
   void didChangeDependencies() {
@@ -90,20 +81,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print('main build');
-    print(getIt.get<ValueNotifier<Song?>>());
     return Scaffold(
       body: Stack(
         children: [
           buildTabView(context, _selectedTabIndex),
           ValueListenableBuilder(
-            valueListenable: GetUtil.currentlyPlaying,
+            valueListenable: GetitUtil.currentlyPlaying,
             builder: (BuildContext context, Song? song, Widget? child) =>
-                song != null ? ExpandablePlayer(song)
+                song != null ? ExpandablePlayer()
                     : SizedBox.shrink(),
           ),
         ],
       ),
+      // bottomNavigationBar gets pushed down when player is in full screen mode
       bottomNavigationBar: ValueListenableBuilder(
         valueListenable: playerExpandProgress,
         builder: (BuildContext context, double height, Widget? child) {
@@ -137,6 +127,8 @@ class _MyHomePageState extends State<MyHomePage> {
             selectedItemColor: Colors.red,
             onTap: (index) => setState(() {
               _selectedTabIndex = index;
+              Provider.of<AppStateDataProvider>(context, listen: false)
+                  .updateAppState(AppStateKey.currentTab, menuTabs[index]);
             }),
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
@@ -182,30 +174,4 @@ class _MyHomePageState extends State<MyHomePage> {
         return LibraryView();
     }
   }
-
-  // buildMainView(context, Map<AppStateKey, dynamic> appStates) {
-  //   String? currentTab = appStates[AppStateKey.currentTab];
-  //   switch (currentTab) {
-  //     case 'library':
-  //       return LibraryView();
-  //     case 'playlists':
-  //       String? currentPlaylistId = appStates[AppStateKey.currentPlaylistId];
-  //       if (currentPlaylistId != null) {
-  //         return FutureBuilderWrapper(
-  //             playlistDataProvider.getPlaylistById(currentPlaylistId),
-  //             (context, snapshot) {
-  //           Playlist playlist = snapshot.data;
-  //           return PlaylistView(playlist: playlist);
-  //         });
-  //       } else {
-  //         return PlaylistsView();
-  //       }
-  //     case 'favorites':
-  //       return FavoritesView();
-  //     case 'preferences':
-  //       return PreferencesView();
-  //     default:
-  //       return LibraryView();
-  //   }
-  // }
 }

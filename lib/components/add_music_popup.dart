@@ -26,7 +26,7 @@ class _AddMusicPopupState extends State<AddMusicPopup> {
       ]),
       body: SingleChildScrollView(
           child: Column(children: [
-        MusicSearchBar(),
+        // MusicSearchBar(), // TODO
         AddMusicSongList(null),
       ])),
     );

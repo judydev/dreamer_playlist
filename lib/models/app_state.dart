@@ -1,5 +1,5 @@
 class AppStates {
-  CurrentTab currentTab = CurrentTab.library;
+  String? currentTab;
   String? currentPlaying;
   String? currentPlaylistId;
   String? lastPlayed;
@@ -8,7 +8,7 @@ class AppStates {
 
   @override
   String toString() {
-    return "AppStates{currentTab: ${currentTab.name}, currentPlaying: $currentPlaying, currentPlaylistId: $currentPlaylistId, lastPlayed: $lastPlayed";
+    return "AppStates{currentTab: $currentTab, currentPlaying: $currentPlaying, currentPlaylistId: $currentPlaylistId, lastPlayed: $lastPlayed";
   }
 }
 
@@ -58,19 +58,4 @@ AppStateKey getAppStateKeyFromString(String key) {
   }
 }
 
-enum CurrentTab { library, playlists, favorites, preferences }
-
-CurrentTab getCurrentTabFromString(String tab) {
-  switch (tab) {
-    case 'library':
-      return CurrentTab.library;
-    case 'playlists':
-      return CurrentTab.playlists;
-    case 'favorites':
-      return CurrentTab.favorites;
-    case 'preferences':
-      return CurrentTab.preferences;
-    default:
-      throw Exception('Unknown tab');
-  }
-}
+const menuTabs = ['Library', 'Playlists', 'Favorites', 'Preferences'];

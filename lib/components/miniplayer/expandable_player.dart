@@ -1,10 +1,14 @@
 // Modified from: https://github.com/dxvid-pts/miniplayer/blob/master/example/lib/widgets/player.dart
 
+import 'package:dreamer_playlist/components/miniplayer/mini_player_mode.dart';
 import 'package:dreamer_playlist/components/miniplayer/miniplayer.dart';
 import 'package:dreamer_playlist/components/miniplayer/utils.dart';
-import 'package:dreamer_playlist/models/song.dart';
-import 'package:dreamer_playlist/helpers/getx_helper.dart';
+import 'package:dreamer_playlist/components/song_tile.dart';
+import 'package:dreamer_playlist/components/song_tile_reorder.dart';
+import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 const double playerMinHeight = 70;
 const miniplayerPercentageDeclaration = 0.2;
@@ -15,16 +19,12 @@ final ValueNotifier<double> playerExpandProgress =
 final MiniplayerController controller = MiniplayerController();
 
 class ExpandablePlayer extends StatefulWidget {
-  final Song song;
-  const ExpandablePlayer(this.song);
-
   @override
   State<StatefulWidget> createState() => _ExpandablePlayerState();
 }
 
 class _ExpandablePlayerState extends State<ExpandablePlayer> {
-  late Song song = widget.song;
-  bool playing = GetUtil.audioPlayer.playing;
+  bool isPlaying = GetitUtil.audioPlayer.playing;
 
   @override
   Widget build(BuildContext context) {
@@ -35,27 +35,16 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
       maxHeight: playerMaxHeight,
       controller: controller,
       elevation: 4,
-      onDismissed: () => GetUtil.currentlyPlaying.value = null,
+      onDismissed: () => {
+        // dismiss mini player
+        GetitUtil.currentlyPlaying.value = null,
+        GetitUtil.audioPlayer.stop()
+      },
       curve: Curves.easeOut,
       builder: (height, percentage) {
-        final bool miniplayer = percentage < miniplayerPercentageDeclaration;
+        final bool isMiniPlayer = percentage < miniplayerPercentageDeclaration;
 
-        final songName = Text(song.name!);
-        final progressIndicator = LinearProgressIndicator(value: 0.3);
-
-        IconButton buttonPlayPrevious = IconButton(
-            onPressed: onPressPlayPrev, icon: Icon(Icons.skip_previous));
-        IconButton buttonPlayNext =
-            IconButton(onPressed: onPressPlayNext, icon: Icon(Icons.skip_next));
-        IconButton buttonPlayPause = IconButton(
-          icon: playing
-              ? Icon(miniplayer ? Icons.pause : Icons.pause_circle_filled)
-              : Icon(miniplayer ? Icons.play_arrow : Icons.play_circle),
-          iconSize: miniplayer ? 25 : 50,
-          onPressed: onPressPlayPause,
-        );
-
-        if (!miniplayer) {
+        if (!isMiniPlayer) {
           // Full Screen Player
           var percentageExpandedPlayer = percentageFromValueInRange(
               min: playerMaxHeight * miniplayerPercentageDeclaration +
@@ -64,28 +53,72 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
               value: height);
           if (percentageExpandedPlayer < 0) percentageExpandedPlayer = 0;
 
+          print(GetitUtil.audioPlayer.audioSource?.sequence);
+
           return Column(
             children: [
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 33),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Opacity(
                     opacity: percentageExpandedPlayer,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Flexible(child: songName),
-                        Flexible(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              buttonPlayPrevious,
-                              buttonPlayPause,
-                              buttonPlayNext,
-                            ],
-                          ),
+                        Icon(Icons.horizontal_rule),
+                        // Currently playing
+                        GetitUtil.currentlyPlaying.value != null
+                            ? SongTile(
+                                GetitUtil.currentlyPlaying.value!,
+                                onTapOverride: () {},
+                              )
+                            : ListTileWrapper(
+                                leading: Icon(Icons.music_video),
+                                title: 'Not playing',
+                              ),
+                        // Music Queue
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Playing Next'),
+                            Row(
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      print('TODO: playing next shuffle');
+                                    },
+                                    icon: Icon(Icons.shuffle)),
+                                IconButton(
+                                    onPressed: () {
+                                      print('TODO: playing next loop');
+                                    },
+                                    icon: Icon(Icons.loop))
+                              ],
+                            )
+                          ],
                         ),
-                        Flexible(child: progressIndicator),
+                        Expanded(
+                          child: ListView(children: [
+                            ...GetitUtil.audioPlayer.audioSource!.sequence.map(
+                                (IndexedAudioSource as) =>
+                                    SongTileReorder(as.tag)),
+                          ]),
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: LinearProgressIndicator(value: 0.4), // Slider
+                        ), // slide bar
+                        PlayerButtonbar(false, () {
+                          setState(() {
+                            isPlaying = !isPlaying;
+                          });
+                        }),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: LinearProgressIndicator(value: 0.1), // volume
+                        ),
+                        SizedBox(height: 30)
                       ],
                     ),
                   ),
@@ -93,71 +126,62 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
               ),
             ],
           );
+        } else {
+          // Mini Player
+          return MiniPlayerMode(
+              height, () => setState(() => isPlaying = !isPlaying));
         }
-
-        // Mini Player
-        final percentageMiniplayer = percentageFromValueInRange(
-            min: playerMinHeight,
-            max: playerMaxHeight * miniplayerPercentageDeclaration +
-                playerMinHeight,
-            value: height);
-
-        final elementOpacity = 1 - 1 * percentageMiniplayer;
-        final progressIndicatorHeight = 4 - 4 * percentageMiniplayer;
-
-        return Column(
-          children: [
-            Expanded(
-                child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Flex(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                direction: Axis.horizontal,
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: Icon(Icons.music_note)),
-                  Flexible(
-                      fit: FlexFit.loose,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          song.name!,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      )),
-                  Row(
-                    children: [
-                      buttonPlayPrevious,
-                      buttonPlayPause,
-                      buttonPlayNext,
-                    ],
-                  )
-                ],
-              ),
-            )),
-            SizedBox(
-              height: progressIndicatorHeight,
-              child: Opacity(
-                opacity: elementOpacity,
-                child: progressIndicator,
-              ),
-            ),
-          ],
-        );
       },
     );
   }
-
-  void onPressPlayPause() {
-    if (GetUtil.audioPlayer.playing) {
-      GetUtil.audioPlayer.pause();
-    } else {
-      GetUtil.audioPlayer.play();
-    }
-    setState(() => playing = !playing);
-  }
-
-  void Function() onPressPlayPrev = () => GetUtil.audioPlayer.seekToPrevious();
-  void Function() onPressPlayNext = () => GetUtil.audioPlayer.seekToNext();
 }
+
+class PlayerButtonbar extends StatelessWidget {
+  final bool isMiniPlayer;
+  final Function callback;
+  const PlayerButtonbar(this.isMiniPlayer, this.callback);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        buttonPlayPrevious,
+        getButtonPlayPause(isMiniPlayer, callback),
+        buttonPlayNext,
+      ],
+    );
+  }
+}
+
+IconButton getButtonPlayPause(bool isMiniPlayer, Function callback) =>
+    IconButton(
+      icon: GetitUtil.audioPlayer.playing
+          ? Icon(isMiniPlayer ? Icons.pause : Icons.pause_circle_filled)
+          : Icon(isMiniPlayer ? Icons.play_arrow : Icons.play_circle),
+      iconSize: isMiniPlayer ? 25 : 50,
+      onPressed: () {
+        if (GetitUtil.audioPlayer.playing) {
+          GetitUtil.audioPlayer.pause();
+        } else {
+          GetitUtil.audioPlayer.play();
+        }
+        callback();
+      },
+    );
+
+IconButton buttonPlayPrevious = IconButton(
+    onPressed: () {
+      GetitUtil.audioPlayer.seekToPrevious();
+      GetitUtil.audioPlayer.play();
+    },
+    icon: Icon(Icons.skip_previous));
+
+IconButton buttonPlayNext = IconButton(
+    onPressed: () {
+      GetitUtil.audioPlayer.seekToNext();
+      GetitUtil.audioPlayer.play();
+    },
+    icon: Icon(Icons.skip_next));
+
+
