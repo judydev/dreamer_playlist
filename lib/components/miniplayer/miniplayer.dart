@@ -1,4 +1,4 @@
-// Reference: https://github.com/dxvid-pts/miniplayer
+// Reference: https://github.com/dxvid-pts/miniplayer/blob/master/lib/miniplayer.dart
 
 import 'dart:async';
 

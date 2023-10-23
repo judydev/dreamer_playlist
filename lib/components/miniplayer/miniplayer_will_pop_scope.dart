@@ -1,4 +1,4 @@
-// Reference: https://github.com/dxvid-pts/miniplayer
+// Reference: https://github.com/dxvid-pts/miniplayer/blob/master/lib/src/miniplayer_will_pop_scope.dart
 
 import 'package:flutter/material.dart';
 

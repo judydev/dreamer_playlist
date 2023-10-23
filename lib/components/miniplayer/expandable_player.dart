@@ -1,4 +1,4 @@
-// Reference: https://github.com/dxvid-pts/miniplayer
+// Modified from: https://github.com/dxvid-pts/miniplayer/blob/master/example/lib/widgets/player.dart
 
 import 'package:dreamer_playlist/components/miniplayer/miniplayer.dart';
 import 'package:dreamer_playlist/components/miniplayer/utils.dart';
