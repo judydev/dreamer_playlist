@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 
 class MiniPlayerMode extends StatefulWidget {
   final double height;
-  final Function callback;
-  const MiniPlayerMode(this.height, this.callback);
+  const MiniPlayerMode(this.height);
 
   @override
   State<MiniPlayerMode> createState() => _MiniPlayerModeState();
@@ -14,7 +13,6 @@ class MiniPlayerMode extends StatefulWidget {
 
 class _MiniPlayerModeState extends State<MiniPlayerMode> {
   late double height = widget.height;
-  late Function callback = widget.callback;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +48,7 @@ class _MiniPlayerModeState extends State<MiniPlayerMode> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   )),
-              PlayerButtonbar(isMiniPlayer: true, callback: callback),
+              PlayerButtonbar(isMiniPlayer: true),
             ],
           ),
         )),

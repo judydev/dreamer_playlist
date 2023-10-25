@@ -55,6 +55,11 @@ play({bool isShuffle = false, int initialIndex = 0}) {
       initialIndex: initialIndex, initialPosition: Duration.zero);
   audioPlayer.setShuffleModeEnabled(isShuffle);
 
+  updateShuffleModeNotifier();
   updateEffectiveIndicesNotifier();
+
+  pauseStateNotifier.value = PauseState.playing;
+  loopModeNotifier.value = LoopMode.off;
+
   audioPlayer.play();
 }

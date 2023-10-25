@@ -54,9 +54,8 @@ class GetitUtil {
 
       switch (state.processingState) {
         case ProcessingState.completed:
-          print('music stops, refresh player');
-          // playerStateNotifier.value = state;
-          audioPlayer.stop();
+          print('music stops, refresh player-------------------');
+          pauseStateNotifier.value = PauseState.paused;
           break;
         default:
           return;

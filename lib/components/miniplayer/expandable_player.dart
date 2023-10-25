@@ -25,7 +25,6 @@ class ExpandablePlayer extends StatefulWidget {
 }
 
 class _ExpandablePlayerState extends State<ExpandablePlayer> {
-  bool isPlaying = GetitUtil.audioPlayer.playing;
   bool isShuffle = GetitUtil.audioPlayer.shuffleModeEnabled;
   AudioPlayer audioPlayer = GetitUtil.audioPlayer;
 
@@ -83,9 +82,6 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                             Text('Playing Next'),
                             Row(
                               children: [
-                                // IconButton(
-                                //     onPressed: () => play(isShuffle: true),
-                                //     icon: Icon(Icons.shuffle)),
                                 getShuffleButton(),
                                 ValueListenableBuilder(
                                     valueListenable: loopModeNotifier,
@@ -137,14 +133,7 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                                     child: LinearProgressIndicator(
                                         value: 0.4), // Slider
                                   ), // slide bar
-                                  PlayerButtonbar(
-                                    isMiniPlayer: false,
-                                    callback: () {
-                                    setState(() {
-                                      isPlaying = !isPlaying;
-                                    });
-                                    },
-                                  ),
+                                  PlayerButtonbar(isMiniPlayer: false),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 10),
@@ -164,8 +153,7 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
           );
         } else {
           // Mini Player
-          return MiniPlayerMode(
-              height, () => setState(() => isPlaying = !isPlaying));
+          return MiniPlayerMode(height);
         }
       },
     );
@@ -182,7 +170,6 @@ ValueListenableBuilder<ShuffleMode> getShuffleButton() {
                 updateEffectiveIndicesNotifier();
                 updateShuffleModeNotifier();
 
-                print(audioPlayer.effectiveIndices);
                 setState(() {
                   isShuffle = !isShuffle;
                 });
@@ -194,8 +181,7 @@ ValueListenableBuilder<ShuffleMode> getShuffleButton() {
 
 class PlayerButtonbar extends StatelessWidget {
   final bool isMiniPlayer;
-  final Function callback;
-  PlayerButtonbar({required this.isMiniPlayer, required this.callback});
+  PlayerButtonbar({required this.isMiniPlayer});
 
   @override
   Widget build(BuildContext context) {
@@ -203,29 +189,36 @@ class PlayerButtonbar extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         getButtonPlayPrev(),
-        getButtonPlayPause(isMiniPlayer, callback),
+        getButtonPlayPause(),
         getButtonPlayNext(),
       ],
     );
   }
 
-final AudioPlayer audioPlayer = GetitUtil.audioPlayer;
+  final AudioPlayer audioPlayer = GetitUtil.audioPlayer;
 
-IconButton getButtonPlayPause(bool isMiniPlayer, Function callback) =>
-    IconButton(
-      icon: GetitUtil.audioPlayer.playing
-          ? Icon(isMiniPlayer ? Icons.pause : Icons.pause_circle_filled)
-          : Icon(isMiniPlayer ? Icons.play_arrow : Icons.play_circle),
-      iconSize: isMiniPlayer ? 25 : 50,
-      onPressed: () {
-        if (GetitUtil.audioPlayer.playing) {
-          GetitUtil.audioPlayer.pause();
-        } else {
-          GetitUtil.audioPlayer.play();
-        }
-        callback();
-      },
-    );
+  ValueListenableBuilder<PauseState> getButtonPlayPause() =>
+      ValueListenableBuilder(
+          valueListenable: pauseStateNotifier,
+          builder: ((context, pauseStateValue, child) {
+            bool isPlaying = pauseStateValue == PauseState.playing;
+
+            return IconButton(
+              icon: isPlaying
+                  ? Icon(isMiniPlayer ? Icons.pause : Icons.pause_circle_filled)
+                  : Icon(isMiniPlayer ? Icons.play_arrow : Icons.play_circle),
+              iconSize: isMiniPlayer ? 25 : 50,
+              onPressed: () {
+                if (isPlaying) {
+                  GetitUtil.audioPlayer.pause();
+                  pauseStateNotifier.value = PauseState.paused;
+                } else {
+                  GetitUtil.audioPlayer.play();
+                  pauseStateNotifier.value = PauseState.playing;
+                }
+              },
+            );
+          }));
 
   IconButton getButtonPlayPrev() => IconButton(
       onPressed: () {
