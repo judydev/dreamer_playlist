@@ -1,6 +1,6 @@
+import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/song.dart';
-import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -19,7 +19,6 @@ class GetitUtil {
     AudioPlayer audioPlayer = _initAudioPlayer();
     getIt.registerSingleton(audioPlayer);
 
-    ValueNotifier<Song?> currentlyPlayingNotifier = ValueNotifier(null);
     getIt.registerSingleton(currentlyPlayingNotifier);
 
     List<Song> orderedSongList = [];
@@ -29,7 +28,6 @@ class GetitUtil {
         ConcatenatingAudioSource(children: const []);
     getIt.registerSingleton(queue);
 
-    ValueNotifier<List<int>?> effectiveIndicesNotifier = ValueNotifier(null);
     getIt.registerSingleton(effectiveIndicesNotifier);
 
     registered = true;
@@ -50,14 +48,14 @@ class GetitUtil {
     });
 
     ap.playerStateStream.listen((state) {
-      // print('playerStateStream listen');
-      // print(state);
+      print('playerState.listen: state.playing');
+      print(state.playing);
+      print(state.processingState);
+
       switch (state.processingState) {
-        // case ProcessingState.ready:
-        //   break;
         case ProcessingState.completed:
-          // print('music stops, refresh player');
-          // print(audioPlayer.)
+          print('music stops, refresh player');
+          // playerStateNotifier.value = state;
           audioPlayer.stop();
           break;
         default:
@@ -71,39 +69,15 @@ class GetitUtil {
       // print(event);
     });
 
-    // ap.durationStream.listen(
-    //   (event) {
-    //     print('durationStream.listen');
-    //     print(event);
-    //   },
-    // );
-
-    // ap.positionStream.listen((event) {
-    //   print('positionStream.listen');
-    //   print(event);
-    // });
-
-    // ap.playbackEventStream.listen((event) {
-    //   print('playbackEventStream.listen');
-    //   print(event);
-    // });
-
     return ap;
   }
 
   static AppStates appStates = getIt.get<AppStates>();
 
   static AudioPlayer audioPlayer = getIt.get<AudioPlayer>();
-  static ValueNotifier<Song?> currentlyPlayingNotifier =
-      getIt.get<ValueNotifier<Song?>>();
 
   static ConcatenatingAudioSource queue =
       getIt.get<ConcatenatingAudioSource>();
-
-  // static ValueNotifier<ConcatenatingAudioSource> queueNotifier =
-  //     getIt.get<ValueNotifier<ConcatenatingAudioSource>>();
-  static ValueNotifier<List<int>?> effectiveIndicesNotifier =
-      getIt.get<ValueNotifier<List<int>?>>();
 
   static List<Song> orderedSongList = getIt.get<List<Song>>();
 
@@ -123,12 +97,9 @@ class GetitUtil {
   // debugging functions
   // ignore: non_constant_identifier_names
   static void print_AudioPlayer_AudioSource_Sequence(sequence) {
-    // audioPlayer.audioSource!.sequence
     print('audioPlayer.audioSource.sequence');
     for (IndexedAudioSource ias in sequence) {
       print(ias.tag);
     }
   }
-
-  // static String? currentTab = appStates.currentTab;
 }

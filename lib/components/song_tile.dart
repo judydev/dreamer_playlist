@@ -1,6 +1,7 @@
+import 'package:dreamer_playlist/components/library_view.dart';
 import 'package:dreamer_playlist/components/popup_menu_tile.dart';
 import 'package:dreamer_playlist/components/select_playlist_popup.dart';
-import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:dreamer_playlist/database/song_data_provider.dart';
@@ -27,10 +28,10 @@ class _SongTileState extends State<SongTile> {
 
   @override
   Widget build(BuildContext context) {
-    List<PopupMenuItem> moreActionsMenu =
+    List<PopupMenuItem> moreActionsMenuItems =
         buildMoreActionsMenu(context, song, currentPlaylistId);
     if (currentPlaylistId == null) {
-      moreActionsMenu.removeAt(0);
+      moreActionsMenuItems.removeAt(0);
     }
 
     return ListTileWrapper(
@@ -39,13 +40,18 @@ class _SongTileState extends State<SongTile> {
       trailing: PopupMenuButton(
         position: PopupMenuPosition.under,
         child: Icon(Icons.more_vert),
-        itemBuilder: (context) {
-          return moreActionsMenu;
-        },
+        itemBuilder: (context) => moreActionsMenuItems,
       ),
       onTap: onTapOverride ??
           () {
             print('onTapCallback, clicked on song tile, play this song');
+            if (songIndex == null) {
+              print('Unknown index');
+              return;
+            }
+
+            shuffleModeNotifier.value = ShuffleMode.off;
+            play(isShuffle: false, initialIndex: songIndex!);
           },
     );
   }

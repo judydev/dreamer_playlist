@@ -1,5 +1,6 @@
 import 'package:dreamer_playlist/components/playlist_view_songlist.dart';
 import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -44,15 +45,16 @@ ButtonBar libraryButtonBar = ButtonBar(
   ],
 );
 
-play({bool isShuffle = false}) {
+play({bool isShuffle = false, int initialIndex = 0}) {
   if (GetitUtil.queue.children.isEmpty) {
     print('no songs in songList');
     return;
   }
   AudioPlayer audioPlayer = GetitUtil.audioPlayer;
   audioPlayer.setAudioSource(GetitUtil.queue,
-      initialIndex: 0, initialPosition: Duration.zero);
+      initialIndex: initialIndex, initialPosition: Duration.zero);
   audioPlayer.setShuffleModeEnabled(isShuffle);
-  GetitUtil.effectiveIndicesNotifier.value = audioPlayer.effectiveIndices;
+
+  updateEffectiveIndicesNotifier();
   audioPlayer.play();
 }

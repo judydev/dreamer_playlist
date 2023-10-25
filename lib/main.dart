@@ -8,6 +8,7 @@ import 'package:dreamer_playlist/components/playlists_view.dart';
 import 'package:dreamer_playlist/components/preferences_view.dart';
 import 'package:dreamer_playlist/database/data_util.dart';
 import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/database/app_state_data_provider.dart';
@@ -86,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           buildTabView(context, _selectedTabIndex),
           ValueListenableBuilder(
-            valueListenable: GetitUtil.currentlyPlayingNotifier,
+            valueListenable: currentlyPlayingNotifier,
             builder: (BuildContext context, Song? song, Widget? child) =>
                 song != null ? ExpandablePlayer()
                     : SizedBox.shrink(),

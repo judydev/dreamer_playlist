@@ -1,12 +1,12 @@
 // Modified from: https://github.com/dxvid-pts/miniplayer/blob/master/example/lib/widgets/player.dart
 
-import 'package:dreamer_playlist/components/library_view.dart';
 import 'package:dreamer_playlist/components/miniplayer/mini_player_mode.dart';
 import 'package:dreamer_playlist/components/miniplayer/miniplayer.dart';
 import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/components/miniplayer/utils.dart';
 import 'package:dreamer_playlist/components/song_tile.dart';
 import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -26,7 +26,8 @@ class ExpandablePlayer extends StatefulWidget {
 
 class _ExpandablePlayerState extends State<ExpandablePlayer> {
   bool isPlaying = GetitUtil.audioPlayer.playing;
-  LoopMode loopMode = LoopMode.off;
+  bool isShuffle = GetitUtil.audioPlayer.shuffleModeEnabled;
+  AudioPlayer audioPlayer = GetitUtil.audioPlayer;
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +40,8 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
       elevation: 4,
       onDismissed: () => {
         // dismiss mini player
-        GetitUtil.currentlyPlayingNotifier.value = null,
-        GetitUtil.audioPlayer.stop()
+        currentlyPlayingNotifier.value = null,
+        audioPlayer.stop()
       },
       curve: Curves.easeOut,
       builder: (height, percentage) {
@@ -67,9 +68,9 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                       children: [
                         Icon(Icons.horizontal_rule),
                         // Currently playing
-                        GetitUtil.currentlyPlayingNotifier.value != null
+                        currentlyPlayingNotifier.value != null
                             ? SongTile(
-                                GetitUtil.currentlyPlayingNotifier.value!,
+                                currentlyPlayingNotifier.value!,
                                 onTapOverride: () {},
                               )
                             : ListTileWrapper(
@@ -82,10 +83,45 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                             Text('Playing Next'),
                             Row(
                               children: [
-                                IconButton(
-                                    onPressed: () => play(isShuffle: true),
-                                    icon: Icon(Icons.shuffle)),
-                                getLoopButton()
+                                // IconButton(
+                                //     onPressed: () => play(isShuffle: true),
+                                //     icon: Icon(Icons.shuffle)),
+                                getShuffleButton(),
+                                ValueListenableBuilder(
+                                    valueListenable: loopModeNotifier,
+                                    builder: ((context, LoopMode loopModeValue,
+                                        child) {
+                                      switch (loopModeValue) {
+                                        case LoopMode.all:
+                                          return IconButton(
+                                              onPressed: () {
+                                                audioPlayer
+                                                    .setLoopMode(LoopMode.one);
+                                                loopModeNotifier.value =
+                                                    LoopMode.one;
+                                              },
+                                              icon: Icon(Icons.repeat_on));
+                                        case LoopMode.one:
+                                          return IconButton(
+                                              onPressed: () {
+                                                audioPlayer
+                                                    .setLoopMode(LoopMode.off);
+                                                loopModeNotifier.value =
+                                                    LoopMode.off;
+                                              },
+                                              icon: Icon(Icons.repeat_one_on));
+                                        case LoopMode.off:
+                                        default:
+                                          return IconButton(
+                                              onPressed: () {
+                                                audioPlayer
+                                                    .setLoopMode(LoopMode.all);
+                                                loopModeNotifier.value =
+                                                    LoopMode.all;
+                                              },
+                                              icon: Icon(Icons.repeat));
+                                      }
+                                    }))
                               ],
                             )
                           ],
@@ -101,11 +137,14 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                                     child: LinearProgressIndicator(
                                         value: 0.4), // Slider
                                   ), // slide bar
-                                  PlayerButtonbar(false, () {
+                                  PlayerButtonbar(
+                                    isMiniPlayer: false,
+                                    callback: () {
                                     setState(() {
                                       isPlaying = !isPlaying;
                                     });
-                                  }),
+                                    },
+                                  ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 10),
@@ -132,57 +171,45 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
     );
   }
 
-  IconButton getLoopButton() {
-    switch (loopMode) {
-      case LoopMode.all:
-        return IconButton(
-            onPressed: () {
-              GetitUtil.audioPlayer.setLoopMode(LoopMode.one);
-              setState(() {
-                loopMode = LoopMode.one;
-              });
-            },
-            icon: Icon(Icons.repeat_on));
-      case LoopMode.one:
-        return IconButton(
-            onPressed: () {
-              GetitUtil.audioPlayer.setLoopMode(LoopMode.off);
-              setState(() {
-                loopMode = LoopMode.off;
-              });
-            },
-            icon: Icon(Icons.repeat_one_on));
-      case LoopMode.off:
-      default:
-        return IconButton(
-            onPressed: () {
-              GetitUtil.audioPlayer.setLoopMode(LoopMode.all);
-              setState(() {
-                loopMode = LoopMode.all;
-              });
-            },
-            icon: Icon(Icons.repeat));
-    }
+ValueListenableBuilder<ShuffleMode> getShuffleButton() {
+    return ValueListenableBuilder(
+        valueListenable: shuffleModeNotifier,
+        builder: (context, shuffleMode, child) {
+          bool isShuffle = shuffleMode == ShuffleMode.on;
+          return IconButton(
+              onPressed: () {
+                audioPlayer.setShuffleModeEnabled(!isShuffle);
+                updateEffectiveIndicesNotifier();
+                updateShuffleModeNotifier();
+
+                print(audioPlayer.effectiveIndices);
+                setState(() {
+                  isShuffle = !isShuffle;
+                });
+              },
+              icon: isShuffle ? Icon(Icons.shuffle_on) : Icon(Icons.shuffle));
+        });
   }
 }
 
 class PlayerButtonbar extends StatelessWidget {
   final bool isMiniPlayer;
   final Function callback;
-  const PlayerButtonbar(this.isMiniPlayer, this.callback);
+  PlayerButtonbar({required this.isMiniPlayer, required this.callback});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        buttonPlayPrevious,
+        getButtonPlayPrev(),
         getButtonPlayPause(isMiniPlayer, callback),
-        buttonPlayNext,
+        getButtonPlayNext(),
       ],
     );
   }
-}
+
+final AudioPlayer audioPlayer = GetitUtil.audioPlayer;
 
 IconButton getButtonPlayPause(bool isMiniPlayer, Function callback) =>
     IconButton(
@@ -200,16 +227,17 @@ IconButton getButtonPlayPause(bool isMiniPlayer, Function callback) =>
       },
     );
 
-IconButton buttonPlayPrevious = IconButton(
-    onPressed: () {
-      GetitUtil.audioPlayer.seekToPrevious();
-      GetitUtil.audioPlayer.play();
-    },
-    icon: Icon(Icons.skip_previous));
+  IconButton getButtonPlayPrev() => IconButton(
+      onPressed: () {
+        audioPlayer.seekToPrevious();
+        audioPlayer.play();
+      },
+      icon: Icon(Icons.skip_previous));
 
-IconButton buttonPlayNext = IconButton(
-    onPressed: () {
-      GetitUtil.audioPlayer.seekToNext();
-      GetitUtil.audioPlayer.play();
-    },
-    icon: Icon(Icons.skip_next));
+  IconButton getButtonPlayNext() => IconButton(
+      onPressed: () {
+        audioPlayer.seekToNext();
+        audioPlayer.play();
+      },
+      icon: Icon(Icons.skip_next));
+}

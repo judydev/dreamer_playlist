@@ -1,6 +1,6 @@
 import 'package:dreamer_playlist/components/miniplayer/expandable_player.dart';
 import 'package:dreamer_playlist/components/miniplayer/utils.dart';
-import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:flutter/material.dart';
 
 class MiniPlayerMode extends StatefulWidget {
@@ -45,12 +45,12 @@ class _MiniPlayerModeState extends State<MiniPlayerMode> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      GetitUtil.currentlyPlayingNotifier.value!.name ??
+                      currentlyPlayingNotifier.value!.name ??
                           'Not playing',
                       overflow: TextOverflow.ellipsis,
                     ),
                   )),
-              PlayerButtonbar(true, callback),
+              PlayerButtonbar(isMiniPlayer: true, callback: callback),
             ],
           ),
         )),

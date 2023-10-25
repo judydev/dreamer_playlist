@@ -8,7 +8,7 @@ class AppStates {
 
   @override
   String toString() {
-    return "AppStates{currentTab: $currentTab, currentPlaying: $currentPlaying, currentPlaylistId: $currentPlaylistId, lastPlayed: $lastPlayed";
+    return "AppStates{currentTab: $currentTab, currentPlaying: $currentPlaying, currentPlaylistId: $currentPlaylistId";
   }
 }
 
@@ -26,7 +26,7 @@ class AppState {
 
   @override
   String toString() {
-    return 'AppState{$key: $value}';
+    return '{$key: $value}';
   }
 }
 
@@ -37,25 +37,6 @@ enum AppStateKey {
   lastPlayed,
   language,
   darkMode
-}
-
-AppStateKey getAppStateKeyFromString(String key) {
-  switch (key) {
-    case 'currentTab':
-      return AppStateKey.currentTab;
-    case 'currentPlaying':
-      return AppStateKey.currentPlaying;
-    case 'currentPlaylistId':
-      return AppStateKey.currentPlaylistId;
-    case 'lastPlayed':
-      return AppStateKey.lastPlayed;
-    case 'language':
-      return AppStateKey.language;
-    case 'darkMode':
-      return AppStateKey.darkMode;
-    default:
-      throw Exception('Unknown key');
-  }
 }
 
 const menuTabs = ['Library', 'Playlists', 'Favorites', 'Preferences'];
