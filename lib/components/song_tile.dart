@@ -2,18 +2,18 @@ import 'package:dreamer_playlist/components/popup_menu_tile.dart';
 import 'package:dreamer_playlist/components/select_playlist_popup.dart';
 import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
-import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/song.dart';
-import 'package:dreamer_playlist/database/app_state_data_provider.dart';
 import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SongTile extends StatefulWidget {
   final Song song;
+  final int? songIndex;
   final String? currentPlaylistId;
   final void Function()? onTapOverride;
-  SongTile(this.song, {this.currentPlaylistId, this.onTapOverride});
+  SongTile(this.song,
+      {this.currentPlaylistId, this.onTapOverride, this.songIndex});
 
   @override
   State<StatefulWidget> createState() => _SongTileState();
@@ -21,6 +21,7 @@ class SongTile extends StatefulWidget {
 
 class _SongTileState extends State<SongTile> {
   late Song song = widget.song;
+  late int? songIndex = widget.songIndex;
   late String? currentPlaylistId = widget.currentPlaylistId;
   late void Function()? onTapOverride = widget.onTapOverride;
 
@@ -44,19 +45,13 @@ class _SongTileState extends State<SongTile> {
       ),
       onTap: onTapOverride ??
           () {
-        print('onTapCallback, clicked on song tile, play this song');
-        GetitUtil.currentlyPlaying.value = song;
-        Provider.of<AppStateDataProvider>(context, listen: false)
-            .updateAppState(AppStateKey.currentPlaying, song.id);
-        GetitUtil.audioPlayer.play();
-      },
+            print('onTapCallback, clicked on song tile, play this song');
+          },
     );
   }
 }
 
-List<PopupMenuItem> Function(
-        BuildContext context, Song song, String? currentPlaylistId)
-    buildMoreActionsMenu = (context, song, currentPlaylistId) {
+List<PopupMenuItem> buildMoreActionsMenu(context, song, currentPlaylistId) {
   return [
     PopupMenuItem(
       // enabled: currentPlaylistId == null ? false : true,
@@ -139,4 +134,4 @@ List<PopupMenuItem> Function(
       },
     ),
   ];
-};
+}

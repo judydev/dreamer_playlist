@@ -1,6 +1,6 @@
 import 'package:dreamer_playlist/components/add_music_popup.dart';
 import 'package:dreamer_playlist/components/edit_playlist_popup.dart';
-import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/components/library_view.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/components/popup_menu_tile.dart';
 import 'package:dreamer_playlist/components/playlist_view_songlist.dart';
@@ -44,14 +44,21 @@ class _PlaylistViewState extends State<PlaylistView> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            // Favorite
             IconButton(
                 onPressed: () {
                   Provider.of<PlaylistDataProvider>(context, listen: false)
-                      .updatePlaylistFavorite(playlist);
+                      .updatePlaylistFavorite(playlist)
+                      .then(
+                    (value) {
+                      print("TODO: handle success updating fav playlist");
+                    },
+                  );
                 },
                 icon: playlist.loved == 1
                     ? Icon(Icons.favorite)
                     : Icon(Icons.favorite_border)),
+            // Edit
             IconButton(
                 onPressed: () {
                   showAdaptiveDialog(
@@ -61,29 +68,20 @@ class _PlaylistViewState extends State<PlaylistView> {
                       });
                 },
                 icon: Icon(Icons.edit)),
+            // Play
             IconButton(
-                onPressed: () {
-                  print('PlaylistView: Play current playlist');
-                  GetitUtil.audioPlayer.play();
-                },
+                onPressed: () => play(),
                 icon: Icon(Icons.play_circle, size: 42)),
+            // Shuffle
             IconButton(
-                onPressed: () {
-                  print('PlaylistView: shuffle play current playlist');
-                  GetitUtil.audioPlayer.shuffle();
-                  GetitUtil.audioPlayer.play();
-                },
+                onPressed: () => play(isShuffle: true),
                 icon: Icon(Icons.shuffle)),
-            IconButton(
-              onPressed: () {
-                print('playlist more actions');
-              },
-              icon: PopupMenuButton(
+            // More Actions
+            PopupMenuButton(
                 position: PopupMenuPosition.under,
                 child: Icon(Icons.more_vert),
                 itemBuilder: (context) => _buildMoreActionsMenu(),
-              ),
-            )
+            ),
           ],
         ),
         Row(
@@ -111,7 +109,7 @@ class _PlaylistViewState extends State<PlaylistView> {
             ),
           ],
         ),
-        PlaylistViewSongList(playlist),
+        SongList(playlist: playlist),
       ],
     );
   }
@@ -158,15 +156,16 @@ class _PlaylistViewState extends State<PlaylistView> {
               ]);
         },
       ),
-      PopupMenuItem(
-        child: PopupMenuTile(
-          icon: Icons.ios_share,
-          title: 'Share',
-        ),
-        onTap: () {
-          print('TODO: Share current playlist');
-        },
-      ),
+      // TODO: future work
+      // PopupMenuItem(
+      //   child: PopupMenuTile(
+      //     icon: Icons.ios_share,
+      //     title: 'Share',
+      //   ),
+      //   onTap: () {
+      //     print('TODO: Share current playlist');
+      //   },
+      // ),
     ];
   }
 }

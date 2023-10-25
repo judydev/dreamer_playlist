@@ -1,3 +1,4 @@
+import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/components/edit_playlist_view.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
@@ -38,9 +39,13 @@ class _PlaylistTileState extends State<PlaylistTile> {
       title: playlist.name!,
       leading: Icon(Icons.queue_music),
       onTap: () {
-        Provider.of<AppStateDataProvider>(context, listen: false)
-            .updateAppState(AppStateKey.currentPlaylistId, playlist.id)
-            .catchError((e) => print('Error update state $e'));
+        if (GetitUtil.appStates.currentTab == menuTabs[1]) {
+          Provider.of<AppStateDataProvider>(context, listen: false)
+              .updateAppState(AppStateKey.currentPlaylistId, playlist.id)
+              .catchError((e) => print('Error update state $e'));
+        }
+
+        GetitUtil.appStates.currentPlaylistId = playlist.id;
       },
     );
   }
@@ -52,7 +57,8 @@ class _PlaylistTileState extends State<PlaylistTile> {
     return showAlertDialogPopup(context, "Warning",
         Text("Are you sure you want to delete playlist ${playlist.name}?"), [
       displayTextButton(context, "Yes", callback: () {
-        playlistDataProvider.deletePlaylist(playlist.id);
+        playlistDataProvider.deletePlaylist(playlist.id).then((value) =>
+            print('TODO: PlaylistTile.deletePlaylist success notification'));
       }),
       displayTextButton(context, "No")
     ]);

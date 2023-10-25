@@ -33,11 +33,6 @@ class _AddMusicSongListState extends State<AddMusicSongList> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Column(
       children: [

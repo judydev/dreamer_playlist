@@ -45,7 +45,8 @@ class _MiniPlayerModeState extends State<MiniPlayerMode> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      GetitUtil.currentlyPlaying.value!.name ?? 'Not playing',
+                      GetitUtil.currentlyPlayingNotifier.value!.name ??
+                          'Not playing',
                       overflow: TextOverflow.ellipsis,
                     ),
                   )),

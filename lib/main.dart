@@ -86,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           buildTabView(context, _selectedTabIndex),
           ValueListenableBuilder(
-            valueListenable: GetitUtil.currentlyPlaying,
+            valueListenable: GetitUtil.currentlyPlayingNotifier,
             builder: (BuildContext context, Song? song, Widget? child) =>
                 song != null ? ExpandablePlayer()
                     : SizedBox.shrink(),
@@ -127,6 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
             selectedItemColor: Colors.red,
             onTap: (index) => setState(() {
               _selectedTabIndex = index;
+              GetitUtil.appStates.currentTab = menuTabs[index];
               Provider.of<AppStateDataProvider>(context, listen: false)
                   .updateAppState(AppStateKey.currentTab, menuTabs[index]);
             }),
@@ -137,8 +138,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: Icon(Icons.queue_music), label: 'Playlists'),
               BottomNavigationBarItem(
                   icon: Icon(Icons.favorite), label: 'Favorite'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.settings), label: 'Preferences'),
+              // BottomNavigationBarItem(
+              //     icon: Icon(Icons.settings), label: 'Preferences'),
             ],
           ),
         ]),

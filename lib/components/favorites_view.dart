@@ -1,9 +1,7 @@
-import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
-import 'package:dreamer_playlist/components/song_tile.dart';
-import 'package:dreamer_playlist/models/song.dart';
-import 'package:dreamer_playlist/database/song_data_provider.dart';
+import 'package:dreamer_playlist/components/library_view.dart';
+import 'package:dreamer_playlist/components/playlist_view_songlist.dart';
+import 'package:dreamer_playlist/components/playlists_view.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class FavoritesView extends StatefulWidget {
   @override
@@ -11,16 +9,7 @@ class FavoritesView extends StatefulWidget {
 }
 
 class _FavoritesViewState extends State<FavoritesView> {
-  late SongDataProvider songDataProvider;
-  late Future<List<Song>> _getFavoriteSongs;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    songDataProvider = Provider.of<SongDataProvider>(context);
-    _getFavoriteSongs = songDataProvider.getFavoriteSongs();
-  }
+  bool showPlaylists = false;
 
   @override
   Widget build(BuildContext context) {
@@ -31,18 +20,45 @@ class _FavoritesViewState extends State<FavoritesView> {
         AppBar(
           title: Text("Favorites"),
         ),
-        FutureBuilderWrapper(_getFavoriteSongs,
-            loadingText: 'Loading favorite songs...', (context, snapshot) {
-          List<Song> songs = snapshot.data;
-          if (songs.isNotEmpty) {
-            return Column(
-              children: [...songs.map((song) => SongTile(song))],
-            );
-          } else {
-            return Text("No favorite songs.");
-          }
-        })
-        // TODO: add favorite playlists
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            TextButton(
+                style: showPlaylists
+                    ? null
+                    : TextButton.styleFrom(
+                        side: const BorderSide(),
+                      ),
+                child: Text('Songs'),
+                onPressed: () {
+                  setState(() {
+                    showPlaylists = false;
+                  });
+                }),
+            TextButton(
+              style: showPlaylists
+                  ? TextButton.styleFrom(
+                      side: const BorderSide(),
+                    )
+                  : null,
+              child: Text('Playlists'),
+              onPressed: () {
+                setState(() {
+                  showPlaylists = true;
+                });
+              },
+            ),
+          ],
+        ),
+        Expanded(
+            child: showPlaylists
+                ? PlaylistsList() // TODO: display playlist when clicked on playlist tile
+                : Column(
+                    children: [
+                      libraryButtonBar,
+                      SongList(),
+                    ],
+                  )),
       ],
     );
   }

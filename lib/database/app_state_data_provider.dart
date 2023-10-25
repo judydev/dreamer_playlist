@@ -1,3 +1,4 @@
+import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/database/database_util.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,18 @@ class AppStateDataProvider extends ChangeNotifier {
       appStates[state['key']] = state['value'];
     }
     return appStates;
+  }
+
+  static Future<Map<String, dynamic>> loadInitialData() async {
+    Map<String, dynamic> res = {};
+    String? currentTab =
+        await AppStateDataProvider().getAppStateByKey(AppStateKey.currentTab);
+
+    AppStates appStates = AppStates();
+    appStates.currentTab = currentTab;
+    GetitUtil.appStates = appStates;
+
+    return res;
   }
 
   // Future<AppStates> getAppStates3() async {

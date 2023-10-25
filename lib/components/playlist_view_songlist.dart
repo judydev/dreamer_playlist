@@ -1,22 +1,22 @@
 import 'package:dreamer_playlist/components/future_builder_wrapper.dart';
 import 'package:dreamer_playlist/components/song_tile.dart';
 import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
-class PlaylistViewSongList extends StatefulWidget {
+class SongList extends StatefulWidget {
   final Playlist? playlist;
-  PlaylistViewSongList(this.playlist);
+  SongList({this.playlist});
 
   @override
-  State<PlaylistViewSongList> createState() => _PlaylistViewSongListState();
+  State<SongList> createState() => _SongListState();
 }
 
-class _PlaylistViewSongListState extends State<PlaylistViewSongList> {
+class _SongListState extends State<SongList> {
   late Playlist? playlist = widget.playlist;
 
   late SongDataProvider songDataProvider;
@@ -30,35 +30,28 @@ class _PlaylistViewSongListState extends State<PlaylistViewSongList> {
     if (playlist != null) {
       _getSongs = songDataProvider.getAllSongsFromPlaylist(playlist!.id);
     } else {
-      _getSongs = songDataProvider.getAllSongs();
+      if (GetitUtil.appStates.currentTab == menuTabs[2]) {
+        _getSongs = songDataProvider.getFavoriteSongs();
+      } else {
+        _getSongs = songDataProvider.getAllSongs();
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return 
-        Expanded(
+    return Expanded(
       child: FutureBuilderWrapper(_getSongs,
-          // loadingText: 'Loading songs...',
           (context, snapshot) {
         List<Song> songs = snapshot.data;
         if (songs.isNotEmpty) {
-          GetitUtil.songList = songs;
-          final playlistAudioSource = ConcatenatingAudioSource(
-            useLazyPreparation:
-                true, 
-            children: [
-              ...songs
-                  .map((song) => AudioSource.file(song.path!, tag: song.name)),
-            ],
-          );
-        
-          GetitUtil.audioPlayer.setAudioSource(playlistAudioSource,
-              initialIndex: 0, initialPosition: Duration.zero);
+          GetitUtil.orderedSongList = songs;
+          GetitUtil.setQueueFromSonglist(songs);
 
           return ListView(children: [
-            ...songs.map((song) => SongTile(
-                  song,
+            ...songs.asMap().entries.map((entry) => SongTile(
+                  entry.value,
+                  songIndex: entry.key,
                   currentPlaylistId: playlist?.id,
                 ))
           ]);

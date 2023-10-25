@@ -1,10 +1,11 @@
 // Modified from: https://github.com/dxvid-pts/miniplayer/blob/master/example/lib/widgets/player.dart
 
+import 'package:dreamer_playlist/components/library_view.dart';
 import 'package:dreamer_playlist/components/miniplayer/mini_player_mode.dart';
 import 'package:dreamer_playlist/components/miniplayer/miniplayer.dart';
+import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/components/miniplayer/utils.dart';
 import 'package:dreamer_playlist/components/song_tile.dart';
-import 'package:dreamer_playlist/components/song_tile_reorder.dart';
 import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class ExpandablePlayer extends StatefulWidget {
 
 class _ExpandablePlayerState extends State<ExpandablePlayer> {
   bool isPlaying = GetitUtil.audioPlayer.playing;
+  LoopMode loopMode = LoopMode.off;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
       elevation: 4,
       onDismissed: () => {
         // dismiss mini player
-        GetitUtil.currentlyPlaying.value = null,
+        GetitUtil.currentlyPlayingNotifier.value = null,
         GetitUtil.audioPlayer.stop()
       },
       curve: Curves.easeOut,
@@ -53,8 +55,6 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
               value: height);
           if (percentageExpandedPlayer < 0) percentageExpandedPlayer = 0;
 
-          print(GetitUtil.audioPlayer.audioSource?.sequence);
-
           return Column(
             children: [
               Expanded(
@@ -67,16 +67,15 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                       children: [
                         Icon(Icons.horizontal_rule),
                         // Currently playing
-                        GetitUtil.currentlyPlaying.value != null
+                        GetitUtil.currentlyPlayingNotifier.value != null
                             ? SongTile(
-                                GetitUtil.currentlyPlaying.value!,
+                                GetitUtil.currentlyPlayingNotifier.value!,
                                 onTapOverride: () {},
                               )
                             : ListTileWrapper(
                                 leading: Icon(Icons.music_video),
                                 title: 'Not playing',
                               ),
-                        // Music Queue
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -84,41 +83,39 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                             Row(
                               children: [
                                 IconButton(
-                                    onPressed: () {
-                                      print('TODO: playing next shuffle');
-                                    },
+                                    onPressed: () => play(isShuffle: true),
                                     icon: Icon(Icons.shuffle)),
-                                IconButton(
-                                    onPressed: () {
-                                      print('TODO: playing next loop');
-                                    },
-                                    icon: Icon(Icons.loop))
+                                getLoopButton()
                               ],
                             )
                           ],
                         ),
                         Expanded(
-                          child: ListView(children: [
-                            ...GetitUtil.audioPlayer.audioSource!.sequence.map(
-                                (IndexedAudioSource as) =>
-                                    SongTileReorder(as.tag)),
-                          ]),
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: LinearProgressIndicator(value: 0.4), // Slider
-                        ), // slide bar
-                        PlayerButtonbar(false, () {
-                          setState(() {
-                            isPlaying = !isPlaying;
-                          });
-                        }),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: LinearProgressIndicator(value: 0.1), // volume
-                        ),
-                        SizedBox(height: 30)
+                          child: MusicQueue()),
+                        height > 300 // prevent bottom overflow
+                            ? Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10),
+                                    child: LinearProgressIndicator(
+                                        value: 0.4), // Slider
+                                  ), // slide bar
+                                  PlayerButtonbar(false, () {
+                                    setState(() {
+                                      isPlaying = !isPlaying;
+                                    });
+                                  }),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10),
+                                    child: LinearProgressIndicator(
+                                        value: 0.1), // volume
+                                  ),
+                                  SizedBox(height: 30)
+                                ],
+                              )
+                            : SizedBox.shrink()
                       ],
                     ),
                   ),
@@ -133,6 +130,39 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
         }
       },
     );
+  }
+
+  IconButton getLoopButton() {
+    switch (loopMode) {
+      case LoopMode.all:
+        return IconButton(
+            onPressed: () {
+              GetitUtil.audioPlayer.setLoopMode(LoopMode.one);
+              setState(() {
+                loopMode = LoopMode.one;
+              });
+            },
+            icon: Icon(Icons.repeat_on));
+      case LoopMode.one:
+        return IconButton(
+            onPressed: () {
+              GetitUtil.audioPlayer.setLoopMode(LoopMode.off);
+              setState(() {
+                loopMode = LoopMode.off;
+              });
+            },
+            icon: Icon(Icons.repeat_one_on));
+      case LoopMode.off:
+      default:
+        return IconButton(
+            onPressed: () {
+              GetitUtil.audioPlayer.setLoopMode(LoopMode.all);
+              setState(() {
+                loopMode = LoopMode.all;
+              });
+            },
+            icon: Icon(Icons.repeat));
+    }
   }
 }
 
@@ -183,5 +213,3 @@ IconButton buttonPlayNext = IconButton(
       GetitUtil.audioPlayer.play();
     },
     icon: Icon(Icons.skip_next));
-
-
