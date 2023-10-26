@@ -1,5 +1,5 @@
 import 'package:dreamer_playlist/components/library_view.dart';
-import 'package:dreamer_playlist/components/playlist_view_songlist.dart';
+import 'package:dreamer_playlist/components/songlist_view.dart';
 import 'package:dreamer_playlist/components/playlists_view.dart';
 import 'package:flutter/material.dart';
 

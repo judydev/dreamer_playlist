@@ -7,25 +7,26 @@ import 'package:just_audio/just_audio.dart';
 class MusicQueue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    AudioPlayer audioPlayer = GetitUtil.audioPlayer;
+    // ignore: no_leading_underscores_for_local_identifiers
+    AudioPlayer _audioPlayer = GetitUtil.audioPlayer;
 
     return ValueListenableBuilder(
-      valueListenable: effectiveIndicesNotifier,
-      builder:
-          (BuildContext context, List<int>? effectiveIndices,
-              Widget? child) =>
-          effectiveIndices != null
-                  ? ListView(
-                  children: effectiveIndices
-                      .map((index) => Container(
-                              color: index == audioPlayer.currentIndex
-                                  ? Theme.of(context).colorScheme.surfaceTint
-                                  : null,
-                          child: SongTileReorder(
-                              songName: audioPlayer.sequence?[index].tag,
-                              songIndex: index)))
-                          .toList())
-                  : SizedBox.shrink(),
-    );
+        valueListenable: queueIndicesNotifier,
+        builder: ((context, queueIndices, child) {
+          return queueIndices.isNotEmpty
+              ? ListView(
+                  children: queueIndices
+                      .map((index) {
+                  return Container(
+                          color: index == _audioPlayer.currentIndex
+                              ? Theme.of(context).colorScheme.surfaceTint
+                              : null,
+                      child: SongTileReorder(
+                          songName: GetitUtil.orderedSongList[index].name!,
+                          songIndex: index));
+                })
+                      .toList())
+              : SizedBox.shrink();
+        }));
   }
 }

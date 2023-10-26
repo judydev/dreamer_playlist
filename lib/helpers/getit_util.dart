@@ -28,8 +28,6 @@ class GetitUtil {
         ConcatenatingAudioSource(children: const []);
     getIt.registerSingleton(queue);
 
-    getIt.registerSingleton(effectiveIndicesNotifier);
-
     registered = true;
   }
 
@@ -45,13 +43,10 @@ class GetitUtil {
       print('currentIndex = $currentIndex');
       currentlyPlayingNotifier.value =
           currentIndex != null ? orderedSongList[currentIndex] : null;
+      updateQueueIndices();
     });
 
     ap.playerStateStream.listen((state) {
-      print('playerState.listen: state.playing');
-      print(state.playing);
-      print(state.processingState);
-
       switch (state.processingState) {
         case ProcessingState.completed:
           print('music stops, refresh player-------------------');
@@ -84,21 +79,24 @@ class GetitUtil {
     queue = ConcatenatingAudioSource(
       useLazyPreparation: true,
       children: [
-        ...songs.map((song) => AudioSource.file(song.path!, tag: song.name)),
+        ...songs.map((song) => AudioSource.file(song.path!, tag: song)),
       ],
     );
   }
 
-  static List<Song> buildSonglistFromIndicies(List<Song> songs) {
-    return songs;
-  }
-
   // debugging functions
   // ignore: non_constant_identifier_names
-  static void print_AudioPlayer_AudioSource_Sequence(sequence) {
+  static void print_AudioPlayer_AudioSource_Sequence(
+      List<IndexedAudioSource> sequence) {
     print('audioPlayer.audioSource.sequence');
-    for (IndexedAudioSource ias in sequence) {
-      print(ias.tag);
-    }
+    List res = sequence.map((ias) => ias.tag).toList();
+    print(res);
+  }
+
+  // ignore: non_constant_identifier_names
+  static void print_Songlist_from_Indices(List<int> indices) {
+    List res = indices.map((i) => audioPlayer.sequence?[i].tag.name).toList();
+    print('indices: $indices');
+    print('songlist from indices: $res');
   }
 }

@@ -1,6 +1,7 @@
 import 'package:dreamer_playlist/components/library_view.dart';
 import 'package:dreamer_playlist/components/popup_menu_tile.dart';
 import 'package:dreamer_playlist/components/select_playlist_popup.dart';
+import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/models/song.dart';
@@ -8,23 +9,13 @@ import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SongTile extends StatefulWidget {
+class SongTile extends StatelessWidget {
   final Song song;
   final int? songIndex;
   final String? currentPlaylistId;
   final void Function()? onTapOverride;
   SongTile(this.song,
       {this.currentPlaylistId, this.onTapOverride, this.songIndex});
-
-  @override
-  State<StatefulWidget> createState() => _SongTileState();
-}
-
-class _SongTileState extends State<SongTile> {
-  late Song song = widget.song;
-  late int? songIndex = widget.songIndex;
-  late String? currentPlaylistId = widget.currentPlaylistId;
-  late void Function()? onTapOverride = widget.onTapOverride;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +42,10 @@ class _SongTileState extends State<SongTile> {
             }
 
             shuffleModeNotifier.value = ShuffleMode.off;
-            play(isShuffle: false, initialIndex: songIndex!);
+            print('SongTile songIndex = $songIndex');
+            play(
+                hasShuffleModeChanged: GetitUtil.audioPlayer.shuffleModeEnabled,
+                initialIndex: songIndex!);
           },
     );
   }

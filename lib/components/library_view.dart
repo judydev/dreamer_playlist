@@ -1,4 +1,4 @@
-import 'package:dreamer_playlist/components/playlist_view_songlist.dart';
+import 'package:dreamer_playlist/components/songlist_view.dart';
 import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
@@ -12,9 +12,7 @@ class LibraryView extends StatelessWidget {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        AppBar(
-          title: Text('All Songs')
-        ),
+        AppBar(title: Text('All Songs')),
         libraryButtonBar,
         TextButton(
             onPressed: () {
@@ -37,29 +35,61 @@ ButtonBar libraryButtonBar = ButtonBar(
         },
         icon: Icon(Icons.edit)),
     IconButton(
-        onPressed: () => play(),        
+        onPressed: () => play(loopMode: LoopMode.off),
         icon: Icon(Icons.play_circle, size: 42)),
     IconButton(
-        onPressed: () => play(isShuffle: true),
+        onPressed: () => shufflePlay(),
         icon: Icon(Icons.shuffle)),
   ],
 );
 
-play({bool isShuffle = false, int initialIndex = 0}) {
+shufflePlay() {
+  AudioPlayer audioPlayer = GetitUtil.audioPlayer;
+  audioPlayer.setAudioSource(GetitUtil.queue);
+  if (!audioPlayer.shuffleModeEnabled) {
+    audioPlayer.setShuffleModeEnabled(true);
+    updateShuffleModeNotifier();
+  }
+  audioPlayer.shuffle();
+  updateQueueIndices();
+  pauseStateNotifier.value = PauseState.playing;
+
+  // set first in the updated queue
+  currentlyPlayingNotifier.value =
+      GetitUtil.orderedSongList[queueIndicesNotifier.value.first];
+  audioPlayer.play();
+}
+
+play(
+    {bool hasShuffleModeChanged = false,
+    LoopMode? loopMode,
+    int initialIndex = 0}) {
   if (GetitUtil.queue.children.isEmpty) {
     print('no songs in songList');
     return;
   }
+
   AudioPlayer audioPlayer = GetitUtil.audioPlayer;
   audioPlayer.setAudioSource(GetitUtil.queue,
       initialIndex: initialIndex, initialPosition: Duration.zero);
-  audioPlayer.setShuffleModeEnabled(isShuffle);
 
-  updateShuffleModeNotifier();
-  updateEffectiveIndicesNotifier();
+  if (hasShuffleModeChanged) {
+    bool oldShuffleMode = audioPlayer.shuffleModeEnabled;
+    audioPlayer.setShuffleModeEnabled(!oldShuffleMode);
+    updateShuffleModeNotifier();
 
+    if (oldShuffleMode) {
+      // update currentlyPlaying
+      currentlyPlayingNotifier.value = GetitUtil.queue.sequence.first.tag;
+    }
+  }
+
+  updateQueueIndices();
   pauseStateNotifier.value = PauseState.playing;
-  loopModeNotifier.value = LoopMode.off;
+
+  if (loopMode != null) {
+    loopModeNotifier.value = loopMode;
+  }
 
   audioPlayer.play();
 }

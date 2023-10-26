@@ -25,7 +25,6 @@ class ExpandablePlayer extends StatefulWidget {
 }
 
 class _ExpandablePlayerState extends State<ExpandablePlayer> {
-  bool isShuffle = GetitUtil.audioPlayer.shuffleModeEnabled;
   AudioPlayer audioPlayer = GetitUtil.audioPlayer;
 
   @override
@@ -67,57 +66,26 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                       children: [
                         Icon(Icons.horizontal_rule),
                         // Currently playing
-                        currentlyPlayingNotifier.value != null
-                            ? SongTile(
-                                currentlyPlayingNotifier.value!,
-                                onTapOverride: () {},
-                              )
-                            : ListTileWrapper(
-                                leading: Icon(Icons.music_video),
-                                title: 'Not playing',
-                              ),
+                        ValueListenableBuilder(
+                            valueListenable: currentlyPlayingNotifier,
+                            builder: ((context, currentlyPlayingValue, child) {
+                              if (currentlyPlayingValue == null) {
+                                return ListTileWrapper(
+                                    leading: Icon(Icons.music_video),
+                                    title: 'Not playing');
+                              } else {
+                                return SongTile(currentlyPlayingValue,
+                                    onTapOverride: () {});
+                              }
+                            })),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Playing Next'),
+                            Text('Queue'),
                             Row(
                               children: [
-                                getShuffleButton(),
-                                ValueListenableBuilder(
-                                    valueListenable: loopModeNotifier,
-                                    builder: ((context, LoopMode loopModeValue,
-                                        child) {
-                                      switch (loopModeValue) {
-                                        case LoopMode.all:
-                                          return IconButton(
-                                              onPressed: () {
-                                                audioPlayer
-                                                    .setLoopMode(LoopMode.one);
-                                                loopModeNotifier.value =
-                                                    LoopMode.one;
-                                              },
-                                              icon: Icon(Icons.repeat_on));
-                                        case LoopMode.one:
-                                          return IconButton(
-                                              onPressed: () {
-                                                audioPlayer
-                                                    .setLoopMode(LoopMode.off);
-                                                loopModeNotifier.value =
-                                                    LoopMode.off;
-                                              },
-                                              icon: Icon(Icons.repeat_one_on));
-                                        case LoopMode.off:
-                                        default:
-                                          return IconButton(
-                                              onPressed: () {
-                                                audioPlayer
-                                                    .setLoopMode(LoopMode.all);
-                                                loopModeNotifier.value =
-                                                    LoopMode.all;
-                                              },
-                                              icon: Icon(Icons.repeat));
-                                      }
-                                    }))
+                                getQueueShuffleButton(),
+                                getQueueLoopButton(),
                               ],
                             )
                           ],
@@ -159,23 +127,65 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
     );
   }
 
-ValueListenableBuilder<ShuffleMode> getShuffleButton() {
+  ValueListenableBuilder<ShuffleMode> getQueueShuffleButton() {
     return ValueListenableBuilder(
         valueListenable: shuffleModeNotifier,
         builder: (context, shuffleMode, child) {
           bool isShuffle = shuffleMode == ShuffleMode.on;
           return IconButton(
               onPressed: () {
+                // updates queue and currentlyPlaying only
                 audioPlayer.setShuffleModeEnabled(!isShuffle);
-                updateEffectiveIndicesNotifier();
+                updateQueueIndices();
                 updateShuffleModeNotifier();
-
-                setState(() {
-                  isShuffle = !isShuffle;
-                });
               },
               icon: isShuffle ? Icon(Icons.shuffle_on) : Icon(Icons.shuffle));
         });
+  }
+
+  ValueListenableBuilder<LoopMode> getQueueLoopButton() {
+    return ValueListenableBuilder(
+        valueListenable: loopModeNotifier,
+        builder: ((context, LoopMode loopModeValue, child) {
+          switch (loopModeValue) {
+            case LoopMode.all:
+              return IconButton(
+                  onPressed: () {
+                    _updateLoopMode(LoopMode.all);
+                  },
+                  icon: Icon(Icons.repeat_on));
+            case LoopMode.one:
+              return IconButton(
+                  onPressed: () {
+                    _updateLoopMode(LoopMode.one);
+                  },
+                  icon: Icon(Icons.repeat_one_on));
+            case LoopMode.off:
+            default:
+              return IconButton(
+                  onPressed: () {
+                    _updateLoopMode(LoopMode.off);
+                  },
+                  icon: Icon(Icons.repeat));
+          }
+        }));
+  }
+
+  _updateLoopMode(LoopMode currentMode) {
+    LoopMode nextMode = _getNextLoopMode(currentMode);
+    audioPlayer.setLoopMode(nextMode);
+    loopModeNotifier.value = nextMode;
+    updateQueueIndices();
+  }
+
+  _getNextLoopMode(LoopMode currentMode) {
+    // order: [off, all, one]
+    int currentIndex = LoopMode.values.indexOf(currentMode);
+    if (currentIndex == 0) {
+      return LoopMode.values[LoopMode.values.length - 1];
+    } else {
+      return LoopMode.values[currentIndex - 1];
+    }
   }
 }
 

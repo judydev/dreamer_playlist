@@ -1,9 +1,10 @@
 import 'package:dreamer_playlist/components/add_music_popup.dart';
 import 'package:dreamer_playlist/components/edit_playlist_popup.dart';
 import 'package:dreamer_playlist/components/library_view.dart';
+import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/components/popup_menu_tile.dart';
-import 'package:dreamer_playlist/components/playlist_view_songlist.dart';
+import 'package:dreamer_playlist/components/songlist_view.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/database/app_state_data_provider.dart';
@@ -74,7 +75,9 @@ class _PlaylistViewState extends State<PlaylistView> {
                 icon: Icon(Icons.play_circle, size: 42)),
             // Shuffle
             IconButton(
-                onPressed: () => play(isShuffle: true),
+                onPressed: () => play(
+                    hasShuffleModeChanged:
+                        !GetitUtil.audioPlayer.shuffleModeEnabled),
                 icon: Icon(Icons.shuffle)),
             // More Actions
             PopupMenuButton(
