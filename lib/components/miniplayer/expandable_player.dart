@@ -246,7 +246,11 @@ class PlayerButtonbar extends StatelessWidget {
       onPressed: () {
         if (_isEmptyQueue()) return;
         audioPlayer.seekToPrevious();
+
         audioPlayer.play();
+        if (pauseStateNotifier.value == PauseState.paused) {
+          pauseStateNotifier.value = PauseState.playing;
+        }
       },
       icon: Icon(Icons.skip_previous));
 
@@ -254,7 +258,11 @@ class PlayerButtonbar extends StatelessWidget {
       onPressed: () {
         if (_isEmptyQueue()) return;
         audioPlayer.seekToNext();
+
         audioPlayer.play();
+        if (pauseStateNotifier.value == PauseState.paused) {
+          pauseStateNotifier.value = PauseState.playing;
+        }
       },
       icon: Icon(Icons.skip_next));
 }
