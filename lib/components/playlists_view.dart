@@ -14,8 +14,10 @@ class PlaylistsView extends StatelessWidget {
       AppBar(
         title: Text("All Playlists"),
       ),
-      Column(
-        children: [NewPlaylistTile(), PlaylistsList()],
+      Expanded(
+        child: ListView(
+          children: [NewPlaylistTile(), PlaylistsList()],
+        ),
       )
     ]));
   }

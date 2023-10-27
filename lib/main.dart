@@ -83,7 +83,12 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Stack(
         children: [
-          buildTabView(context, _selectedTabIndex),
+          SizedBox(
+              // prevent list from being hidden behind miniplayer
+              height: MediaQuery.of(context).size.height - 126 > 0
+                  ? MediaQuery.of(context).size.height - 126
+                  : null,
+              child: buildTabView(context, _selectedTabIndex)),
           ExpandablePlayer()
         ],
       ),
