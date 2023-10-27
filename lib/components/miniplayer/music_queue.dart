@@ -15,18 +15,18 @@ class MusicQueue extends StatelessWidget {
           return queueIndices.isNotEmpty
               ? ListView(
                   children: queueIndices
-                      .map((songIndex) {
+                      .map((queueIndex) {
                   return ValueListenableBuilder(
                       valueListenable: currentlyPlayingNotifier,
                       builder: ((context, value, child) {
                         return Container(
-                            color: songIndex == _audioPlayer.currentIndex
+                            color: queueIndex == _audioPlayer.currentIndex
                               ? Theme.of(context).colorScheme.surfaceTint
                               : null,
                       child: SongTileReorder(
                                 songName:
-                                    _audioPlayer.sequence?[songIndex].tag.name,
-                                songIndex: songIndex));
+                                    _audioPlayer.sequence?[queueIndex].tag.name,
+                                songIndex: queueIndex));
                       }));
                 })
                       .toList())

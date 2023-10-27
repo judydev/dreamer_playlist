@@ -36,11 +36,6 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
       maxHeight: playerMaxHeight,
       controller: controller,
       elevation: 4,
-      onDismissed: () => {
-        // dismiss mini player
-        currentlyPlayingNotifier.value = null,
-        audioPlayer.stop()
-      },
       curve: Curves.easeOut,
       builder: (height, percentage) {
         final bool isMiniPlayer = percentage < miniplayerPercentageDeclaration;

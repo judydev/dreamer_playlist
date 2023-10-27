@@ -37,11 +37,6 @@ class Miniplayer extends StatefulWidget {
   ///This can be used to hide the BottomNavigationBar.
   final ValueNotifier<double>? valueNotifier;
 
-  ///Deprecated
-  @Deprecated(
-      "Migrate onDismiss to onDismissed as onDismiss will be used differently in a future version.")
-  final Function? onDismiss;
-
   ///If onDismissed is set, the miniplayer can be dismissed
   final Function? onDismissed;
 
@@ -61,7 +56,6 @@ class Miniplayer extends StatefulWidget {
     this.backgroundColor,
     this.valueNotifier,
     this.duration = const Duration(milliseconds: 300),
-    this.onDismiss,
     this.onDismissed,
     this.controller,
     this.backgroundBoxShadow = Colors.black45,
@@ -129,9 +123,6 @@ class _MiniplayerState extends State<Miniplayer> with TickerProviderStateMixin {
 
     if (widget.onDismissed != null) {
       onDismissed = widget.onDismissed;
-    } else {
-      // ignore: deprecated_member_use_from_same_package
-      onDismissed = widget.onDismiss;
     }
 
     super.initState();
