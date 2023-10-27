@@ -131,15 +131,16 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
     return ValueListenableBuilder(
         valueListenable: shuffleModeNotifier,
         builder: (context, shuffleMode, child) {
-          bool isShuffle = shuffleMode == ShuffleMode.on;
+          bool isShuffled = shuffleMode == ShuffleMode.on;
           return IconButton(
               onPressed: () {
                 // updates queue and currentlyPlaying only
-                audioPlayer.setShuffleModeEnabled(!isShuffle);
+                audioPlayer.setShuffleModeEnabled(!isShuffled);
+                audioPlayer.shuffle(); // re-shuffle
                 updateQueueIndices();
                 updateShuffleModeNotifier();
               },
-              icon: isShuffle ? Icon(Icons.shuffle_on) : Icon(Icons.shuffle));
+              icon: isShuffled ? Icon(Icons.shuffle_on) : Icon(Icons.shuffle));
         });
   }
 

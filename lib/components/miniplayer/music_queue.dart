@@ -5,11 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
 class MusicQueue extends StatelessWidget {
+  final AudioPlayer _audioPlayer = GetitUtil.audioPlayer;
+
   @override
   Widget build(BuildContext context) {
-    // ignore: no_leading_underscores_for_local_identifiers
-    AudioPlayer _audioPlayer = GetitUtil.audioPlayer;
-
     return ValueListenableBuilder(
         valueListenable: queueIndicesNotifier,
         builder: ((context, queueIndices, child) {
@@ -29,4 +28,11 @@ class MusicQueue extends StatelessWidget {
               : SizedBox.shrink();
         }));
   }
+}
+
+List<int> updateQueueIndices() {
+  List<int> playingNextIndices = [];
+  playingNextIndices = GetitUtil.audioPlayer.effectiveIndices ?? [];
+  queueIndicesNotifier.value = playingNextIndices;
+  return playingNextIndices;
 }

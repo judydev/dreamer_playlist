@@ -1,3 +1,4 @@
+import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/components/songlist_view.dart';
 import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
@@ -35,7 +36,9 @@ ButtonBar libraryButtonBar = ButtonBar(
         },
         icon: Icon(Icons.edit)),
     IconButton(
-        onPressed: () => play(loopMode: LoopMode.off),
+        onPressed: () => play(
+            loopMode: LoopMode.off,
+            hasShuffleModeChanged: GetitUtil.audioPlayer.shuffleModeEnabled),
         icon: Icon(Icons.play_circle, size: 42)),
     IconButton(
         onPressed: () => shufflePlay(),
@@ -56,7 +59,7 @@ shufflePlay() {
 
   // set first in the updated queue
   currentlyPlayingNotifier.value =
-      GetitUtil.orderedSongList[queueIndicesNotifier.value.first];
+      audioPlayer.sequence?[audioPlayer.effectiveIndices!.first].tag;
   audioPlayer.play();
 }
 
