@@ -34,17 +34,21 @@ class GetitUtil {
 
   static AudioPlayer _initAudioPlayer() {
     AudioPlayer ap = AudioPlayer();
-    // audioPlayer.pause()
-    ap.sequenceStream.listen((event) {
-      // print('sequenceStream listen');
+
+    ap.shuffleModeEnabledStream.listen(
+      (event) {
+        updateShuffleModeNotifier();
+      },
+    );
+
+    ap.shuffleIndicesStream.listen((event) {
+      updateQueueIndicesNotifier();
     });
 
     // update current index, refreshes player display value
     ap.currentIndexStream.listen((currentIndex) {
-      print('currentIndex = $currentIndex');
       currentlyPlayingNotifier.value =
-          currentIndex != null ? orderedSongList[currentIndex] : null;
-      updateQueueIndices();
+          currentIndex != null ? GetitUtil.orderedSongList[currentIndex] : null;
     });
 
     ap.playerStateStream.listen((state) {
@@ -57,7 +61,7 @@ class GetitUtil {
           audioPlayer.pause();
           pauseStateNotifier.value = PauseState.paused;
           currentlyPlayingNotifier.value = null;
-          updateQueueIndices();
+          updateQueueIndicesNotifier();
           break;
         default:
           return;

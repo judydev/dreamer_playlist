@@ -4,9 +4,9 @@ import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-class MusicQueue extends StatelessWidget {
-  final AudioPlayer _audioPlayer = GetitUtil.audioPlayer;
+AudioPlayer _audioPlayer = GetitUtil.audioPlayer;
 
+class MusicQueue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
@@ -15,14 +15,19 @@ class MusicQueue extends StatelessWidget {
           return queueIndices.isNotEmpty
               ? ListView(
                   children: queueIndices
-                      .map((index) {
-                  return Container(
-                          color: index == _audioPlayer.currentIndex
+                      .map((songIndex) {
+                  return ValueListenableBuilder(
+                      valueListenable: currentlyPlayingNotifier,
+                      builder: ((context, value, child) {
+                        return Container(
+                            color: songIndex == _audioPlayer.currentIndex
                               ? Theme.of(context).colorScheme.surfaceTint
                               : null,
                       child: SongTileReorder(
-                          songName: GetitUtil.orderedSongList[index].name!,
-                          songIndex: index));
+                                songName:
+                                    _audioPlayer.sequence?[songIndex].tag.name,
+                                songIndex: songIndex));
+                      }));
                 })
                       .toList())
               : SizedBox.shrink();
@@ -30,9 +35,10 @@ class MusicQueue extends StatelessWidget {
   }
 }
 
-List<int> updateQueueIndices() {
-  List<int> playingNextIndices = [];
-  playingNextIndices = GetitUtil.audioPlayer.effectiveIndices ?? [];
-  queueIndicesNotifier.value = playingNextIndices;
-  return playingNextIndices;
+void updateQueueIndicesNotifier() {
+  queueIndicesNotifier.value = _audioPlayer.effectiveIndices ?? [];
 }
+
+bool isEmptyQueue() =>
+    // queue.children.isEmpty;
+    _audioPlayer.sequence == null || _audioPlayer.sequence!.isEmpty;

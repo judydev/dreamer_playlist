@@ -131,14 +131,11 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
     return ValueListenableBuilder(
         valueListenable: shuffleModeNotifier,
         builder: (context, shuffleMode, child) {
-          bool isShuffled = shuffleMode == ShuffleMode.on;
+          bool isShuffled = audioPlayer.shuffleModeEnabled;
           return IconButton(
               onPressed: () {
-                // updates queue and currentlyPlaying only
                 audioPlayer.setShuffleModeEnabled(!isShuffled);
-                audioPlayer.shuffle(); // re-shuffle
-                updateQueueIndices();
-                updateShuffleModeNotifier();
+                updateQueueIndicesNotifier();
               },
               icon: isShuffled ? Icon(Icons.shuffle_on) : Icon(Icons.shuffle));
         });
@@ -176,7 +173,7 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
     LoopMode nextMode = _getNextLoopMode(currentMode);
     audioPlayer.setLoopMode(nextMode);
     loopModeNotifier.value = nextMode;
-    updateQueueIndices();
+    updateQueueIndicesNotifier();
   }
 
   _getNextLoopMode(LoopMode currentMode) {
@@ -220,7 +217,7 @@ class PlayerButtonbar extends StatelessWidget {
                   : Icon(isMiniPlayer ? Icons.play_arrow : Icons.play_circle),
               iconSize: isMiniPlayer ? 25 : 50,
               onPressed: () {
-                if (_isEmptyQueue()) return;
+                if (isEmptyQueue()) return;
 
                 if (isPlaying) {
                   audioPlayer.pause();
@@ -230,7 +227,7 @@ class PlayerButtonbar extends StatelessWidget {
                     // previous queue reached the end, reset currentlyPlaying and play
                     currentlyPlayingNotifier.value =
                         audioPlayer.sequence?[0].tag;
-                    updateQueueIndices();
+                    updateQueueIndicesNotifier();
                   }
 
                   audioPlayer.play();
@@ -239,13 +236,10 @@ class PlayerButtonbar extends StatelessWidget {
               },
             );
           }));
-
-  bool _isEmptyQueue() =>
-      audioPlayer.sequence == null || audioPlayer.sequence!.isEmpty;  
   
   IconButton getButtonPlayPrev() => IconButton(
       onPressed: () {
-        if (_isEmptyQueue()) return;
+        if (isEmptyQueue()) return;
         audioPlayer.seekToPrevious();
 
         audioPlayer.play();
@@ -257,7 +251,7 @@ class PlayerButtonbar extends StatelessWidget {
 
   IconButton getButtonPlayNext() => IconButton(
       onPressed: () {
-        if (_isEmptyQueue()) return;
+        if (isEmptyQueue()) return;
         audioPlayer.seekToNext();
 
         audioPlayer.play();
