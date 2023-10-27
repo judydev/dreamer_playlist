@@ -219,19 +219,32 @@ class PlayerButtonbar extends StatelessWidget {
                   : Icon(isMiniPlayer ? Icons.play_arrow : Icons.play_circle),
               iconSize: isMiniPlayer ? 25 : 50,
               onPressed: () {
+                if (_isEmptyQueue()) return;
+
                 if (isPlaying) {
-                  GetitUtil.audioPlayer.pause();
+                  audioPlayer.pause();
                   pauseStateNotifier.value = PauseState.paused;
                 } else {
-                  GetitUtil.audioPlayer.play();
+                  if (currentlyPlayingNotifier.value == null) {
+                    // previous queue reached the end, reset currentlyPlaying and play
+                    currentlyPlayingNotifier.value =
+                        audioPlayer.sequence?[0].tag;
+                    updateQueueIndices();
+                  }
+
+                  audioPlayer.play();
                   pauseStateNotifier.value = PauseState.playing;
                 }
               },
             );
           }));
 
+  bool _isEmptyQueue() =>
+      audioPlayer.sequence == null || audioPlayer.sequence!.isEmpty;  
+  
   IconButton getButtonPlayPrev() => IconButton(
       onPressed: () {
+        if (_isEmptyQueue()) return;
         audioPlayer.seekToPrevious();
         audioPlayer.play();
       },
@@ -239,6 +252,7 @@ class PlayerButtonbar extends StatelessWidget {
 
   IconButton getButtonPlayNext() => IconButton(
       onPressed: () {
+        if (_isEmptyQueue()) return;
         audioPlayer.seekToNext();
         audioPlayer.play();
       },

@@ -50,7 +50,13 @@ class GetitUtil {
       switch (state.processingState) {
         case ProcessingState.completed:
           print('music stops, refresh player-------------------');
+
+          // reset playlist queue after player stops
+          audioPlayer.setAudioSource(GetitUtil.queue);
+          audioPlayer.pause();
           pauseStateNotifier.value = PauseState.paused;
+          currentlyPlayingNotifier.value = null;
+          updateQueueIndices();
           break;
         default:
           return;

@@ -86,12 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Stack(
         children: [
           buildTabView(context, _selectedTabIndex),
-          ValueListenableBuilder(
-            valueListenable: currentlyPlayingNotifier,
-            builder: (BuildContext context, Song? song, Widget? child) =>
-                song != null ? ExpandablePlayer()
-                    : SizedBox.shrink(),
-          ),
+          ExpandablePlayer()
         ],
       ),
       // bottomNavigationBar gets pushed down when player is in full screen mode

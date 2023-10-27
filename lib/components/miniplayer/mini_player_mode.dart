@@ -3,16 +3,9 @@ import 'package:dreamer_playlist/components/miniplayer/utils.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:flutter/material.dart';
 
-class MiniPlayerMode extends StatefulWidget {
+class MiniPlayerMode extends StatelessWidget {
   final double height;
   const MiniPlayerMode(this.height);
-
-  @override
-  State<MiniPlayerMode> createState() => _MiniPlayerModeState();
-}
-
-class _MiniPlayerModeState extends State<MiniPlayerMode> {
-  late double height = widget.height;
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +35,15 @@ class _MiniPlayerModeState extends State<MiniPlayerMode> {
                   fit: FlexFit.loose,
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      currentlyPlayingNotifier.value!.name ??
+                    child: ValueListenableBuilder(
+                      valueListenable: currentlyPlayingNotifier,
+                      builder: (context, currentlyPlayingValue, child) {
+                        return Text(
+                          currentlyPlayingValue?.name ??
                           'Not playing',
                       overflow: TextOverflow.ellipsis,
+                        );
+                      },
                     ),
                   )),
               PlayerButtonbar(isMiniPlayer: true),

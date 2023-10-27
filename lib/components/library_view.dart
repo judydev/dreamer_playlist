@@ -77,11 +77,6 @@ play(
     bool oldShuffleMode = audioPlayer.shuffleModeEnabled;
     audioPlayer.setShuffleModeEnabled(!oldShuffleMode);
     updateShuffleModeNotifier();
-
-    if (oldShuffleMode) {
-      // update currentlyPlaying
-      currentlyPlayingNotifier.value = GetitUtil.queue.sequence.first.tag;
-    }
   }
 
   updateQueueIndices();
@@ -91,5 +86,7 @@ play(
     loopModeNotifier.value = loopMode;
   }
 
+  // set currentlyPlaying as the first in sequence
+  currentlyPlayingNotifier.value = GetitUtil.queue.sequence[initialIndex].tag;
   audioPlayer.play();
 }

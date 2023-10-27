@@ -17,7 +17,11 @@ List<int> updateQueueIndices() {
     case LoopMode.off:
       if (_audioPlayer.currentIndex != null) {
         if (currentIndex < effectiveIndices.length) {
-          playingNextIndices = effectiveIndices.sublist(currentIndex + 1);
+          if (currentlyPlayingNotifier.value == null) {
+            playingNextIndices = effectiveIndices.sublist(currentIndex);
+          } else {
+            playingNextIndices = effectiveIndices.sublist(currentIndex + 1);
+          }
         } else {
           playingNextIndices = [];
         }
