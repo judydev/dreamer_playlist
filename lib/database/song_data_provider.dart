@@ -150,7 +150,7 @@ class SongDataProvider extends ChangeNotifier {
   Future<List<Song>> getAllSongsFromPlaylist(String playlistId) async {
     final db = await DatabaseUtil.getDatabase();
     String sql =
-        'select * from ${DatabaseUtil.songTableName} where id in (select songId from ${DatabaseUtil.playlistSongTableName} where playlistId = "$playlistId")';
+        'select * from ${DatabaseUtil.songTableName} join ${DatabaseUtil.playlistSongTableName} on ${DatabaseUtil.songTableName}.id = ${DatabaseUtil.playlistSongTableName}.songId where playlistId = "$playlistId"';
     List<Map<String, dynamic>> maps = await db.rawQuery(sql);
 
     List<Song> songs =

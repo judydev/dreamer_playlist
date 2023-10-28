@@ -5,7 +5,7 @@ class PlaylistSong {
   late String? playlistId;
   late String? songId;
   late int? added;
-  late int? lastPlayed;
+  // late int? lastPlayed;
   // Song? song;
 
   PlaylistSong({this.playlistId, this.songId, this.added})
@@ -22,6 +22,6 @@ class PlaylistSong {
 
   @override
   String toString() {
-    return 'PlaylistSong{id: $id, playlistId: $playlistId, songId: $songId, added: $added, lastPlayed: $lastPlayed}';
+    return 'PlaylistSong{id: $id, playlistId: $playlistId, songId: $songId, added: $added}';
   }
 }
