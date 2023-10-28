@@ -95,7 +95,7 @@ List<PopupMenuItem> buildMoreActionsMenu(context, song, currentPlaylistId) {
         showAdaptiveDialog(
           context: context,
           builder: ((context) {
-            return SelectPlaylistPopup(song.id);
+            return SelectPlaylistPopup(song);
           }),
         );
       },
