@@ -44,8 +44,8 @@ class _SongListState extends State<SongList> {
       child: FutureBuilderWrapper(_getSongs,
           (context, snapshot) {
         List<Song> songs = snapshot.data;
+        GetitUtil.orderedSongList = songs;
         if (songs.isNotEmpty) {
-          GetitUtil.orderedSongList = songs;
           GetitUtil.setQueueFromSonglist(songs);
 
           return ListView(children: [

@@ -48,7 +48,9 @@ class GetitUtil {
     // update current index, refreshes player display value
     ap.currentIndexStream.listen((currentIndex) {
       currentlyPlayingNotifier.value =
-          currentIndex != null ? GetitUtil.orderedSongList[currentIndex] : null;
+          currentIndex != null && ap.sequence != null
+              ? ap.sequence![currentIndex].tag
+              : null;
     });
 
     ap.playerStateStream.listen((state) {

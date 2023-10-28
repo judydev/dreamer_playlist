@@ -25,7 +25,7 @@ class ExpandablePlayer extends StatefulWidget {
 }
 
 class _ExpandablePlayerState extends State<ExpandablePlayer> {
-  AudioPlayer audioPlayer = GetitUtil.audioPlayer;
+  AudioPlayer _audioPlayer = GetitUtil.audioPlayer;
 
   @override
   Widget build(BuildContext context) {
@@ -126,10 +126,13 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
     return ValueListenableBuilder(
         valueListenable: shuffleModeNotifier,
         builder: (context, shuffleMode, child) {
-          bool isShuffled = audioPlayer.shuffleModeEnabled;
+          bool isShuffled = _audioPlayer.shuffleModeEnabled;
           return IconButton(
               onPressed: () {
-                audioPlayer.setShuffleModeEnabled(!isShuffled);
+                _audioPlayer.setShuffleModeEnabled(!isShuffled);
+                if (!isShuffled) {
+                  _audioPlayer.shuffle();
+                }
                 updateQueueIndicesNotifier();
               },
               icon: isShuffled ? Icon(Icons.shuffle_on) : Icon(Icons.shuffle));
@@ -166,7 +169,7 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
 
   _updateLoopMode(LoopMode currentMode) {
     LoopMode nextMode = _getNextLoopMode(currentMode);
-    audioPlayer.setLoopMode(nextMode);
+    _audioPlayer.setLoopMode(nextMode);
     loopModeNotifier.value = nextMode;
     updateQueueIndicesNotifier();
   }
@@ -198,7 +201,7 @@ class PlayerButtonbar extends StatelessWidget {
     );
   }
 
-  final AudioPlayer audioPlayer = GetitUtil.audioPlayer;
+  final AudioPlayer _audioPlayer = GetitUtil.audioPlayer;
 
   ValueListenableBuilder<PauseState> getButtonPlayPause() =>
       ValueListenableBuilder(
@@ -212,20 +215,20 @@ class PlayerButtonbar extends StatelessWidget {
                   : Icon(isMiniPlayer ? Icons.play_arrow : Icons.play_circle),
               iconSize: isMiniPlayer ? 25 : 50,
               onPressed: () {
-                if (isEmptyQueue()) return;
+                if (isEmptySonglist()) return;
 
                 if (isPlaying) {
-                  audioPlayer.pause();
+                  _audioPlayer.pause();
                   pauseStateNotifier.value = PauseState.paused;
                 } else {
                   if (currentlyPlayingNotifier.value == null) {
                     // previous queue reached the end, reset currentlyPlaying and play
                     currentlyPlayingNotifier.value =
-                        audioPlayer.sequence?[0].tag;
+                        _audioPlayer.sequence?[0].tag;
                     updateQueueIndicesNotifier();
                   }
 
-                  audioPlayer.play();
+                  _audioPlayer.play();
                   pauseStateNotifier.value = PauseState.playing;
                 }
               },
@@ -234,10 +237,10 @@ class PlayerButtonbar extends StatelessWidget {
   
   IconButton getButtonPlayPrev() => IconButton(
       onPressed: () {
-        if (isEmptyQueue()) return;
-        audioPlayer.seekToPrevious();
+        if (isEmptySonglist()) return;
+        _audioPlayer.seekToPrevious();
 
-        audioPlayer.play();
+        _audioPlayer.play();
         if (pauseStateNotifier.value == PauseState.paused) {
           pauseStateNotifier.value = PauseState.playing;
         }
@@ -246,10 +249,10 @@ class PlayerButtonbar extends StatelessWidget {
 
   IconButton getButtonPlayNext() => IconButton(
       onPressed: () {
-        if (isEmptyQueue()) return;
-        audioPlayer.seekToNext();
+        if (isEmptySonglist()) return;
+        _audioPlayer.seekToNext();
 
-        audioPlayer.play();
+        _audioPlayer.play();
         if (pauseStateNotifier.value == PauseState.paused) {
           pauseStateNotifier.value = PauseState.playing;
         }

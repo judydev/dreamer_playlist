@@ -10,6 +10,7 @@ import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/database/app_state_data_provider.dart';
 import 'package:dreamer_playlist/database/playlist_data_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 class PlaylistView extends StatefulWidget {
@@ -22,6 +23,8 @@ class PlaylistView extends StatefulWidget {
 
 class _PlaylistViewState extends State<PlaylistView> {
   late Playlist playlist = widget.playlist;
+
+  final AudioPlayer _audioPlayer = GetitUtil.audioPlayer;
 
   @override
   Widget build(BuildContext context) {
@@ -71,13 +74,15 @@ class _PlaylistViewState extends State<PlaylistView> {
                 icon: Icon(Icons.edit)),
             // Play
             IconButton(
-                onPressed: () => play(),
+                onPressed: () {
+                  play(hasShuffleModeChanged: _audioPlayer.shuffleModeEnabled);
+                },
                 icon: Icon(Icons.play_circle, size: 42)),
             // Shuffle
             IconButton(
-                onPressed: () => play(
-                    hasShuffleModeChanged:
-                        !GetitUtil.audioPlayer.shuffleModeEnabled),
+                onPressed: () {
+                  shufflePlay();
+                },
                 icon: Icon(Icons.shuffle)),
             // More Actions
             PopupMenuButton(

@@ -34,8 +34,8 @@ ButtonBar libraryButtonBar = ButtonBar(
         },
         icon: Icon(Icons.edit)),
     IconButton(
-        onPressed: () => play(
-            loopMode: LoopMode.off,
+        onPressed: () =>
+            play(
             hasShuffleModeChanged: _audioPlayer.shuffleModeEnabled),
         icon: Icon(Icons.play_circle, size: 42)),
     IconButton(
@@ -47,8 +47,11 @@ ButtonBar libraryButtonBar = ButtonBar(
 AudioPlayer _audioPlayer = GetitUtil.audioPlayer;
 
 shufflePlay() async {
+  if (isEmptySonglist()) return;
+
+  // set songlist and audio source
+  GetitUtil.setQueueFromSonglist(GetitUtil.orderedSongList);
   await _audioPlayer.setAudioSource(GetitUtil.queue);
-  if (isEmptyQueue()) return;
 
   if (_audioPlayer.shuffleModeEnabled) {
     // shuffle already enabled, re-shuffle
@@ -60,17 +63,20 @@ shufflePlay() async {
   updateQueueIndicesNotifier();
   pauseStateNotifier.value = PauseState.playing;
 
+  // set currentlyPlaying as the first in sequence
+  currentlyPlayingNotifier.value = GetitUtil.queue.sequence[0].tag;
+
   await _audioPlayer.play();
 }
 
 play(
     {bool hasShuffleModeChanged = false,
-    LoopMode? loopMode,
     int initialIndex = 0}) async {
+  if (isEmptySonglist()) return;
 
-  await _audioPlayer.setAudioSource(GetitUtil.queue,
-      initialIndex: initialIndex, initialPosition: Duration.zero);
-  if (isEmptyQueue()) return; 
+  // set songlist and audio source
+  GetitUtil.setQueueFromSonglist(GetitUtil.orderedSongList);
+  await _audioPlayer.setAudioSource(GetitUtil.queue);
 
   if (hasShuffleModeChanged) {
     bool oldShuffleMode = _audioPlayer.shuffleModeEnabled;
@@ -79,10 +85,6 @@ play(
 
   updateQueueIndicesNotifier();
   pauseStateNotifier.value = PauseState.playing;
-
-  if (loopMode != null) {
-    loopModeNotifier.value = loopMode;
-  }
 
   // set currentlyPlaying as the first in sequence
   currentlyPlayingNotifier.value = GetitUtil.queue.sequence[initialIndex].tag;
