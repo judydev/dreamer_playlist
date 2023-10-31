@@ -47,11 +47,10 @@ ButtonBar libraryButtonBar = ButtonBar(
 AudioPlayer _audioPlayer = GetitUtil.audioPlayer;
 
 shufflePlay() async {
-  if (isEmptySonglist()) return;
-
   // set songlist and audio source
   GetitUtil.setQueueFromSonglist(GetitUtil.orderedSongList);
   await _audioPlayer.setAudioSource(GetitUtil.queue);
+  if (isEmptyQueue()) return;
 
   if (_audioPlayer.shuffleModeEnabled) {
     // shuffle already enabled, re-shuffle
@@ -72,11 +71,10 @@ shufflePlay() async {
 play(
     {bool hasShuffleModeChanged = false,
     int initialIndex = 0}) async {
-  if (isEmptySonglist()) return;
-
   // set songlist and audio source
   GetitUtil.setQueueFromSonglist(GetitUtil.orderedSongList);
   await _audioPlayer.setAudioSource(GetitUtil.queue);
+  if (isEmptyQueue()) return;
 
   if (hasShuffleModeChanged) {
     bool oldShuffleMode = _audioPlayer.shuffleModeEnabled;

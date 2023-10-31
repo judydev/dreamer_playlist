@@ -54,7 +54,12 @@ class MiniPlayerMode extends StatelessWidget {
           height: progressIndicatorHeight,
           child: Opacity(
             opacity: elementOpacity,
-            child: LinearProgressIndicator(value: 0.2), // Slider
+              child: ValueListenableBuilder(
+                valueListenable: progressBarValueNotifier,
+                builder: ((context, progressBarValue, child) {
+                  return LinearProgressIndicator(value: progressBarValue);
+                }),
+              )
           ),
         ),
       ],

@@ -39,6 +39,6 @@ void updateQueueIndicesNotifier() {
   queueIndicesNotifier.value = _audioPlayer.effectiveIndices ?? [];
 }
 
-bool isEmptySonglist() => GetitUtil.orderedSongList.isEmpty;
-    // queue.children.isEmpty;
-    // _audioPlayer.sequence == null || _audioPlayer.sequence!.isEmpty;
+bool isEmptyQueue() {
+  return _audioPlayer.sequence != null ? _audioPlayer.sequence!.isEmpty : true;
+}

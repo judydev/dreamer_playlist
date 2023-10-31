@@ -30,6 +30,7 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
   @override
   Widget build(BuildContext context) {
     double playerMaxHeight = MediaQuery.of(context).size.height;
+
     return Miniplayer(
       valueNotifier: playerExpandProgress,
       minHeight: playerMinHeight,
@@ -52,28 +53,28 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
           return Column(
             children: [
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Opacity(
-                    opacity: percentageExpandedPlayer,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Icon(Icons.horizontal_rule),
-                        // Currently playing
-                        ValueListenableBuilder(
-                            valueListenable: currentlyPlayingNotifier,
-                            builder: ((context, currentlyPlayingValue, child) {
-                              if (currentlyPlayingValue == null) {
-                                return ListTileWrapper(
-                                    leading: Icon(Icons.music_video),
-                                    title: 'Not playing');
-                              } else {
-                                return SongTile(currentlyPlayingValue,
-                                    onTapOverride: () {});
-                              }
-                            })),
-                        Row(
+                child: Opacity(
+                  opacity: percentageExpandedPlayer,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Icon(Icons.horizontal_rule),
+                      // Currently playing
+                      ValueListenableBuilder(
+                          valueListenable: currentlyPlayingNotifier,
+                          builder: ((context, currentlyPlayingValue, child) {
+                            if (currentlyPlayingValue == null) {
+                              return ListTileWrapper(
+                                  leading: Icon(Icons.music_video),
+                                  title: 'Not playing');
+                            } else {
+                              return SongTile(currentlyPlayingValue,
+                                  onTapOverride: () {});
+                            }
+                          })),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('Queue'),
@@ -85,30 +86,73 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                             )
                           ],
                         ),
-                        Expanded(
-                          child: MusicQueue()),
-                        height > 300 // prevent bottom overflow
-                            ? Column(
-                                children: [
-                                  Padding(
+                      ),
+                      Expanded(child: MusicQueue()),
+                      height > 331 // prevent bottom overflow
+                          ? Column(
+                              children: [
+                                Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 10),
-                                    child: LinearProgressIndicator(
-                                        value: 0.4), // Slider
-                                  ), // slide bar
-                                  PlayerButtonbar(isMiniPlayer: false),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10),
-                                    child: LinearProgressIndicator(
-                                        value: 0.1), // volume
-                                  ),
-                                  SizedBox(height: 30)
-                                ],
-                              )
-                            : SizedBox.shrink()
-                      ],
-                    ),
+                                    child: ValueListenableBuilder(
+                                      valueListenable: progressBarValueNotifier,
+                                      builder:
+                                          ((context, progressValue, child) {
+                                        Duration? duration =
+                                            _audioPlayer.duration;
+                                        return Column(children: [
+                                          Slider(
+                                            min: 0,
+                                            max: 1,
+                                            value: progressValue,
+                                            onChanged: (updatedValue) {
+                                              if (duration != null) {
+                                                _audioPlayer.seek(
+                                                    duration * updatedValue);
+                                                progressBarValueNotifier.value =
+                                                    updatedValue;
+                                              }
+                                            },
+                                          ),
+                                          Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 20),
+                                              child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                        convertDurationToTimeDisplay(
+                                                            duration != null
+                                                                ? duration *
+                                                                    progressValue
+                                                                : Duration
+                                                                    .zero),
+                                                        style: TextStyle(
+                                                            fontSize: 12)),
+                                                    Text(
+                                                        convertDurationToTimeDisplay(
+                                                            duration ??
+                                                                Duration.zero),
+                                                        style: TextStyle(
+                                                            fontSize: 12))
+                                                  ])),
+                                        ]);
+                                      }),
+                                    )), // slide bar
+                                PlayerButtonbar(isMiniPlayer: false),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 10, 0, 30),
+                                  child: LinearProgressIndicator(
+                                      value: 0.1), // volume
+                                ),
+                              ],
+                            )
+                          : SizedBox.shrink()
+                    ],
                   ),
                 ),
               ),
@@ -215,7 +259,7 @@ class PlayerButtonbar extends StatelessWidget {
                   : Icon(isMiniPlayer ? Icons.play_arrow : Icons.play_circle),
               iconSize: isMiniPlayer ? 25 : 50,
               onPressed: () {
-                if (isEmptySonglist()) return;
+                if (isEmptyQueue()) return;
 
                 if (isPlaying) {
                   _audioPlayer.pause();
@@ -237,7 +281,7 @@ class PlayerButtonbar extends StatelessWidget {
   
   IconButton getButtonPlayPrev() => IconButton(
       onPressed: () {
-        if (isEmptySonglist()) return;
+        if (isEmptyQueue()) return;
         _audioPlayer.seekToPrevious();
 
         _audioPlayer.play();
@@ -249,7 +293,7 @@ class PlayerButtonbar extends StatelessWidget {
 
   IconButton getButtonPlayNext() => IconButton(
       onPressed: () {
-        if (isEmptySonglist()) return;
+        if (isEmptyQueue()) return;
         _audioPlayer.seekToNext();
 
         _audioPlayer.play();
@@ -258,4 +302,19 @@ class PlayerButtonbar extends StatelessWidget {
         }
       },
       icon: Icon(Icons.skip_next));
+}
+
+String convertDurationToTimeDisplay(Duration duration) {
+  String hh = convertToTwoDigits(duration.inHours);
+  String mm = convertToTwoDigits(duration.inMinutes);
+  String ss = convertToTwoDigits(duration.inSeconds);
+  return '$hh:$mm:$ss';
+}
+
+String convertToTwoDigits(int num) {
+  String s = num.toString();
+  if (s.length == 1) {
+    return '0$s';
+  }
+  return s;
 }

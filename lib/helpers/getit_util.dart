@@ -35,6 +35,13 @@ class GetitUtil {
   static AudioPlayer _initAudioPlayer() {
     AudioPlayer ap = AudioPlayer();
 
+    ap.positionStream.listen((position) {
+      if (ap.duration != null) {
+        progressBarValueNotifier.value =
+            position.inMilliseconds / ap.duration!.inMilliseconds;
+      }
+    });
+
     ap.shuffleModeEnabledStream.listen(
       (event) {
         updateShuffleModeNotifier();

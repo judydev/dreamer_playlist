@@ -20,6 +20,8 @@ ValueNotifier<PauseState> pauseStateNotifier = ValueNotifier(PauseState.paused);
 ValueNotifier<ShuffleMode> shuffleModeNotifier = ValueNotifier(
     _audioPlayer.shuffleModeEnabled ? ShuffleMode.on : ShuffleMode.off);
 
+ValueNotifier<double> progressBarValueNotifier = ValueNotifier(0);
+
 enum ShuffleMode { on, off }
 void updateShuffleModeNotifier() {
   shuffleModeNotifier.value =
