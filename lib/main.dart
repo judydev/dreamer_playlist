@@ -21,7 +21,7 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseUtil.initDatabase();
-  GetitUtil.initRegistration();
+  await GetitUtil.initRegistration();
   await DataUtil.loadInitialData();
 
   runApp(

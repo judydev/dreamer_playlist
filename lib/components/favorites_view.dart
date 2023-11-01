@@ -56,7 +56,7 @@ class _FavoritesViewState extends State<FavoritesView> {
                 : Column(
                     children: [
                       libraryButtonBar,
-                      SongList(),
+                      SongListView(),
                     ],
                   )),
       ],

@@ -39,7 +39,7 @@ class SongDataProvider extends ChangeNotifier {
     // build a song instance and add to database
     String strippedName = StorageProvider.getFilenameFromPlatformFile(
         selectedFile.name, selectedFile.extension!);
-    Song song = Song(name: strippedName, path: songFile.path);
+    Song song = Song(title: strippedName, path: songFile.path);
     await addSongToDb(song);
 
     notifyListeners();

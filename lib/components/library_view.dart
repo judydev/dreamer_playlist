@@ -18,7 +18,7 @@ class LibraryView extends StatelessWidget {
               openFilePicker(context, null);
             },
             child: Text("Import local file to Library")),
-        SongList()
+        SongListView()
       ],
     );
   }
@@ -28,16 +28,19 @@ class LibraryView extends StatelessWidget {
 ButtonBar libraryButtonBar = ButtonBar(
   alignment: MainAxisAlignment.spaceEvenly,
   children: [
+    // Edit
     IconButton(
         onPressed: () {
           print('TODO: batch edit songs (e.g. batch delete)');
         },
         icon: Icon(Icons.edit)),
+    // Play
     IconButton(
         onPressed: () =>
             play(
             hasShuffleModeChanged: _audioPlayer.shuffleModeEnabled),
         icon: Icon(Icons.play_circle, size: 42)),
+    // Shuffle
     IconButton(
         onPressed: () => shufflePlay(),
         icon: Icon(Icons.shuffle)),
@@ -70,7 +73,7 @@ shufflePlay() async {
 
 play(
     {bool hasShuffleModeChanged = false,
-    int initialIndex = 0}) async {
+    int songIndex = 0}) async {
   // set songlist and audio source
   GetitUtil.setQueueFromSonglist(GetitUtil.orderedSongList);
   await _audioPlayer.setAudioSource(GetitUtil.queue);

@@ -48,7 +48,7 @@ void addSongsToPlaylist(
   int duplicates = 0;
   for (Song song in selectedSongs) {
     Provider.of<SongDataProvider>(context, listen: false)
-        .checkIfSongExistsInPlaylist(song.id, playlist.id)
+        .checkIfSongExistsInPlaylist(song.id!, playlist.id)
         .then((duplicate) {
       if (duplicate) {
         duplicates += 1;
@@ -56,12 +56,12 @@ void addSongsToPlaylist(
             context,
             "Warning",
             Text(
-                "${song.name} is already in the playlist, are you sure you want to add it again?"),
+                "${song.title} is already in the playlist, are you sure you want to add it again?"),
             [
               displayTextButton(context, "Add", callback: () {
                 duplicates -= 1;
                 Provider.of<SongDataProvider>(context, listen: false)
-                    .associateSongToPlaylist(song.id, playlist.id)
+                    .associateSongToPlaylist(song.id!, playlist.id)
                     .then(
                   (value) {
                     print('TODO: success UI indicating song added');
@@ -81,9 +81,9 @@ void addSongsToPlaylist(
             ]);
       } else {
         Provider.of<SongDataProvider>(context, listen: false)
-            .associateSongToPlaylist(song.id, playlist.id)
+            .associateSongToPlaylist(song.id!, playlist.id)
             .then((value) {
-          print('TODO: success UI indicating song ${song.name} added');
+          print('TODO: success UI indicating song ${song.title} added');
           if (duplicates == 0) {
             Navigator.pop(context, true);
           }
@@ -166,7 +166,7 @@ class _SongTileForAddMusicState extends State<_SongTileForAddMusic> {
   @override
   Widget build(BuildContext context) {
     return ListTileWrapper(
-        title: song.name!,
+        title: song.title!,
         leading: Icon(Icons.play_circle_outline),
         trailing: IconButton(
           icon: isSelected

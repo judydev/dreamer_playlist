@@ -8,15 +8,15 @@ import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SongList extends StatefulWidget {
+class SongListView extends StatefulWidget {
   final Playlist? playlist;
-  SongList({this.playlist});
+  SongListView({this.playlist});
 
   @override
-  State<SongList> createState() => _SongListState();
+  State<SongListView> createState() => _SongListViewState();
 }
 
-class _SongListState extends State<SongList> {
+class _SongListViewState extends State<SongListView> {
   late Playlist? playlist = widget.playlist;
 
   late SongDataProvider songDataProvider;

@@ -16,7 +16,7 @@ class SongTileReorder extends StatelessWidget {
       trailing: Icon(Icons.menu),
       onTap: () {
         print('SongTileReorder songIndex = $songIndex');
-        play(initialIndex: songIndex, hasShuffleModeChanged: false);
+        play(songIndex: songIndex, hasShuffleModeChanged: false);
       },
     );
   }

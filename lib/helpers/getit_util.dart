@@ -104,6 +104,22 @@ class GetitUtil {
     );
   }
 
+  static void addSongToQueue(Song song) {
+    print('addSongToQ');
+    print(queue.children);
+    AudioSource added = AudioSource.file(song.path!, tag: song);
+    queue.children.add(added);
+    print(queue.children);
+    if (audioPlayer.audioSource == null) {
+      setQueueFromSonglist([song]);
+    }
+
+    audioPlayer.setAudioSource(queue);
+    updateQueueIndicesNotifier();
+    print('effectiveIndic');
+    print(audioPlayer.effectiveIndices);
+  }
+
   // debugging functions
   // ignore: non_constant_identifier_names
   static void print_AudioPlayer_AudioSource_Sequence(

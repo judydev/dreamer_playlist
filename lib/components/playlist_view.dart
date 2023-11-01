@@ -88,7 +88,7 @@ class _PlaylistViewState extends State<PlaylistView> {
             PopupMenuButton(
                 position: PopupMenuPosition.under,
                 child: Icon(Icons.more_vert),
-                itemBuilder: (context) => _buildMoreActionsMenu(),
+              itemBuilder: (context) => _buildPlaylistMoreActionsMenu(),
             ),
           ],
         ),
@@ -117,12 +117,12 @@ class _PlaylistViewState extends State<PlaylistView> {
             ),
           ],
         ),
-        SongList(playlist: playlist),
+        SongListView(playlist: playlist),
       ],
     );
   }
 
-  List<PopupMenuItem> _buildMoreActionsMenu() {
+  List<PopupMenuItem> _buildPlaylistMoreActionsMenu() {
     return [
       PopupMenuItem(
         child: PopupMenuTile(

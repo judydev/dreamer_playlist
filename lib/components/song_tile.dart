@@ -26,7 +26,7 @@ class SongTile extends StatelessWidget {
     }
 
     return ListTileWrapper(
-      title: song.name!,
+      title: song.title!,
       leading: Icon(Icons.play_circle_outline),
       trailing: PopupMenuButton(
         position: PopupMenuPosition.under,
@@ -45,13 +45,14 @@ class SongTile extends StatelessWidget {
             print('SongTile songIndex = $songIndex');
             play(
                 hasShuffleModeChanged: GetitUtil.audioPlayer.shuffleModeEnabled,
-                initialIndex: songIndex!);
+                songIndex: songIndex!);
           },
     );
   }
 }
 
-List<PopupMenuItem> buildMoreActionsMenu(context, song, currentPlaylistId) {
+List<PopupMenuItem> buildMoreActionsMenu(
+    context, Song song, String? currentPlaylistId) {
   return [
     PopupMenuItem(
       // enabled: currentPlaylistId == null ? false : true,
@@ -60,9 +61,9 @@ List<PopupMenuItem> buildMoreActionsMenu(context, song, currentPlaylistId) {
         title: 'Remove from playlist', // only for songs in current playlist
       ),
       onTap: () {
-        print('Remove ${song.name} from playlist ');
+        print('Remove ${song.title} from playlist ');
         Provider.of<SongDataProvider>(context, listen: false)
-            .removeSongFromPlaylist(song.id, currentPlaylistId!)
+            .removeSongFromPlaylist(song.id!, currentPlaylistId!)
             .then(
           (value) {
             // TODO: handle success and error
@@ -102,13 +103,47 @@ List<PopupMenuItem> buildMoreActionsMenu(context, song, currentPlaylistId) {
     ),
     PopupMenuItem(
       child: PopupMenuTile(
+        icon: Icons.playlist_add_rounded,
+        title: 'Add to queue',
+      ),
+      onTap: () {
+        print('TODO: add current playlist to queue');
+        print(song.title);
+
+        GetitUtil.addSongToQueue(song);
+        // GetitUtil.audioPlayer.setAudioSource(GetitUtil.queue);
+        GetitUtil.print_AudioPlayer_AudioSource_Sequence(
+            GetitUtil.queue.sequence);
+
+        // if (GetitUtil.audioPlayer.audioSource == null) {
+        //   print('audioSource is null');
+        //   // GetitUtil.setQueueFromSonglist([song]);
+        //   GetitUtil.setQueueFromSonglist([song]);
+        //   GetitUtil.audioPlayer.setAudioSource(GetitUtil.queue);
+        //   GetitUtil.print_AudioPlayer_AudioSource_Sequence(
+        //       GetitUtil.audioPlayer.sequence!);
+        // } else {
+        //   print('exisiting sequence');
+
+        //   GetitUtil.print_AudioPlayer_AudioSource_Sequence(
+        //       GetitUtil.audioPlayer.sequence ?? []);
+        //   GetitUtil.audioPlayer.sequence!
+        //       .add(AudioSource.file(song.path!, tag: song));
+        //   GetitUtil.print_AudioPlayer_AudioSource_Sequence(
+        //       GetitUtil.audioPlayer.sequence!);
+        //       GetitUtil.addSongToQueue(song);
+        // }
+      },
+    ),
+    PopupMenuItem(
+      child: PopupMenuTile(
         icon: song.loved == 1 ? Icons.favorite : Icons.favorite_border,
         title: song.loved == 1 ? 'Loved' : 'Love',
       ),
       onTap: () {
-        print('Add ${song.name} to Favorite');
+        print('Add ${song.title} to Favorite');
         Provider.of<SongDataProvider>(context, listen: false)
-            .updateSongFavorite(song.id, song.loved ?? 0)
+            .updateSongFavorite(song.id!, song.loved ?? 0)
             .then((value) => {
                   print(
                       "TODO: SongTile.updateSongFavorite handle success/error")
@@ -121,7 +156,7 @@ List<PopupMenuItem> buildMoreActionsMenu(context, song, currentPlaylistId) {
         title: 'Rename',
       ),
       onTap: () {
-        print('TODO: Rename ${song.name}');
+        print('TODO: Rename ${song.title}');
       },
     ),
     PopupMenuItem(
@@ -130,7 +165,7 @@ List<PopupMenuItem> buildMoreActionsMenu(context, song, currentPlaylistId) {
         title: 'Share',
       ),
       onTap: () {
-        print('TODO: Share ${song.name}');
+        print('TODO: Share ${song.title}');
       },
     ),
   ];

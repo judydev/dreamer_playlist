@@ -51,7 +51,7 @@ void openFilePicker(context, String? playlistId) {
                       {
                         await Provider.of<SongDataProvider>(context,
                                 listen: false)
-                            .associateSongToPlaylist(song.id, playlistId),
+                            .associateSongToPlaylist(song.id!, playlistId),
                       },
                   }
                 else

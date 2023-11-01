@@ -39,7 +39,7 @@ class MiniPlayerMode extends StatelessWidget {
                       valueListenable: currentlyPlayingNotifier,
                       builder: (context, currentlyPlayingValue, child) {
                         return Text(
-                          currentlyPlayingValue?.name ??
+                          currentlyPlayingValue?.title ??
                           'Not playing',
                       overflow: TextOverflow.ellipsis,
                         );
