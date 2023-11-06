@@ -1,9 +1,20 @@
+import 'package:audio_service/audio_service.dart';
+import 'package:dreamer_playlist/helpers/audio_handler.dart';
 import 'package:dreamer_playlist/helpers/getit_util.dart';
-import 'package:dreamer_playlist/models/song.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-ValueNotifier<Song?> currentlyPlayingNotifier = ValueNotifier(null);
+ValueNotifier<int?> currentIndexNotifier = ValueNotifier(null);
+MediaItem? getCurrentPlaying(int? currentIndex) {
+  if (currentIndex == null) return null;
+  List<MediaItem> playlist = GetitUtil.audioHandler.queue.value;
+  if (playlist.length > currentIndex) {
+    return GetitUtil.audioHandler.queue.value[currentIndex];
+  }
+  debugPrint('getCurrentPlaying index out of range');
+  currentIndexNotifier.value = null;
+  return null;
+}
 
 // used to refresh the music queue
 ValueNotifier<List<int>> queueIndicesNotifier = ValueNotifier([]);
@@ -11,31 +22,26 @@ ValueNotifier<List<int>> queueIndicesNotifier = ValueNotifier([]);
 // loopModeNotifier: to refresh the loop button in MusicQueue
 ValueNotifier<LoopMode> loopModeNotifier = ValueNotifier(LoopMode.off);
 
-AudioPlayer _audioPlayer = GetitUtil.audioPlayer;
 // to refresh the play/pause button in PlayerButtonbar
-enum PauseState { playing, paused }
+enum PlayingState { playing, paused }
 
-ValueNotifier<PauseState> pauseStateNotifier = ValueNotifier(PauseState.paused);
+ValueNotifier<PlayingState> playingStateNotifier =
+    ValueNotifier(PlayingState.paused);
 
-ValueNotifier<ShuffleMode> shuffleModeNotifier = ValueNotifier(
-    _audioPlayer.shuffleModeEnabled ? ShuffleMode.on : ShuffleMode.off);
+ValueNotifier<ShuffleMode> shuffleModeNotifier = ValueNotifier(ShuffleMode.off);
 
 ValueNotifier<double> progressBarValueNotifier = ValueNotifier(0);
 
 enum ShuffleMode { on, off }
-void updateShuffleModeNotifier() {
-  shuffleModeNotifier.value =
-      _audioPlayer.shuffleModeEnabled ? ShuffleMode.on : ShuffleMode.off;
-}
 
-// enum PlayerMode { mini, full }
+MyAudioHandler _audioHandler = GetitUtil.audioHandler;
 
 // debugging functions
 printSongListFromIndices(List<int>? indices) {
   if (indices == null) {
-    return;
+    return _audioHandler.queue.value.map((e) => e.title).toList();
   }
 
-  List res = indices.map((i) => _audioPlayer.sequence![i].tag.name).toList();
+  List res = indices.map((i) => _audioHandler.queue.value[i].title).toList();
   print('new songlist = $res');
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:audio_service/audio_service.dart';
 import 'package:uuid/uuid.dart';
 
 class Song {
@@ -19,6 +20,17 @@ class Song {
       'path': path,
     };
   }
+
+  factory Song.fromMediaItem(MediaItem mediaItem) {
+    return Song(
+      title: mediaItem.title,
+      path: mediaItem.extras!['path'],
+      added: mediaItem.extras!['added'],
+    );
+  }
+
+  MediaItem toMediaItem() =>
+      MediaItem(id: id!, title: title!, extras: {'path': path, 'added': added});
 
   Song fromMapEntry(Map mapEntry) {
     id = mapEntry['id'];

@@ -46,7 +46,7 @@ class _SongListViewState extends State<SongListView> {
         List<Song> songs = snapshot.data;
         GetitUtil.orderedSongList = songs;
         if (songs.isNotEmpty) {
-          GetitUtil.setQueueFromSonglist(songs);
+          GetitUtil.orderedSongList = songs;
 
           return ListView(children: [
             ...songs.asMap().entries.map((entry) => SongTile(

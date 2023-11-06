@@ -85,8 +85,8 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           SizedBox(
               // prevent list from being hidden behind miniplayer
-              height: MediaQuery.of(context).size.height - 126 > 0
-                  ? MediaQuery.of(context).size.height - 126
+              height: MediaQuery.sizeOf(context).height - 126 > 0
+                  ? MediaQuery.sizeOf(context).height - 126
                   : null,
               child: buildTabView(context, _selectedTabIndex)),
           ExpandablePlayer()
@@ -96,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: ValueListenableBuilder(
         valueListenable: playerExpandProgress,
         builder: (BuildContext context, double height, Widget? child) {
-          double playerMaxHeight = MediaQuery.of(context).size.height;
+          double playerMaxHeight = MediaQuery.sizeOf(context).height;
           final value = percentageFromValueInRange(
               min: playerMinHeight, max: playerMaxHeight, value: height);
 

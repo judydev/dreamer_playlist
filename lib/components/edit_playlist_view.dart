@@ -17,7 +17,7 @@ class _EditPlaylistViewState extends State<EditPlaylistView> {
   @override
   Widget build(BuildContext context) {
     return (SizedBox(
-      height: MediaQuery.of(context).size.height / 5,
+      height: MediaQuery.sizeOf(context).height / 5,
       child: Column(
         children: [
           TextFormField(

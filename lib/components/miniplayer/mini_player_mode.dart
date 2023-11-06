@@ -9,7 +9,7 @@ class MiniPlayerMode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double playerMaxHeight = MediaQuery.of(context).size.height;
+    double playerMaxHeight = MediaQuery.sizeOf(context).height;
     final percentageMiniplayer = percentageFromValueInRange(
         min: playerMinHeight,
         max:
@@ -36,10 +36,10 @@ class MiniPlayerMode extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: ValueListenableBuilder(
-                      valueListenable: currentlyPlayingNotifier,
-                      builder: (context, currentlyPlayingValue, child) {
+                      valueListenable: currentIndexNotifier,
+                      builder: (context, currentIndex, child) {
                         return Text(
-                          currentlyPlayingValue?.title ??
+                          getCurrentPlaying(currentIndex)?.title ??
                           'Not playing',
                       overflow: TextOverflow.ellipsis,
                         );

@@ -1,4 +1,4 @@
-import 'package:dreamer_playlist/components/library_view.dart';
+import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/components/popup_menu_tile.dart';
 import 'package:dreamer_playlist/components/select_playlist_popup.dart';
 import 'package:dreamer_playlist/helpers/getit_util.dart';
@@ -7,6 +7,7 @@ import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 class SongTile extends StatelessWidget {
@@ -25,6 +26,8 @@ class SongTile extends StatelessWidget {
       moreActionsMenuItems.removeAt(0);
     }
 
+    AudioPlayer audioPlayer = GetitUtil.audioHandler.audioPlayer;
+
     return ListTileWrapper(
       title: song.title!,
       leading: Icon(Icons.play_circle_outline),
@@ -34,27 +37,31 @@ class SongTile extends StatelessWidget {
         itemBuilder: (context) => moreActionsMenuItems,
       ),
       onTap: onTapOverride ??
-          () {
+          () async {
             print('onTapCallback, clicked on song tile, play this song');
             if (songIndex == null) {
               print('Unknown index');
               return;
             }
 
-            shuffleModeNotifier.value = ShuffleMode.off;
-            print('SongTile songIndex = $songIndex');
-            play(
-                hasShuffleModeChanged: GetitUtil.audioPlayer.shuffleModeEnabled,
-                songIndex: songIndex!);
+            await GetitUtil.audioHandler
+                .resetQueueFromSonglist(GetitUtil.orderedSongList);
+           
+            updateQueueIndicesNotifier();
+            currentIndexNotifier.value = songIndex;
+            await Future.delayed(Duration(milliseconds: 10), () => {}); // TODO
+            await audioPlayer.seek(Duration.zero, index: songIndex);
+            await audioPlayer.play();
           },
     );
   }
 }
 
 List<PopupMenuItem> buildMoreActionsMenu(
-    context, Song song, String? currentPlaylistId) {
+    context, Song song, String? currentPlaylistId,
+    {int? songIndex}) {
   return [
-    PopupMenuItem(
+    PopupMenuItem<PopupMenuTile>(
       // enabled: currentPlaylistId == null ? false : true,
       child: PopupMenuTile(
         icon: Icons.delete_outline,
@@ -72,7 +79,7 @@ List<PopupMenuItem> buildMoreActionsMenu(
         );
       },
     ),
-    PopupMenuItem(
+    PopupMenuItem<PopupMenuTile>(
       child: PopupMenuTile(
         icon: Icons.delete_forever_outlined,
         title: 'Delete from library',
@@ -87,7 +94,7 @@ List<PopupMenuItem> buildMoreActionsMenu(
         // TODO: verify that song-playlist is removed from db
       },
     ),
-    PopupMenuItem(
+    PopupMenuItem<PopupMenuTile>(
       child: PopupMenuTile(
         icon: Icons.playlist_add,
         title: 'Add to playlist',
@@ -101,41 +108,26 @@ List<PopupMenuItem> buildMoreActionsMenu(
         );
       },
     ),
-    PopupMenuItem(
+    PopupMenuItem<PopupMenuTile>(
+      child: PopupMenuTile(
+        icon: Icons.playlist_add_rounded,
+        title: 'Play next',
+      ),
+      onTap: () {
+        GetitUtil.audioHandler.addQueueItemAt(
+            song.toMediaItem(), currentIndexNotifier.value ?? 0);
+      },
+    ),
+    PopupMenuItem<PopupMenuTile>(
       child: PopupMenuTile(
         icon: Icons.playlist_add_rounded,
         title: 'Add to queue',
       ),
       onTap: () {
-        print('TODO: add current playlist to queue');
-        print(song.title);
-
-        GetitUtil.addSongToQueue(song);
-        // GetitUtil.audioPlayer.setAudioSource(GetitUtil.queue);
-        GetitUtil.print_AudioPlayer_AudioSource_Sequence(
-            GetitUtil.queue.sequence);
-
-        // if (GetitUtil.audioPlayer.audioSource == null) {
-        //   print('audioSource is null');
-        //   // GetitUtil.setQueueFromSonglist([song]);
-        //   GetitUtil.setQueueFromSonglist([song]);
-        //   GetitUtil.audioPlayer.setAudioSource(GetitUtil.queue);
-        //   GetitUtil.print_AudioPlayer_AudioSource_Sequence(
-        //       GetitUtil.audioPlayer.sequence!);
-        // } else {
-        //   print('exisiting sequence');
-
-        //   GetitUtil.print_AudioPlayer_AudioSource_Sequence(
-        //       GetitUtil.audioPlayer.sequence ?? []);
-        //   GetitUtil.audioPlayer.sequence!
-        //       .add(AudioSource.file(song.path!, tag: song));
-        //   GetitUtil.print_AudioPlayer_AudioSource_Sequence(
-        //       GetitUtil.audioPlayer.sequence!);
-        //       GetitUtil.addSongToQueue(song);
-        // }
+        GetitUtil.audioHandler.addQueueItem(song.toMediaItem());
       },
     ),
-    PopupMenuItem(
+    PopupMenuItem<PopupMenuTile>(
       child: PopupMenuTile(
         icon: song.loved == 1 ? Icons.favorite : Icons.favorite_border,
         title: song.loved == 1 ? 'Loved' : 'Love',
@@ -150,7 +142,7 @@ List<PopupMenuItem> buildMoreActionsMenu(
                 });
       },
     ),
-    PopupMenuItem(
+    PopupMenuItem<PopupMenuTile>(
       child: PopupMenuTile(
         icon: Icons.edit,
         title: 'Rename',
@@ -159,7 +151,7 @@ List<PopupMenuItem> buildMoreActionsMenu(
         print('TODO: Rename ${song.title}');
       },
     ),
-    PopupMenuItem(
+    PopupMenuItem<PopupMenuTile>(
       child: PopupMenuTile(
         icon: Icons.ios_share,
         title: 'Share',
