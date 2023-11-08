@@ -7,7 +7,7 @@ import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-class LibraryView extends StatelessWidget {
+class LibraryTabView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(

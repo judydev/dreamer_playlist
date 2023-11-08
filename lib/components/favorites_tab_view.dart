@@ -1,14 +1,14 @@
-import 'package:dreamer_playlist/components/library_view.dart';
+import 'package:dreamer_playlist/components/library_tab_view.dart';
 import 'package:dreamer_playlist/components/songlist_view.dart';
-import 'package:dreamer_playlist/components/playlists_view.dart';
+import 'package:dreamer_playlist/components/playlists_tab_view.dart';
 import 'package:flutter/material.dart';
 
-class FavoritesView extends StatefulWidget {
+class FavoritesTabView extends StatefulWidget {
   @override
-  State<FavoritesView> createState() => _FavoritesViewState();
+  State<FavoritesTabView> createState() => _FavoritesTabViewState();
 }
 
-class _FavoritesViewState extends State<FavoritesView> {
+class _FavoritesTabViewState extends State<FavoritesTabView> {
   bool showPlaylists = false;
 
   @override

@@ -1,6 +1,6 @@
 import 'package:dreamer_playlist/components/add_music_popup.dart';
 import 'package:dreamer_playlist/components/edit_playlist_popup.dart';
-import 'package:dreamer_playlist/components/library_view.dart';
+import 'package:dreamer_playlist/components/library_tab_view.dart';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/components/popup_menu_tile.dart';
@@ -12,15 +12,15 @@ import 'package:dreamer_playlist/database/playlist_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PlaylistView extends StatefulWidget {
+class PlaylistTabView extends StatefulWidget {
   final Playlist playlist;
-  PlaylistView({required this.playlist});
+  PlaylistTabView({required this.playlist});
 
   @override
-  State<PlaylistView> createState() => _PlaylistViewState();
+  State<PlaylistTabView> createState() => _PlaylistTabViewState();
 }
 
-class _PlaylistViewState extends State<PlaylistView> {
+class _PlaylistTabViewState extends State<PlaylistTabView> {
   late Playlist playlist = widget.playlist;
 
   @override
@@ -37,7 +37,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                 Provider.of<AppStateDataProvider>(context, listen: false)
                     .updateAppState(AppStateKey.currentPlaylistId, null);
               },
-            )), // TODO: hide when first open
+            )),
         Padding(
           padding: EdgeInsets.all(20),
           child: Icon(Icons.music_video, size: 64),

@@ -2,12 +2,12 @@ import 'package:dreamer_playlist/database/app_state_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PreferencesView extends StatefulWidget {
+class PreferencesTabView extends StatefulWidget {
   @override
-  State<PreferencesView> createState() => _PreferencesViewState();
+  State<PreferencesTabView> createState() => _PreferencesTabViewState();
 }
 
-class _PreferencesViewState extends State<PreferencesView> {
+class _PreferencesTabViewState extends State<PreferencesTabView> {
   late AppStateDataProvider appStateDataProvider;
   late Future<Map<String, dynamic>> _getPreferences;
 

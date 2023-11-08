@@ -7,7 +7,7 @@ import 'package:dreamer_playlist/database/playlist_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PlaylistsView extends StatelessWidget {
+class PlaylistsTabView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return (Column(mainAxisAlignment: MainAxisAlignment.start, children: [

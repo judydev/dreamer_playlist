@@ -1,7 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
-import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:just_audio/just_audio.dart';
 

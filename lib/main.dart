@@ -1,10 +1,10 @@
 import 'package:dreamer_playlist/components/miniplayer/utils.dart';
 import 'package:dreamer_playlist/components/miniplayer/expandable_player.dart';
-import 'package:dreamer_playlist/components/favorites_view.dart';
-import 'package:dreamer_playlist/components/library_view.dart';
-import 'package:dreamer_playlist/components/playlist_view.dart';
-import 'package:dreamer_playlist/components/playlists_view.dart';
-import 'package:dreamer_playlist/components/preferences_view.dart';
+import 'package:dreamer_playlist/components/favorites_tab_view.dart';
+import 'package:dreamer_playlist/components/library_tab_view.dart';
+import 'package:dreamer_playlist/components/playlist_tab_view.dart';
+import 'package:dreamer_playlist/components/playlists_tab_view.dart';
+import 'package:dreamer_playlist/components/preferences_tab_view.dart';
 import 'package:dreamer_playlist/database/data_util.dart';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
@@ -164,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
   buildTabView(context, int tabIndex) {
     switch (tabIndex) {
       case 0:
-        return LibraryView();
+        return LibraryTabView();
       case 1:
         return FutureBuilderWrapper(
             appStateDataProvider.getAppStateByKey(
@@ -175,18 +175,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 playlistDataProvider.getPlaylistById(currentPlaylistId),
                 (context, snapshot) {
               Playlist playlist = snapshot.data;
-              return PlaylistView(playlist: playlist);
+              return PlaylistTabView(playlist: playlist);
             });
           } else {
-            return PlaylistsView();
+            return PlaylistsTabView();
           }
         });
       case 2:
-        return FavoritesView();
+        return FavoritesTabView();
       case 3:
-        return PreferencesView();
+        return PreferencesTabView();
       default:
-        return LibraryView();
+        return LibraryTabView();
     }
   }
 }
