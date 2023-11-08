@@ -1,6 +1,9 @@
 import 'package:dreamer_playlist/components/library_tab_view.dart';
+import 'package:dreamer_playlist/components/playlist_tab_view.dart';
 import 'package:dreamer_playlist/components/songlist_view.dart';
 import 'package:dreamer_playlist/components/playlists_tab_view.dart';
+import 'package:dreamer_playlist/helpers/notifiers.dart';
+import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:flutter/material.dart';
 
 class FavoritesTabView extends StatefulWidget {
@@ -52,7 +55,15 @@ class _FavoritesTabViewState extends State<FavoritesTabView> {
         ),
         Expanded(
             child: showPlaylists
-                ? PlaylistsList() // TODO: display playlist when clicked on playlist tile
+                ? ValueListenableBuilder<Playlist?>(
+                    valueListenable: selectedFavoritePlaylistNotifier,
+                    builder: ((context, selectedPlaylist, child) {
+                      if (selectedPlaylist == null) {
+                        return PlaylistsList();
+                      } else {
+                        return PlaylistTabView(playlist: selectedPlaylist);
+                      }
+                    }))
                 : Column(
                     children: [
                       libraryButtonBar,

@@ -1,6 +1,7 @@
 import 'package:dreamer_playlist/components/add_music_popup.dart';
 import 'package:dreamer_playlist/components/edit_playlist_popup.dart';
 import 'package:dreamer_playlist/components/library_tab_view.dart';
+import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/components/popup_menu_tile.dart';
@@ -34,8 +35,13 @@ class _PlaylistTabViewState extends State<PlaylistTabView> {
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios_new),
               onPressed: () {
+                if (isPlaylistsTab()) {
                 Provider.of<AppStateDataProvider>(context, listen: false)
                     .updateAppState(AppStateKey.currentPlaylistId, null);
+                }
+                if (isFavoriteTab()) {
+                  selectedFavoritePlaylistNotifier.value = null;
+                }
               },
             )),
         Padding(
@@ -55,6 +61,9 @@ class _PlaylistTabViewState extends State<PlaylistTabView> {
                       print("TODO: handle success updating fav playlist");
                     },
                   );
+                  if (isFavoriteTab()) {
+                    selectedFavoritePlaylistNotifier.value = null;
+                  }
                 },
                 icon: playlist.loved == 1
                     ? Icon(Icons.favorite)

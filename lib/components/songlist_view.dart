@@ -30,7 +30,7 @@ class _SongListViewState extends State<SongListView> {
     if (playlist != null) {
       _getSongs = songDataProvider.getAllSongsFromPlaylist(playlist!.id);
     } else {
-      if (GetitUtil.appStates.currentTab == menuTabs[2]) {
+      if (isFavoriteTab()) {
         _getSongs = songDataProvider.getFavoriteSongs();
       } else {
         _getSongs = songDataProvider.getAllSongs();

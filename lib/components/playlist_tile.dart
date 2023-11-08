@@ -1,4 +1,4 @@
-import 'package:dreamer_playlist/helpers/service_locator.dart';
+import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/components/edit_playlist_view.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
@@ -8,30 +8,9 @@ import 'package:dreamer_playlist/database/playlist_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PlaylistTile extends StatefulWidget {
+class PlaylistTile extends StatelessWidget {
   final Playlist playlist;
-  final int index;
-  final Function setCurrentPlaylistCallback;
-
-  PlaylistTile(this.playlist, this.index, this.setCurrentPlaylistCallback);
-
-  @override
-  State<StatefulWidget> createState() => _PlaylistTileState();
-}
-
-class _PlaylistTileState extends State<PlaylistTile> {
-  late Playlist playlist;
-  late int index;
-  late Function setCurrentPlaylistCallback;
-
-  @override
-  void initState() {
-    super.initState();
-
-    playlist = widget.playlist;
-    index = widget.index;
-    setCurrentPlaylistCallback = widget.setCurrentPlaylistCallback;
-  }
+  PlaylistTile(this.playlist);
 
   @override
   Widget build(BuildContext context) {
@@ -39,13 +18,15 @@ class _PlaylistTileState extends State<PlaylistTile> {
       title: playlist.name!,
       leading: Icon(Icons.queue_music),
       onTap: () {
-        if (GetitUtil.appStates.currentTab == menuTabs[1]) {
+        if (isPlaylistsTab()) {
           Provider.of<AppStateDataProvider>(context, listen: false)
               .updateAppState(AppStateKey.currentPlaylistId, playlist.id)
               .catchError((e) => print('Error update state $e'));
         }
 
-        GetitUtil.appStates.currentPlaylistId = playlist.id;
+        if (isFavoriteTab()) {
+          selectedFavoritePlaylistNotifier.value = playlist;
+        }
       },
     );
   }
@@ -65,14 +46,9 @@ class _PlaylistTileState extends State<PlaylistTile> {
   }
 }
 
-class NewPlaylistTile extends StatefulWidget {
+class NewPlaylistTile extends StatelessWidget {
   NewPlaylistTile();
 
-  @override
-  State<StatefulWidget> createState() => _NewPlaylistTileState();
-}
-
-class _NewPlaylistTileState extends State<NewPlaylistTile> {
   @override
   Widget build(BuildContext context) {
     return ListTileWrapper(

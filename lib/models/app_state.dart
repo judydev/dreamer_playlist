@@ -1,3 +1,5 @@
+import 'package:dreamer_playlist/helpers/service_locator.dart';
+
 class AppStates {
   String? currentTab;
   String? currentPlaying;
@@ -40,3 +42,10 @@ enum AppStateKey {
 }
 
 const menuTabs = ['Library', 'Playlists', 'Favorites', 'Preferences'];
+bool isFavoriteTab() {
+  return GetitUtil.appStates.currentTab == menuTabs[2];
+}
+
+bool isPlaylistsTab() {
+  return GetitUtil.appStates.currentTab == menuTabs[1];
+}

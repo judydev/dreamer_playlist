@@ -48,7 +48,6 @@ class SongTile extends StatelessWidget {
             currentIndexNotifier.value = songIndex;
             await Future.delayed(Duration(milliseconds: 10), () => {}); // TODO
             await GetitUtil.audioHandler.skipToQueueItem(songIndex!);
-            await GetitUtil.audioHandler.play();
           },
     );
   }

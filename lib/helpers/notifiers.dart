@@ -1,3 +1,4 @@
+import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -16,4 +17,6 @@ ValueNotifier<PlayingState> playingStateNotifier =
     ValueNotifier(PlayingState.paused);
 
 ValueNotifier<bool> shuffleModeNotifier = ValueNotifier(false);
+
+final selectedFavoritePlaylistNotifier = ValueNotifier<Playlist?>(null);
 

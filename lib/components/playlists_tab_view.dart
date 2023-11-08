@@ -38,7 +38,7 @@ class _PlaylistsListState extends State<PlaylistsList> {
 
     playlistDataProvider = Provider.of<PlaylistDataProvider>(context);
 
-    if (GetitUtil.appStates.currentTab == menuTabs[2]) {
+    if (isFavoriteTab()) {
       _getPlaylists = playlistDataProvider.getFavoritePlaylists();
     } else {
       _getPlaylists = playlistDataProvider.getAllPlaylists();
@@ -49,15 +49,18 @@ class _PlaylistsListState extends State<PlaylistsList> {
   Widget build(BuildContext context) {
     return FutureBuilderWrapper(
       _getPlaylists,
-      loadingText: "Loading playlists...",
       (context, snapshot) {
         List<Playlist> playlists = snapshot.data ?? [];
+        if (playlists.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: Text('No favorite playlists.'),
+          );
+        }
         return Column(
           children: [
             ...playlists.asMap().entries.map((entry) =>
-                PlaylistTile(entry.value, entry.key, (editedProject, index) {
-                  playlists[index] = editedProject;
-                })),
+                PlaylistTile(entry.value))
           ],
         );
       },

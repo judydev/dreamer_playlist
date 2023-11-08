@@ -35,7 +35,6 @@ class _SelectPlaylistPopupState extends State<SelectPlaylistPopup> {
         appBar: AppBar(title: Text('Select a playlist')),
         body: FutureBuilderWrapper(
           _getAllPlaylists,
-          loadingText: "Loading playlists...",
           (context, snapshot) {
             List<Playlist> playlists = snapshot.data ?? [];
             return Column(

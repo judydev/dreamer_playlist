@@ -292,8 +292,7 @@ class MyAudioHandler extends BaseAudioHandler
 
   void _listenForSequenceChanges() {
     _audioPlayer.sequenceStream.listen((sequence) {
-      print('sequence changed');
-      print(sequence);
+      // print('sequence changed');
       if (sequence == null || sequence.isEmpty) {
         return;
       }
