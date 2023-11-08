@@ -277,6 +277,7 @@ class PlayerButtonbar extends StatelessWidget {
         if (isEmptyQueue()) return;
         GetitUtil.pageManager.onPreviousSongButtonPressed();
       },
+      iconSize: isMiniPlayer ? 25 : 35,
       icon: Icon(Icons.skip_previous));
 
   IconButton getButtonPlayNext() => IconButton(
@@ -284,6 +285,7 @@ class PlayerButtonbar extends StatelessWidget {
         if (isEmptyQueue()) return;
         GetitUtil.pageManager.onNextSongButtonPressed();
       },
+      iconSize: isMiniPlayer ? 25 : 35,
       icon: Icon(Icons.skip_next));
 }
 

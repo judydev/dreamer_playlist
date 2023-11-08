@@ -28,7 +28,7 @@ class PageManager {
   // Events: Calls coming from the UI
   void init() async {
     // await _loadPlaylist();
-    _listenToChangesInPlaylist();
+    // _listenToChangesInPlaylist();
     _listenToPlaybackState();
     _listenToCurrentPosition();
     // _listenToBufferedPosition();
@@ -48,16 +48,16 @@ class PageManager {
   // void remove() {}
   void dispose() {}
 
-  void _listenToChangesInPlaylist() {
-    _audioHandler.queue.listen((queue) {
-      print('listenToChangesInPlaylist');
-      if (queue.isEmpty) return;
-      final newList = queue.map((item) => item.title).toList();
-      print('newList: $newList');
-      // playlistNotifier.value = queue;
-      playlistTitlesNotifier.value = newList;
-    });
-  }
+  // void _listenToChangesInPlaylist() {
+  //   _audioHandler.queue.listen((queue) {
+  //     print('listenToChangesInPlaylist');
+  //     if (queue.isEmpty) return;
+  //     final newList = queue.map((item) => item.title).toList();
+  //     print('newList: $newList');
+  //     // playlistNotifier.value = queue;
+  //     playlistTitlesNotifier.value = newList;
+  //   });
+  // }
 
   void _listenToPlaybackState() {
     _audioHandler.playbackState.listen((playbackState) {
@@ -66,13 +66,13 @@ class PageManager {
       if (processingState == AudioProcessingState.loading ||
           processingState == AudioProcessingState.buffering) {
         // playButtonNotifier.value = ButtonState.loading;
-        playingStateNotifier.value = PlayingState.loading;
+        // playingStateNotifier.value = PlayingState.loading;
       } else if (!isPlaying) {
         // playButtonNotifier.value = ButtonState.paused;
-        playingStateNotifier.value = PlayingState.paused;
+        // playingStateNotifier.value = PlayingState.paused;
       } else if (processingState != AudioProcessingState.completed) {
         // playButtonNotifier.value = ButtonState.playing;
-        playingStateNotifier.value = PlayingState.playing;
+        // playingStateNotifier.value = PlayingState.playing;
       } else {
         _audioHandler.seek(Duration.zero);
         _audioHandler.pause();

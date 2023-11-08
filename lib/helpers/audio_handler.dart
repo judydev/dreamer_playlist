@@ -37,7 +37,7 @@ class MyAudioHandler extends BaseAudioHandler
     _listenForSequenceChanges();
     _listenForPlayerStateChanges();
     _listenForShuffleModeChanges();
-    _listenForLoopModeChanges();
+    // _listenForLoopModeChanges();
   }
 
   Future<void> _loadEmptyPlaylist() async {
@@ -61,8 +61,12 @@ class MyAudioHandler extends BaseAudioHandler
         case ProcessingState.completed:
           currentIndexNotifier.value = null;
 
+          int firstIndex = 0;
+          if (_audioPlayer.shuffleModeEnabled) {
+            firstIndex = _audioPlayer.effectiveIndices![0];
+          }
           await _audioPlayer.pause();
-          await _audioPlayer.seek(Duration.zero, index: 0);
+          await _audioPlayer.seek(Duration.zero, index: firstIndex);
           break;
         default:
           return;
@@ -72,31 +76,20 @@ class MyAudioHandler extends BaseAudioHandler
 
   void _listenForShuffleModeChanges() {
     _audioPlayer.shuffleModeEnabledStream.listen(((shuffleModeEnabled) {
-      print('shuffleMode changed to $shuffleModeEnabled');
       shuffleModeNotifier.value = shuffleModeEnabled;
-
-      // update queue
-      // print('shuffled sequence: ${_audioPlayer.effectiveIndices}');
-      // if (shuffleModeEnabled) {
-      //   int? currentIndex = currentIndexNotifier.value;
-      //   print('shuffle -> true, currentIndex = $currentIndex');
-      //   print('nextIndex = ${_audioPlayer.nextIndex}');
-      //   print('prevIndex = ${_audioPlayer.previousIndex}');
-      // }
-      // queueIndicesNotifier.value = _audioPlayer.effectiveIndices!;
     }));
 
     _audioPlayer.shuffleIndicesStream
         .listen((event) {}); // this stream is always changing
   }
 
-  void _listenForLoopModeChanges() {
-    _audioPlayer.loopModeStream.listen(
-      (event) {
-        print('loopmode changed to $event');
-      },
-    );
-  }
+  // void _listenForLoopModeChanges() {
+  //   _audioPlayer.loopModeStream.listen(
+  //     (event) {
+  //       print('loopmode changed to $event');
+  //     },
+  //   );
+  // }
 
   // @override
   // Future<void> click([MediaButton button = MediaButton.media]) {

@@ -55,9 +55,8 @@ ButtonBar libraryButtonBar = ButtonBar(
 Future<void> shufflePlay() async {
   AudioPlayer audioPlayer = GetitUtil.audioHandler.audioPlayer;
   MyAudioHandler audioHandler = GetitUtil.audioHandler;
-  if (isEmptyQueue()) {
-    await audioHandler.resetQueueFromSonglist(GetitUtil.orderedSongList);
-  }
+
+  await audioHandler.resetQueueFromSonglist(GetitUtil.orderedSongList);
   if (isEmptyQueue()) return;
 
   if (audioPlayer.shuffleModeEnabled) {
@@ -67,12 +66,9 @@ Future<void> shufflePlay() async {
     await audioPlayer.setShuffleModeEnabled(true);
   }
 
-  await Future.delayed(Duration(milliseconds: 10), () => {}); // TODO
-
   updateQueueIndicesNotifier();
   int firstIndex = audioPlayer.effectiveIndices![0];
   await audioHandler.skipToQueueItem(firstIndex);
-  await audioHandler.play();
 }
 
 Future<void> play(
