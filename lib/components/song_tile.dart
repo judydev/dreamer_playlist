@@ -65,11 +65,13 @@ List<PopupMenuItem> buildMoreActionsMenu(
       ),
       onTap: () async {
         print('Remove ${song.title} from playlist ');
+        if (song.playlistSongId == null) {
+          print(
+              'Error when removing ${song.title} from playlist: invalid PlaylistSongId');
+          return;
+        }
         await Provider.of<SongDataProvider>(context, listen: false)
-            .removeSongFromPlaylist(song.id!, currentPlaylistId!)
-            .then((value) => (value) {
-                  print(value);
-                });
+            .removeSongFromPlaylist(song.playlistSongId!);  
       },
     ),
     PopupMenuItem<PopupMenuTile>(

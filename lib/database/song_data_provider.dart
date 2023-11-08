@@ -135,22 +135,10 @@ class SongDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<Song>> getAllSongsFromPlaylist2(String playlistId) async {
-    final db = await DatabaseUtil.getDatabase();
-    String sql =
-        'select * from ${DatabaseUtil.songTableName} where id in (select songId from ${DatabaseUtil.playlistSongTableName} where playlistId = "$playlistId")';
-    List<Map<String, dynamic>> maps = await db.rawQuery(sql);
-
-    List<Song> songs =
-        List.generate(maps.length, (i) => Song().fromMapEntry(maps[i]));
-
-    return songs;
-  }
-
   Future<List<Song>> getAllSongsFromPlaylist(String playlistId) async {
     final db = await DatabaseUtil.getDatabase();
     String sql =
-        'select * from ${DatabaseUtil.songTableName} join ${DatabaseUtil.playlistSongTableName} on ${DatabaseUtil.songTableName}.id = ${DatabaseUtil.playlistSongTableName}.songId where playlistId = "$playlistId"';
+        'select s.name, s.path, s.loved, s.added, s.lastPlayed, s.id as id, ps.id as playlistSongId from ${DatabaseUtil.songTableName} as s join ${DatabaseUtil.playlistSongTableName} as ps on s.id = ps.songId where ps.playlistId = "$playlistId"';
     List<Map<String, dynamic>> maps = await db.rawQuery(sql);
 
     List<Song> songs =
@@ -159,13 +147,13 @@ class SongDataProvider extends ChangeNotifier {
     return songs;
   }
 
-  Future<void> removeSongFromPlaylist(String songId, String playlistId) async {
+  Future<void> removeSongFromPlaylist(String playlistSongId) async {
     final db = await DatabaseUtil.getDatabase();
 
     await db.delete(DatabaseUtil.playlistSongTableName,
-        where: 'songId = ? AND playlistId = ?',
-        whereArgs: [songId, playlistId]);
+        where: 'id = ?', whereArgs: [playlistSongId]);
 
+    // TODO: handle exception
     notifyListeners();
   }
 }

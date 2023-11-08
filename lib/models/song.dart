@@ -10,6 +10,7 @@ class Song {
   late int? added;
   int? lastPlayed;
   File? audioFile;
+  String? playlistSongId; // used when loading a song from a playlist
 
   Song({this.title, this.path, this.added}) : id = Uuid().v4();
 
@@ -39,6 +40,7 @@ class Song {
     loved = mapEntry['loved'];
     added = mapEntry['added'];
     lastPlayed = mapEntry['lastPlayed'];
+    playlistSongId = mapEntry['playlistSongId'];
 
     return this;
   }
