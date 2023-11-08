@@ -1,6 +1,6 @@
 import 'package:dreamer_playlist/components/miniplayer/expandable_player.dart';
 import 'package:dreamer_playlist/components/miniplayer/utils.dart';
-import 'package:dreamer_playlist/helpers/notifiers.dart';
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:flutter/material.dart';
 
 class MiniPlayerMode extends StatelessWidget {
@@ -36,10 +36,11 @@ class MiniPlayerMode extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: ValueListenableBuilder(
-                      valueListenable: currentIndexNotifier,
-                      builder: (context, currentIndex, child) {
+                      valueListenable:
+                          GetitUtil.pageManager.currentPlayingNotifier,
+                      builder: (context, mediaItem, child) {
                         return Text(
-                          getCurrentPlaying(currentIndex)?.title ??
+                          mediaItem?.title ??
                           'Not playing',
                       overflow: TextOverflow.ellipsis,
                         );
@@ -55,7 +56,7 @@ class MiniPlayerMode extends StatelessWidget {
           child: Opacity(
             opacity: elementOpacity,
               child: ValueListenableBuilder(
-                valueListenable: progressBarValueNotifier,
+                valueListenable: GetitUtil.pageManager.progressBarValueNotifier,
                 builder: ((context, progressBarValue, child) {
                   return LinearProgressIndicator(value: progressBarValue);
                 }),

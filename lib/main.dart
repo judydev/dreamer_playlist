@@ -6,7 +6,7 @@ import 'package:dreamer_playlist/components/playlist_view.dart';
 import 'package:dreamer_playlist/components/playlists_view.dart';
 import 'package:dreamer_playlist/components/preferences_view.dart';
 import 'package:dreamer_playlist/database/data_util.dart';
-import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
@@ -21,8 +21,9 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseUtil.initDatabase();
-  await GetitUtil.initRegistration();
   await DataUtil.loadInitialData();
+
+  await setupServiceLocator();
 
   runApp(
     MultiProvider(providers: [
@@ -68,7 +69,15 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late AppStateDataProvider appStateDataProvider;
   late PlaylistDataProvider playlistDataProvider;
-  int _selectedTabIndex = menuTabs.indexOf(GetitUtil.appStates.currentTab!);
+  int _selectedTabIndex = GetitUtil.appStates.currentTab != null
+      ? menuTabs.indexOf(GetitUtil.appStates.currentTab!)
+      : 0;
+
+  @override
+  void initState() {
+    super.initState();
+    GetitUtil.pageManager.init();
+  }
 
   @override
   void didChangeDependencies() {
@@ -76,6 +85,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
     appStateDataProvider = Provider.of<AppStateDataProvider>(context);
     playlistDataProvider = Provider.of<PlaylistDataProvider>(context);
+  }
+
+  @override
+  void dispose() {
+    GetitUtil.pageManager.dispose();
+    super.dispose();
   }
 
   @override

@@ -1,5 +1,5 @@
 import 'package:dreamer_playlist/database/app_state_data_provider.dart';
-import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 
 class DataUtil {

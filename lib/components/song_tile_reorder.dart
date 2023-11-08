@@ -1,5 +1,5 @@
-import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -33,14 +33,15 @@ class SongTileReorder extends StatelessWidget {
               ),
             ),
             child: Container(
-                color: currentIndex != null && queueIndex == currentIndex
-                    ? Theme.of(context).colorScheme.surfaceTint
-                    : null,
+                // color: currentIndex != null && queueIndex == currentIndex
+                //     ? Theme.of(context).colorScheme.surfaceTint
+                //     : null,
                 child: child),
           );
         }),
         child: ListTileWrapper(
-            title: _audioPlayer.sequence?[queueIndex].tag.title,
+            // title: _audioPlayer.sequence?[queueIndex].tag.title,
+            title: GetitUtil.audioHandler.queue.value[queueIndex].title,
             leading: Icon(Icons.music_video),
             trailing: Icon(Icons.menu),
             onTap: () async {

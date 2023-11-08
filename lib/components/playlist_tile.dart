@@ -1,4 +1,4 @@
-import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/components/edit_playlist_view.dart';
 import 'package:dreamer_playlist/models/app_state.dart';

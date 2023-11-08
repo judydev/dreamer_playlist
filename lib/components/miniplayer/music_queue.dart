@@ -1,6 +1,6 @@
 import 'package:dreamer_playlist/components/song_tile_reorder.dart';
-import 'package:dreamer_playlist/helpers/getit_util.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 

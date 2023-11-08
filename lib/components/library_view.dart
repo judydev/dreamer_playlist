@@ -1,7 +1,7 @@
 import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/components/songlist_view.dart';
 import 'package:dreamer_playlist/helpers/audio_handler.dart';
-import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:flutter/material.dart';
@@ -40,23 +40,13 @@ ButtonBar libraryButtonBar = ButtonBar(
         onPressed: () {
           play(
               hasShuffleModeChanged:
-                      GetitUtil.audioHandler.audioPlayer.shuffleModeEnabled)
-              .then((value) => print('play success'))
-              .catchError((e) {
-            print('play error');
-            debugPrint(e);
-          });
+                  GetitUtil.audioHandler.audioPlayer.shuffleModeEnabled);
         },
         icon: Icon(Icons.play_circle, size: 42)),
     // Shuffle
     IconButton(
         onPressed: () {
-          shufflePlay()
-              .then((value) => print('shufflePlay success'))
-              .catchError((e) {
-            print('shufflePlay error');
-            debugPrint(e);
-          });
+          shufflePlay();
         },
         icon: Icon(Icons.shuffle)),
   ],
@@ -89,8 +79,7 @@ Future<void> play(
     {bool hasShuffleModeChanged = false, int songIndex = 0}) async {
   MyAudioHandler audioHandler = GetitUtil.audioHandler;
   AudioPlayer audioPlayer = audioHandler.audioPlayer;
-  await audioHandler
-      .resetQueueFromSonglist(GetitUtil.orderedSongList);
+  await audioHandler.resetQueueFromSonglist(GetitUtil.orderedSongList);
   if (isEmptyQueue()) return;
 
   if (hasShuffleModeChanged) {

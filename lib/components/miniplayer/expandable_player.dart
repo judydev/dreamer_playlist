@@ -7,7 +7,7 @@ import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/components/miniplayer/utils.dart';
 import 'package:dreamer_playlist/components/song_tile.dart';
 import 'package:dreamer_playlist/helpers/audio_handler.dart';
-import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/models/song.dart';
@@ -29,7 +29,6 @@ class ExpandablePlayer extends StatefulWidget {
 
 class _ExpandablePlayerState extends State<ExpandablePlayer> {
   MyAudioHandler _audioHandler = GetitUtil.audioHandler;
-  AudioPlayer _audioPlayer = GetitUtil.audioHandler.audioPlayer;
 
   @override
   Widget build(BuildContext context) {
@@ -65,10 +64,9 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                       Icon(Icons.horizontal_rule),
                       // Currently playing
                       ValueListenableBuilder(
-                          valueListenable: currentIndexNotifier,
-                          builder: ((context, currentIndex, child) {
-                            MediaItem? mediaItem =
-                                getCurrentPlaying(currentIndex);
+                          valueListenable:
+                              GetitUtil.pageManager.currentPlayingNotifier,
+                          builder: ((context, mediaItem, child) {
                             if (mediaItem == null) {
                               return ListTileWrapper(
                                   leading: Icon(Icons.music_video),
@@ -102,23 +100,26 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 10),
                                     child: ValueListenableBuilder(
-                                      valueListenable: progressBarValueNotifier,
+                                      valueListenable: GetitUtil
+                                          .pageManager.progressBarValueNotifier,
                                       builder:
                                           ((context, progressValue, child) {
-                                        Duration? duration =
-                                            _audioPlayer.duration;
+                                        Duration? duration = _audioHandler
+                                            .mediaItem.value?.duration;
+
                                         return Column(children: [
                                           Slider(
                                             min: 0,
                                             max: 1,
-                                            value: progressValue,
-                                            onChanged: (updatedValue) {
-                                              if (duration != null) {
-                                                _audioHandler.audioPlayer.seek(
-                                                    duration * updatedValue);
-                                                progressBarValueNotifier.value =
-                                                    updatedValue;
-                                              }
+                                            value: progressValue > 1
+                                                ? 1
+                                                : progressValue,
+                                            onChanged: (newProgressValue) {
+                                              if (duration == null) return;
+
+                                              Duration newPosition =
+                                                  duration * newProgressValue;
+                                              _audioHandler.seek(newPosition);
                                             },
                                           ),
                                           Padding(
@@ -170,22 +171,29 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
     );
   }
 
-  ValueListenableBuilder<ShuffleMode> getQueueShuffleButton() {
+  ValueListenableBuilder<bool> getQueueShuffleButton() {
     return ValueListenableBuilder(
         valueListenable: shuffleModeNotifier,
-        builder: (context, shuffleMode, child) {
-          bool isShuffled = _audioPlayer.shuffleModeEnabled;
+        builder: (context, isShuffleModeEnabled, child) {
           return IconButton(
-              onPressed: () {
-                _audioPlayer.setShuffleModeEnabled(!isShuffled);
+              onPressed: () async {
+                print('queue shuffle button');
                 if (isEmptyQueue()) return;
 
-                if (!isShuffled) {
-                  _audioHandler.shuffle();
+                if (isShuffleModeEnabled) {
+                  await _audioHandler
+                      .setShuffleMode(AudioServiceShuffleMode.none);
+                } else {
+                  await _audioHandler
+                      .setShuffleMode(AudioServiceShuffleMode.all);
+                  await _audioHandler.shuffle();
                 }
+
                 updateQueueIndicesNotifier();
               },
-              icon: isShuffled ? Icon(Icons.shuffle_on) : Icon(Icons.shuffle));
+              icon: isShuffleModeEnabled
+                  ? Icon(Icons.shuffle_on_outlined)
+                  : Icon(Icons.shuffle_outlined));
         });
   }
 
@@ -193,38 +201,27 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
     return ValueListenableBuilder(
         valueListenable: loopModeNotifier,
         builder: ((context, LoopMode loopModeValue, child) {
+          Icon icon = Icon(Icons.repeat_outlined);
           switch (loopModeValue) {
             case LoopMode.all:
-              return IconButton(
-                  onPressed: () {
-                    _updateLoopMode(LoopMode.all);
-                  },
-                  icon: Icon(Icons.repeat_on));
+              icon = Icon(Icons.repeat_on_outlined);
+              break;
             case LoopMode.one:
-              return IconButton(
-                  onPressed: () {
-                    _updateLoopMode(LoopMode.one);
-                  },
-                  icon: Icon(Icons.repeat_one_on));
-            case LoopMode.off:
+              icon = Icon(Icons.repeat_one_on_outlined);
+              break;
             default:
-              return IconButton(
-                  onPressed: () {
-                    _updateLoopMode(LoopMode.off);
-                  },
-                  icon: Icon(Icons.repeat));
           }
+
+          return IconButton(
+              onPressed: () => _audioHandler.setRepeatMode(GetitUtil
+                  .audioHandler
+                  .loopModeToRepeatMode(_getNextLoopMode(loopModeValue))),
+              icon: icon);
         }));
   }
 
-  _updateLoopMode(LoopMode currentMode) {
-    LoopMode nextMode = _getNextLoopMode(currentMode);
-    _audioPlayer.setLoopMode(nextMode);
-    loopModeNotifier.value = nextMode;
-  }
-
   _getNextLoopMode(LoopMode currentMode) {
-    // order: [off, all, one]
+    // LoopMode: [off, all, one]
     int currentIndex = LoopMode.values.indexOf(currentMode);
     if (currentIndex == 0) {
       return LoopMode.values[LoopMode.values.length - 1];
@@ -250,8 +247,7 @@ class PlayerButtonbar extends StatelessWidget {
     );
   }
 
-  final MyAudioHandler _audioHandler = GetitUtil.audioHandler;
-  final AudioPlayer _audioPlayer = GetitUtil.audioHandler.audioPlayer;
+  final _audioHandler = GetitUtil.audioHandler;
 
   ValueListenableBuilder<PlayingState> getButtonPlayPause() =>
       ValueListenableBuilder(
@@ -268,17 +264,9 @@ class PlayerButtonbar extends StatelessWidget {
                 if (isEmptyQueue()) return;
 
                 if (isPlaying) {
-                  print('isPlaying');
                   await _audioHandler.pause();
                 } else {
-                  if (currentIndexNotifier.value == null) {
-                    int firstIndex = _audioPlayer.effectiveIndices![0];
-                    await _audioPlayer.seek(Duration.zero, index: firstIndex);
-                    await _audioPlayer.play();
-                  } else {
-                    print('playerbuttonbar resume');
-                    await _audioPlayer.play();
-                  }
+                  await _audioHandler.play();
                 }
               },
             );
@@ -287,16 +275,14 @@ class PlayerButtonbar extends StatelessWidget {
   IconButton getButtonPlayPrev() => IconButton(
       onPressed: () {
         if (isEmptyQueue()) return;
-        _audioHandler.seekToPrevious();
-        _audioHandler.play();
+        GetitUtil.pageManager.onPreviousSongButtonPressed();
       },
       icon: Icon(Icons.skip_previous));
 
   IconButton getButtonPlayNext() => IconButton(
       onPressed: () {
         if (isEmptyQueue()) return;
-        _audioHandler.seekToNext();
-        _audioHandler.play();
+        GetitUtil.pageManager.onNextSongButtonPressed();
       },
       icon: Icon(Icons.skip_next));
 }

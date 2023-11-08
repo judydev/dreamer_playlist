@@ -1,9 +1,21 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/models/song.dart';
-import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+
+Future<MyAudioHandler> initAudioService() async {
+  return await AudioService.init(
+    builder: () => MyAudioHandler(),
+    config: const AudioServiceConfig(
+        // androidNotificationChannelId: 'com.mycompany.myapp.audio',
+        // androidNotificationChannelName: 'Audio Service Demo',
+        // androidNotificationOngoing: true,
+        // androidStopForegroundOnPause: true,
+        ),
+  );
+}
 
 class MyAudioHandler extends BaseAudioHandler
     with
@@ -18,9 +30,11 @@ class MyAudioHandler extends BaseAudioHandler
 
   MyAudioHandler() {
     _loadEmptyPlaylist();
-    _audioPlayer.playbackEventStream.map(_transformEvent).pipe(playbackState);
+    _notifyAudioHandlerAboutPlaybackEvents();
+    _listenForDurationChanges();
     _listenForCurrentSongIndexChanges();
-    _listenForPositionChanges();
+
+    // _listenForPositionChanges();
     _listenForSequenceChanges();
     _listenForPlayerStateChanges();
     _listenForShuffleModeChanges();
@@ -31,47 +45,8 @@ class MyAudioHandler extends BaseAudioHandler
     try {
       await _audioPlayer.setAudioSource(_songQueue);
     } catch (e) {
-      debugPrint(e.toString());
+      print('Error loading empty playlist $e');
     }
-  }
-
-  void _listenForCurrentSongIndexChanges() {
-    _audioPlayer.currentIndexStream.listen((index) {
-      currentIndexNotifier.value = index;
-      final playlist = queue.value;
-      if (index == null || playlist.isEmpty) return;
-      // if (_audioPlayer.shuffleModeEnabled) {
-      //   index = _audioPlayer.shuffleIndices![index];
-      // }
-
-      mediaItem.add(playlist[index]);
-      print('currentIndexChange to $index -------------');
-      print(_audioPlayer.effectiveIndices);
-    });
-  }
-
-  void _listenForPositionChanges() {
-    _audioPlayer.positionStream.listen((position) {
-      if (_audioPlayer.duration != null && position != Duration.zero) {
-        progressBarValueNotifier.value =
-            position.inMilliseconds / _audioPlayer.duration!.inMilliseconds;
-      }
-    });
-  }
-
-  void _listenForSequenceChanges() {
-    _audioPlayer.sequenceStream.listen((sequence) {
-      print('sequence changed');
-      print(sequence);
-      if (sequence == null || sequence.isEmpty) {
-        return;
-      }
-
-      final items = sequence.map((source) => source.tag as MediaItem);
-      queue.add(items.toList());
-
-      updateQueueIndicesNotifier();
-    });
   }
 
   void _listenForPlayerStateChanges() {
@@ -97,14 +72,23 @@ class MyAudioHandler extends BaseAudioHandler
   }
 
   void _listenForShuffleModeChanges() {
-    _audioPlayer.shuffleModeEnabledStream.listen(((event) {
-      updateShuffleModeNotifier();
-    }));
-  }
+    _audioPlayer.shuffleModeEnabledStream.listen(((shuffleModeEnabled) {
+      print('shuffleMode changed to $shuffleModeEnabled');
+      shuffleModeNotifier.value = shuffleModeEnabled;
 
-  void updateShuffleModeNotifier() {
-    shuffleModeNotifier.value =
-        _audioPlayer.shuffleModeEnabled ? ShuffleMode.on : ShuffleMode.off;
+      // update queue
+      // print('shuffled sequence: ${_audioPlayer.effectiveIndices}');
+      // if (shuffleModeEnabled) {
+      //   int? currentIndex = currentIndexNotifier.value;
+      //   print('shuffle -> true, currentIndex = $currentIndex');
+      //   print('nextIndex = ${_audioPlayer.nextIndex}');
+      //   print('prevIndex = ${_audioPlayer.previousIndex}');
+      // }
+      // queueIndicesNotifier.value = _audioPlayer.effectiveIndices!;
+    }));
+
+    _audioPlayer.shuffleIndicesStream
+        .listen((event) {}); // this stream is always changing
   }
 
   void _listenForLoopModeChanges() {
@@ -115,6 +99,12 @@ class MyAudioHandler extends BaseAudioHandler
     );
   }
 
+  // @override
+  // Future<void> click([MediaButton button = MediaButton.media]) {
+  //   print('clicked');
+  //   return super.click();
+  // }
+
   @override
   Future<void> play() => _audioPlayer.play();
 
@@ -122,16 +112,16 @@ class MyAudioHandler extends BaseAudioHandler
   Future<void> pause() => _audioPlayer.pause();
 
   @override
-  Future<void> stop() async {
-    await _audioPlayer.stop();
-    return super.stop();
-  }
+  Future<void> stop() => _audioPlayer.stop();
 
   @override
-  Future<void> seek(Duration position) async {
-    await _audioPlayer.seek(position);
-    await super.seek(position);
-  }
+  Future<void> seek(Duration position) => _audioPlayer.seek(position);
+
+  @override
+  Future<void> skipToPrevious() => _audioPlayer.seekToPrevious();
+
+  @override
+  Future<void> skipToNext() => _audioPlayer.seekToNext();
 
   @override
   Future<void> skipToQueueItem(int index) async {
@@ -139,6 +129,30 @@ class MyAudioHandler extends BaseAudioHandler
     await _audioPlayer.seek(Duration.zero, index: index);
     await _audioPlayer.play();
     await super.skipToQueueItem(index);
+  }
+
+  @override
+  Future<void> setShuffleMode(AudioServiceShuffleMode shuffleMode) async {
+    await _audioPlayer
+        .setShuffleModeEnabled(shuffleMode == AudioServiceShuffleMode.all);
+  }
+
+  @override
+  Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {
+    LoopMode loopMode = LoopMode.off;
+    switch (repeatMode) {
+      case AudioServiceRepeatMode.all:
+        loopMode = LoopMode.all;
+        break;
+      case AudioServiceRepeatMode.one:
+        loopMode = LoopMode.one;
+        break;
+      default:
+        loopMode = LoopMode.off;
+    }
+
+    await _audioPlayer.setLoopMode(loopMode);
+    loopModeNotifier.value = loopMode;
   }
 
   Future<void> shuffle() => _audioPlayer.shuffle();
@@ -151,6 +165,17 @@ class MyAudioHandler extends BaseAudioHandler
         .map((song) => AudioSource.file(song.path!, tag: song.toMediaItem()))
         .toList());
   }
+
+  // @override
+  // Future<void> addQueueItems(List<MediaItem> mediaItems) async {
+  //   // manage Just Audio
+  //   final audioSource = mediaItems.map(_createAudioSource);
+  //   _playlist.addAll(audioSource.toList());
+
+  //   // notify system
+  //   final newQueue = queue.value..addAll(mediaItems);
+  // queue.add(newQueue); // notify AudioHandler about changes to the playlist
+  // }
 
   @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
@@ -183,6 +208,13 @@ class MyAudioHandler extends BaseAudioHandler
     return AudioSource.file(mediaItem.extras!['path'], tag: mediaItem);
   }
 
+  // UriAudioSource _createAudioSourceFromUrl(MediaItem mediaItem) {
+  //   return AudioSource.uri(
+  //     Uri.parse(mediaItem.extras!['url'] as String),
+  //     tag: mediaItem,
+  //   );
+  // }
+
   @override
   Future<void> removeQueueItemAt(int index) async {
     if (_songQueue.length > index) {
@@ -195,20 +227,19 @@ class MyAudioHandler extends BaseAudioHandler
     }
   }
 
-  PlaybackState _transformEvent(PlaybackEvent event) {
-    return PlaybackState(
+  void _notifyAudioHandlerAboutPlaybackEvents() {
+    _audioPlayer.playbackEventStream.listen((PlaybackEvent event) {
+      final playing = _audioPlayer.playing;
+      playbackState.add(playbackState.value.copyWith(
         controls: [
-          MediaControl.rewind,
-          if (_audioPlayer.playing) MediaControl.pause else MediaControl.play,
-          MediaControl.stop,
-          MediaControl.fastForward,
+          MediaControl.skipToPrevious,
+          if (playing) MediaControl.pause else MediaControl.play,
+          MediaControl.skipToNext,
         ],
         systemActions: const {
           MediaAction.seek,
-          MediaAction.seekForward,
-          MediaAction.seekBackward,
         },
-        // androidCompactActionIndices: const [0, 1, 3],
+        androidCompactActionIndices: const [0, 1, 3],
         processingState: const {
           ProcessingState.idle: AudioProcessingState.idle,
           ProcessingState.loading: AudioProcessingState.loading,
@@ -216,10 +247,108 @@ class MyAudioHandler extends BaseAudioHandler
           ProcessingState.ready: AudioProcessingState.ready,
           ProcessingState.completed: AudioProcessingState.completed,
         }[_audioPlayer.processingState]!,
-        playing: _audioPlayer.playing,
+        playing: playing,
         updatePosition: _audioPlayer.position,
-        // bufferedPosition: player.bufferedPosition
+        // bufferedPosition: _audioPlayer.bufferedPosition,
+        shuffleMode: _audioPlayer.shuffleModeEnabled
+            ? AudioServiceShuffleMode.all
+            : AudioServiceShuffleMode.none,
+        repeatMode: loopModeToRepeatMode(_audioPlayer.loopMode),
         speed: _audioPlayer.speed,
-        queueIndex: event.currentIndex);
+        queueIndex: event.currentIndex,
+      ));
+    });
+  }
+
+  AudioServiceRepeatMode loopModeToRepeatMode(LoopMode loopMode) {
+    switch (loopMode) {
+      case LoopMode.all:
+        return AudioServiceRepeatMode.all;
+      case LoopMode.one:
+        return AudioServiceRepeatMode.one;
+      case LoopMode.off:
+      default:
+        return AudioServiceRepeatMode.none;
+    }
+  }
+
+  void _listenForDurationChanges() {
+    _audioPlayer.durationStream.listen((duration) {
+      final index = _audioPlayer.currentIndex;
+      final newQueue = queue.value;
+      if (index == null || newQueue.isEmpty) return;
+      final oldMediaItem = newQueue[index];
+      final newMediaItem = oldMediaItem.copyWith(duration: duration);
+      newQueue[index] = newMediaItem;
+      queue.add(newQueue);
+      mediaItem.add(newMediaItem);
+    });
+  }
+
+  void _listenForCurrentSongIndexChanges() {
+    _audioPlayer.currentIndexStream.listen((index) {
+      // when clicking on songTile
+      final playlist = queue.value; // ordered list
+      if (index == null || playlist.isEmpty) return;
+
+      mediaItem.add(playlist[index]);
+
+      // currentIndexNotifier.value = index;
+      // final seq = _audioPlayer.sequenceState?.effectiveSequence;
+    });
+  }
+
+  void _listenForSequenceChanges() {
+    _audioPlayer.sequenceStream.listen((sequence) {
+      print('sequence changed');
+      print(sequence);
+      if (sequence == null || sequence.isEmpty) {
+        return;
+      }
+
+      final items = sequence.map((source) => source.tag as MediaItem);
+      queue.add(items.toList());
+
+      // GetitUtil.pageManager.playlistNotifier.value = sequence;
+      updateQueueIndicesNotifier();
+    });
+
+    _audioPlayer.sequenceStateStream.listen((sequenceState) {
+      if (sequenceState == null) return;
+      // TODO: update current song title
+      // final currentItem = sequenceState.currentSource;
+      // final title = currentItem?.tag as String?;
+      // currentSongTitleNotifier.value = title ?? '';
+      // print('sequenceState.currentindex = ${sequenceState.currentIndex}');
+
+      // TODO: update playlist
+      // final playlist = sequenceState.effectiveSequence;
+      // print('sequenceState playlist change');
+      // print(playlist
+      //     .map(
+      //       (e) => (e.tag as MediaItem).title,
+      //     )
+      //     .toList());
+      // final titles = playlist.map((item) => item.tag as String).toList();
+      // playlistNotifier.value = titles;
+      // GetitUtil.pageManager.playlistNotifier.value = playlist;
+
+      // TODO: update shuffle mode, handled in _listenForShuffleModeChanges()
+      // print('sequenceState.shuffleMode = ${sequenceState.shuffleModeEnabled}');
+      // shuffleModeNotifier.value = sequenceState.shuffleModeEnabled;
+      // GetitUtil.pageManager.isShuffleModeEnabledNotifier.value =
+      //     sequenceState.shuffleModeEnabled;
+
+      // TODO: update previous and next buttons
+      // if (playlist.isEmpty || currentItem == null) {
+      //   GetitUtil.pageManager.isFirstSongNotifier.value = true;
+      //   GetitUtil.pageManager.isLastSongNotifier.value = true;
+      // } else {
+      //   GetitUtil.pageManager.isFirstSongNotifier.value =
+      //       playlist.first == currentItem;
+      //   GetitUtil.pageManager.isLastSongNotifier.value =
+      //       playlist.last == currentItem;
+      // }
+    });
   }
 }

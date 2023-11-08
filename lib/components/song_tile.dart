@@ -1,13 +1,12 @@
 import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/components/popup_menu_tile.dart';
 import 'package:dreamer_playlist/components/select_playlist_popup.dart';
-import 'package:dreamer_playlist/helpers/getit_util.dart';
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 
 class SongTile extends StatelessWidget {
@@ -25,8 +24,6 @@ class SongTile extends StatelessWidget {
     if (currentPlaylistId == null) {
       moreActionsMenuItems.removeAt(0);
     }
-
-    AudioPlayer audioPlayer = GetitUtil.audioHandler.audioPlayer;
 
     return ListTileWrapper(
       title: song.title!,
@@ -50,8 +47,8 @@ class SongTile extends StatelessWidget {
             updateQueueIndicesNotifier();
             currentIndexNotifier.value = songIndex;
             await Future.delayed(Duration(milliseconds: 10), () => {}); // TODO
-            await audioPlayer.seek(Duration.zero, index: songIndex);
-            await audioPlayer.play();
+            await GetitUtil.audioHandler.skipToQueueItem(songIndex!);
+            await GetitUtil.audioHandler.play();
           },
     );
   }
@@ -62,21 +59,17 @@ List<PopupMenuItem> buildMoreActionsMenu(
     {int? songIndex}) {
   return [
     PopupMenuItem<PopupMenuTile>(
-      // enabled: currentPlaylistId == null ? false : true,
       child: PopupMenuTile(
         icon: Icons.delete_outline,
         title: 'Remove from playlist', // only for songs in current playlist
       ),
-      onTap: () {
+      onTap: () async {
         print('Remove ${song.title} from playlist ');
-        Provider.of<SongDataProvider>(context, listen: false)
+        await Provider.of<SongDataProvider>(context, listen: false)
             .removeSongFromPlaylist(song.id!, currentPlaylistId!)
-            .then(
-          (value) {
-            // TODO: handle success and error
-            print('TODO: SongTile.removeFromPlaylist handle success and error');
-          },
-        );
+            .then((value) => (value) {
+                  print(value);
+                });
       },
     ),
     PopupMenuItem<PopupMenuTile>(
