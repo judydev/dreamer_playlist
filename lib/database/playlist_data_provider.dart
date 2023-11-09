@@ -30,7 +30,6 @@ class PlaylistDataProvider extends ChangeNotifier {
   }
 
   Future<Playlist?> getPlaylistById(String id) async {
-    print('id = $id');
     final db = await DatabaseUtil.getDatabase();
     final List<Map<String, dynamic>> maps =
         await db.query(DatabaseUtil.playlistTableName, where: 'id = "$id"');

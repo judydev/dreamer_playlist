@@ -54,10 +54,10 @@ void addSongsToPlaylist(
         duplicates += 1;
         showAlertDialogPopup(
             context,
-            "Warning",
-            Text(
+            title: "Warning",
+            content: Text(
                 "${song.title} is already in the playlist, are you sure you want to add it again?"),
-            [
+            actions: [
               displayTextButton(context, "Add", callback: () {
                 duplicates -= 1;
                 Provider.of<SongDataProvider>(context, listen: false)

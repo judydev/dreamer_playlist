@@ -142,7 +142,26 @@ List<PopupMenuItem> buildMoreActionsMenu(
         title: 'Rename',
       ),
       onTap: () {
-        print('TODO: Rename ${song.title}');
+        String? updatedSongTitle;
+        showAlertDialogPopup(context,
+            title: "Rename Song",
+            content: TextField(
+              decoration: InputDecoration(
+                border: UnderlineInputBorder(),
+                hintText: song.title,
+              ),
+              onChanged: (value) {
+                updatedSongTitle = value;
+              },
+            ),
+            actions: [
+              displayTextButton(context, "Cancel"),
+              displayTextButton(context, "OK", callback: () {
+                if (updatedSongTitle == null) return;
+                Provider.of<SongDataProvider>(context, listen: false)
+                    .updateSongName(song.id!, updatedSongTitle!);
+              })
+            ]);
       },
     ),
     PopupMenuItem<PopupMenuTile>(

@@ -158,10 +158,10 @@ class _PlaylistTabViewState extends State<PlaylistTabView> {
         onTap: () {
           showAlertDialogPopup(
               context,
-              "Warning",
-              Text(
+              title: "Warning",
+              content: Text(
                   "Are you sure you want to delete playlist ${playlist.name}?"),
-              [
+              actions: [
                 displayTextButton(context, "Yes", callback: () {
                   Provider.of<PlaylistDataProvider>(context, listen: false)
                       .deletePlaylist(playlist.id);

@@ -58,19 +58,14 @@ class SongDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateSongName(String songId, String newName) async {}
-  // Future<void> updateSong(Song song) async {
-  //   final db = await DatabaseUtil.getDatabase();
+  Future<void> updateSongName(String songId, String name) async {
+    final db = await DatabaseUtil.getDatabase();
 
-  //   await db.update(
-  //     DatabaseUtil.songTableName,
-  //     song.toMap(),
-  //     where: 'id = ?',
-  //     whereArgs: [song.id],
-  //   );
+    await db.update(DatabaseUtil.songTableName, {'name': name},
+        where: 'id = ?', whereArgs: [songId]);
 
-  //   notifyListeners();
-  // }
+    notifyListeners();
+  }
 
   Future<void> deleteSong(Song song) async {
     final db = await DatabaseUtil.getDatabase();

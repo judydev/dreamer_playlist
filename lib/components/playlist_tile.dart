@@ -35,8 +35,11 @@ class PlaylistTile extends StatelessWidget {
     PlaylistDataProvider playlistDataProvider =
         Provider.of<PlaylistDataProvider>(context, listen: false);
 
-    return showAlertDialogPopup(context, "Warning",
-        Text("Are you sure you want to delete playlist ${playlist.name}?"), [
+    return showAlertDialogPopup(context,
+        title: "Warning",
+        content:
+            Text("Are you sure you want to delete playlist ${playlist.name}?"),
+        actions: [
       displayTextButton(context, "Yes", callback: () {
         playlistDataProvider.deletePlaylist(playlist.id).then((value) =>
             print('TODO: PlaylistTile.deletePlaylist success notification'));

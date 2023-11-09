@@ -18,7 +18,8 @@ TextButton displayTextButton(BuildContext context, String title,
 }
 
 Future<void> showAlertDialogPopup(
-    context, String title, Widget? content, List<Widget>? actions) async {
+    context,
+    {required String title, Widget? content, List<Widget>? actions}) async {
   return showAdaptiveDialog<void>(
     context: context,
     barrierDismissible: false,
@@ -58,9 +59,10 @@ void openFilePicker(context, String? playlistId) {
                   {
                     showAlertDialogPopup(
                         context,
-                        "Warning",
-                        Text("The file you selected is not an audio file."),
-                        [displayTextButton(context, "OK")])
+                        title: "Warning",
+                        content:
+                            Text("The file you selected is not an audio file."),
+                        actions: [displayTextButton(context, "OK")])
                   }
               }
           }
