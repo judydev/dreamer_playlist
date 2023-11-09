@@ -23,9 +23,9 @@ class _AddMusicPopupState extends State<AddMusicPopup> {
     return Scaffold(
       appBar: AppBar(actions: [
         TextButton(
-            onPressed: () {
+            onPressed: () async {
               if (selectedSongs.isNotEmpty) {
-                addSongsToPlaylist(context, selectedSongs, playlist);
+                await addSongsToPlaylist(context, selectedSongs, playlist);
               } else {
                 Navigator.pop(context, true);
               }
@@ -43,54 +43,40 @@ class _AddMusicPopupState extends State<AddMusicPopup> {
   }
 }
 
-void addSongsToPlaylist(
-    BuildContext context, List<Song> selectedSongs, Playlist playlist) {
-  int duplicates = 0;
-  for (Song song in selectedSongs) {
-    Provider.of<SongDataProvider>(context, listen: false)
-        .checkIfSongExistsInPlaylist(song.id!, playlist.id)
-        .then((duplicate) {
-      if (duplicate) {
-        duplicates += 1;
-        showAlertDialogPopup(
-            context,
-            title: "Warning",
-            content: Text(
-                "${song.title} is already in the playlist, are you sure you want to add it again?"),
-            actions: [
-              displayTextButton(context, "Add", callback: () {
-                duplicates -= 1;
-                Provider.of<SongDataProvider>(context, listen: false)
-                    .associateSongToPlaylist(song.id!, playlist.id)
-                    .then(
-                  (value) {
-                    print('TODO: success UI indicating song added');
-                    if (duplicates == 0) {
-                      Navigator.pop(context, true);
-                    }
-                  },
-                );
-              }),
-              displayTextButton(context, "Skip", callback: () {
-                duplicates -= 1;
+Future<void> addSongsToPlaylist(
+    BuildContext context, List<Song> selectedSongs, Playlist playlist) async {
+  if (selectedSongs.isEmpty) return;
 
-                if (duplicates == 0) {
-                  Navigator.pop(context, true);
-                }
-              })
-            ]);
-      } else {
-        Provider.of<SongDataProvider>(context, listen: false)
-            .associateSongToPlaylist(song.id!, playlist.id)
-            .then((value) {
-          print('TODO: success UI indicating song ${song.title} added');
-          if (duplicates == 0) {
-            Navigator.pop(context, true);
-          }
-        });
-      }
-    });
+  Set<String> duplicatedIds =
+      await Provider.of<SongDataProvider>(context, listen: false)
+          .checkIfSongsExistInPlaylist(
+              selectedSongs.map((s) => s.id!).toList(), playlist.id);
+
+  for (Song song in selectedSongs) {
+    if (duplicatedIds.contains(song.id)) {
+      if (!context.mounted) return;
+      await showAlertDialogPopup(context,
+          title: "Warning",
+          content: Text(
+              "${song.title} is already in the playlist, are you sure you want to add it again?"),
+          actions: [
+            displayTextButton(context, "Add", callback: () {
+              Provider.of<SongDataProvider>(context, listen: false)
+                  .associateSongToPlaylist(song.id!, playlist.id);
+              // TODO: handle success/exception
+            }),
+            displayTextButton(context, "Skip")
+          ]);
+    } else {
+      if (!context.mounted) return;
+      await Provider.of<SongDataProvider>(context, listen: false)
+          .associateSongToPlaylist(song.id!, playlist.id);
+      // TODO: handle success/exception
+    }
   }
+  
+  if (!context.mounted) return;
+  Navigator.pop(context, true);
 }
 
 class AddMusicSongList extends StatefulWidget {

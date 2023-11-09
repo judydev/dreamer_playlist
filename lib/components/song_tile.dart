@@ -85,7 +85,6 @@ List<PopupMenuItem> buildMoreActionsMenu(
                   // TODO: handle success and error
                   print("SongTile.deleteFromLibrary handle success and error")
                 });
-        // TODO: verify that song-playlist is removed from db
       },
     ),
     PopupMenuItem<PopupMenuTile>(
@@ -96,9 +95,7 @@ List<PopupMenuItem> buildMoreActionsMenu(
       onTap: () {
         showAdaptiveDialog(
           context: context,
-          builder: ((context) {
-            return SelectPlaylistPopup(song);
-          }),
+          builder: ((context) => SelectPlaylistPopup([song])),
         );
       },
     ),
@@ -129,11 +126,8 @@ List<PopupMenuItem> buildMoreActionsMenu(
       onTap: () {
         print('Add ${song.title} to Favorite');
         Provider.of<SongDataProvider>(context, listen: false)
-            .updateSongFavorite(song.id!, song.loved ?? 0)
-            .then((value) => {
-                  print(
-                      "TODO: SongTile.updateSongFavorite handle success/error")
-                });
+            .updateSongFavorite(song.id!, song.loved ?? 0);
+        // TODO: handle exception
       },
     ),
     PopupMenuItem<PopupMenuTile>(
@@ -160,18 +154,19 @@ List<PopupMenuItem> buildMoreActionsMenu(
                 if (updatedSongTitle == null) return;
                 Provider.of<SongDataProvider>(context, listen: false)
                     .updateSongName(song.id!, updatedSongTitle!);
+                // TODO:handle exception
               })
             ]);
       },
     ),
-    PopupMenuItem<PopupMenuTile>(
-      child: PopupMenuTile(
-        icon: Icons.ios_share,
-        title: 'Share',
-      ),
-      onTap: () {
-        print('TODO: Share ${song.title}');
-      },
-    ),
+    // PopupMenuItem<PopupMenuTile>(
+    //   child: PopupMenuTile(
+    //     icon: Icons.ios_share,
+    //     title: 'Share',
+    //   ),
+    //   onTap: () {
+    //     print('TODO: Share ${song.title}');
+    //   },
+    // ),
   ];
 }

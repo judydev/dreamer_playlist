@@ -102,16 +102,22 @@ class SongDataProvider extends ChangeNotifier {
   }
 
   // Playlist Songs
-  Future<bool> checkIfSongExistsInPlaylist(
-      String songId, String playlistId) async {
+  Future<Set<String>> checkIfSongsExistInPlaylist(
+      List<String> songIds, String playlistId) async {
     final db = await DatabaseUtil.getDatabase();
 
-    List<Map<String, Object?>> res = await db.query(
-        DatabaseUtil.playlistSongTableName,
-        where: 'songId = ? AND playlistId = ?',
-        whereArgs: [songId, playlistId],
-        limit: 1);
-    return res.isNotEmpty;
+    String sql = '''
+          SELECT DISTINCT s.* FROM ${DatabaseUtil.songTableName} AS s JOIN ${DatabaseUtil.playlistSongTableName} AS ps
+          ON s.id = ps.songId WHERE playlistId = "$playlistId" AND songId IN (
+            ${songIds.map(
+              (id) => '"$id"',
+            ).toList().join(',')}
+          )
+        ''';
+
+    List<Map<String, dynamic>> maps = await db.rawQuery(sql);
+    Set<String> res = maps.map((e) => e['id'] as String).toSet();
+    return res; // return set of duplicated songIds
   }
 
   Future<void> associateSongToPlaylist(String songId, String playlistId) async {
@@ -132,8 +138,12 @@ class SongDataProvider extends ChangeNotifier {
 
   Future<List<Song>> getAllSongsFromPlaylist(String playlistId) async {
     final db = await DatabaseUtil.getDatabase();
-    String sql =
-        'select s.name, s.path, s.loved, s.added, s.lastPlayed, s.id as id, ps.id as playlistSongId from ${DatabaseUtil.songTableName} as s join ${DatabaseUtil.playlistSongTableName} as ps on s.id = ps.songId where ps.playlistId = "$playlistId"';
+    String sql = 
+        '''
+          SELECT s.name, s.path, s.loved, s.added, s.lastPlayed, s.id AS id, ps.id AS playlistSongId 
+          FROM ${DatabaseUtil.songTableName} AS s JOIN ${DatabaseUtil.playlistSongTableName} AS ps 
+          ON s.id = ps.songId WHERE ps.playlistId = "$playlistId"
+        ''';
     List<Map<String, dynamic>> maps = await db.rawQuery(sql);
 
     List<Song> songs =

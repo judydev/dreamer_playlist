@@ -25,7 +25,7 @@ class MyAudioHandler extends BaseAudioHandler
   final _audioPlayer = AudioPlayer();
   AudioPlayer get audioPlayer => _audioPlayer;
 
-  final _songQueue = ConcatenatingAudioSource(children: []);
+  final _playlist = ConcatenatingAudioSource(children: []);
 
   MyAudioHandler() {
     _loadEmptyPlaylist();
@@ -42,7 +42,7 @@ class MyAudioHandler extends BaseAudioHandler
 
   Future<void> _loadEmptyPlaylist() async {
     try {
-      await _audioPlayer.setAudioSource(_songQueue);
+      await _audioPlayer.setAudioSource(_playlist);
     } catch (e) {
       print('Error loading empty playlist $e');
     }
@@ -152,27 +152,30 @@ class MyAudioHandler extends BaseAudioHandler
   Future<void> seekToPrevious() => _audioPlayer.seekToPrevious();
 
   Future<void> resetQueueFromSonglist(List<Song> songs) async {
-    _songQueue.clear();
-    _songQueue.addAll(songs
+    _playlist.clear();
+    _playlist.addAll(songs
         .map((song) => AudioSource.file(song.path!, tag: song.toMediaItem()))
         .toList());
   }
 
-  // @override
-  // Future<void> addQueueItems(List<MediaItem> mediaItems) async {
-  //   // manage Just Audio
-  //   final audioSource = mediaItems.map(_createAudioSource);
-  //   _playlist.addAll(audioSource.toList());
+  @override
+  Future<void> addQueueItems(List<MediaItem> mediaItems) async {
+    // manage Just Audio
+    final audioSource = mediaItems.map(_createAudioSource);
+    _playlist.addAll(audioSource.toList());
 
-  //   // notify system
-  //   final newQueue = queue.value..addAll(mediaItems);
-  // queue.add(newQueue); // notify AudioHandler about changes to the playlist
-  // }
+    // notify system
+    final newQueue = queue.value..addAll(mediaItems);
+    queue.add(newQueue); // notify AudioHandler about changes to the playlist
+
+    // update MusicQueue
+    updateQueueIndicesNotifier();
+  }
 
   @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
     final audioSource = _createAudioSource(mediaItem);
-    _songQueue.add(audioSource);
+    _playlist.add(audioSource);
 
     final newQueue = queue.value..add(mediaItem);
     queue.add(newQueue);
@@ -182,13 +185,13 @@ class MyAudioHandler extends BaseAudioHandler
 
   Future<void> addQueueItemAt(MediaItem mediaItem, int index) async {
     final audioSource = _createAudioSource(mediaItem);
-    if (_songQueue.length > index) {
+    if (_playlist.length > index) {
       index += 1;
     } else {
-      index = _songQueue.length;
+      index = _playlist.length;
     }
 
-    _songQueue.insert(index, audioSource);
+    _playlist.insert(index, audioSource);
 
     final newQueue = queue.value..insert(index, mediaItem);
     queue.add(newQueue);
@@ -209,8 +212,8 @@ class MyAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> removeQueueItemAt(int index) async {
-    if (_songQueue.length > index) {
-      _songQueue.removeAt(index);
+    if (_playlist.length > index) {
+      _playlist.removeAt(index);
 
       final newQueue = queue.value..removeAt(index);
       queue.add(newQueue);

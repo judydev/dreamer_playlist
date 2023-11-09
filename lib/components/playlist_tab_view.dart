@@ -1,6 +1,8 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:dreamer_playlist/components/add_music_popup.dart';
 import 'package:dreamer_playlist/components/edit_playlist_popup.dart';
 import 'package:dreamer_playlist/components/library_tab_view.dart';
+import 'package:dreamer_playlist/components/select_playlist_popup.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
@@ -13,16 +15,9 @@ import 'package:dreamer_playlist/database/playlist_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PlaylistTabView extends StatefulWidget {
+class PlaylistTabView extends StatelessWidget {
   final Playlist playlist;
   PlaylistTabView({required this.playlist});
-
-  @override
-  State<PlaylistTabView> createState() => _PlaylistTabViewState();
-}
-
-class _PlaylistTabViewState extends State<PlaylistTabView> {
-  late Playlist playlist = widget.playlist;
 
   @override
   Widget build(BuildContext context) {
@@ -55,12 +50,7 @@ class _PlaylistTabViewState extends State<PlaylistTabView> {
             IconButton(
                 onPressed: () {
                   Provider.of<PlaylistDataProvider>(context, listen: false)
-                      .updatePlaylistFavorite(playlist)
-                      .then(
-                    (value) {
-                      print("TODO: handle success updating fav playlist");
-                    },
-                  );
+                      .updatePlaylistFavorite(playlist);                      
                   if (isFavoriteTab()) {
                     selectedFavoritePlaylistNotifier.value = null;
                   }
@@ -73,9 +63,7 @@ class _PlaylistTabViewState extends State<PlaylistTabView> {
                 onPressed: () {
                   showAdaptiveDialog(
                       context: context,
-                      builder: (context) {
-                        return EditPlaylistPopup(playlist);
-                      });
+                      builder: (context) => EditPlaylistPopup(playlist));
                 },
                 icon: Icon(Icons.edit)),
             // Play
@@ -96,7 +84,7 @@ class _PlaylistTabViewState extends State<PlaylistTabView> {
             PopupMenuButton(
                 position: PopupMenuPosition.under,
                 child: Icon(Icons.more_vert),
-              itemBuilder: (context) => _buildPlaylistMoreActionsMenu(),
+              itemBuilder: (context) => _buildPlaylistMoreActionsMenu(context),
             ),
           ],
         ),
@@ -109,9 +97,7 @@ class _PlaylistTabViewState extends State<PlaylistTabView> {
                 onPressed: () {
                   showAdaptiveDialog(
                       context: context,
-                      builder: ((context) {
-                        return AddMusicPopup(playlist);
-                      }));
+                        builder: ((context) => AddMusicPopup(playlist)));
                 },
                   child: Text('Add from library')),
             ),
@@ -130,24 +116,33 @@ class _PlaylistTabViewState extends State<PlaylistTabView> {
     );
   }
 
-  List<PopupMenuItem> _buildPlaylistMoreActionsMenu() {
+  List<PopupMenuItem> _buildPlaylistMoreActionsMenu(context) {
     return [
       PopupMenuItem(
+        enabled: GetitUtil.orderedSongList.isNotEmpty,
         child: PopupMenuTile(
           icon: Icons.playlist_add_rounded,
           title: 'Add to queue',
         ),
         onTap: () {
-          print('TODO: add current playlist to queue');
+          List<MediaItem> mediaItems = GetitUtil.orderedSongList
+              .map((song) => song.toMediaItem())
+              .toList();
+          GetitUtil.audioHandler.addQueueItems(mediaItems);
         },
       ),
       PopupMenuItem(
+        enabled: GetitUtil.orderedSongList.isNotEmpty,
         child: PopupMenuTile(
           icon: Icons.copy_rounded,
           title: 'Add to playlist',
         ),
         onTap: () {
-          print('TODO: add current playlist to another playlist');
+          showAdaptiveDialog(
+            context: context,
+            builder: ((context) =>
+                SelectPlaylistPopup(GetitUtil.orderedSongList)),
+          );
         },
       ),
       PopupMenuItem(

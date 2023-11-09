@@ -8,15 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SelectPlaylistPopup extends StatefulWidget {
-  final Song song;
-  SelectPlaylistPopup(this.song);
+  final List<Song> songs; // songs to be added to selected playlist
+  SelectPlaylistPopup(this.songs);
 
   @override
   State<SelectPlaylistPopup> createState() => _SelectPlaylistPopupState();
 }
 
 class _SelectPlaylistPopupState extends State<SelectPlaylistPopup> {
-  late Song song = widget.song;
+  late List<Song> songs = widget.songs;
 
   late PlaylistDataProvider playlistDataProvider;
   late Future<List<Playlist>> _getAllPlaylists;
@@ -44,7 +44,7 @@ class _SelectPlaylistPopupState extends State<SelectPlaylistPopup> {
                       title: playlist.name!,
                     leading: Icon(Icons.queue_music),
                     onTap: () {
-                      addSongsToPlaylist(context, [song], playlist);
+                      addSongsToPlaylist(context, songs, playlist);
                     }))
               ],
             );
