@@ -13,28 +13,32 @@ class SongTile extends StatelessWidget {
   final Song song;
   final int? songIndex;
   final String? currentPlaylistId;
-  final void Function()? onTapOverride;
+  final bool disableTap;
+  final Icon? leadingIcon;
+  final Icon? trailingIcon;
+
   SongTile(this.song,
-      {this.currentPlaylistId, this.onTapOverride, this.songIndex});
+      {this.songIndex,
+      this.currentPlaylistId,
+      this.disableTap = false,
+      this.leadingIcon,
+      this.trailingIcon});
 
   @override
   Widget build(BuildContext context) {
-    List<PopupMenuItem> moreActionsMenuItems =
-        buildMoreActionsMenu(context, song, currentPlaylistId);
-    if (currentPlaylistId == null) {
-      moreActionsMenuItems.removeAt(0);
-    }
-
     return ListTileWrapper(
       title: song.title!,
-      leading: Icon(Icons.play_circle_outline),
-      trailing: PopupMenuButton(
+      leading: leadingIcon ?? Icon(Icons.play_circle_outline),
+      trailing: trailingIcon ??
+          PopupMenuButton(
         position: PopupMenuPosition.under,
         child: Icon(Icons.more_vert),
-        itemBuilder: (context) => moreActionsMenuItems,
+            itemBuilder: (context) =>
+                buildMoreActionsMenu(context, song, currentPlaylistId),
       ),
-      onTap: onTapOverride ??
-          () async {
+      onTap: disableTap
+          ? null
+          : () async {
             print('onTapCallback, clicked on song tile, play this song');
             if (songIndex == null) {
               print('Unknown index');
@@ -51,26 +55,25 @@ class SongTile extends StatelessWidget {
           },
     );
   }
-}
-
-List<PopupMenuItem> buildMoreActionsMenu(
+  
+  List<PopupMenuItem> buildMoreActionsMenu(
     context, Song song, String? currentPlaylistId,
     {int? songIndex}) {
-  return [
+      
+    List<PopupMenuItem> menuItems = [
     PopupMenuItem<PopupMenuTile>(
       child: PopupMenuTile(
         icon: Icons.delete_outline,
         title: 'Remove from playlist', // only for songs in current playlist
       ),
-      onTap: () async {
-        print('Remove ${song.title} from playlist ');
+        onTap: () async {
         if (song.playlistSongId == null) {
           print(
               'Error when removing ${song.title} from playlist: invalid PlaylistSongId');
           return;
         }
         await Provider.of<SongDataProvider>(context, listen: false)
-            .removeSongFromPlaylist(song.playlistSongId!);  
+              .removeSongsFromPlaylist([song.playlistSongId!]);  
       },
     ),
     PopupMenuItem<PopupMenuTile>(
@@ -89,7 +92,7 @@ List<PopupMenuItem> buildMoreActionsMenu(
     ),
     PopupMenuItem<PopupMenuTile>(
       child: PopupMenuTile(
-        icon: Icons.playlist_add,
+          icon: Icons.format_list_bulleted_add,
         title: 'Add to playlist',
       ),
       onTap: () {
@@ -101,7 +104,7 @@ List<PopupMenuItem> buildMoreActionsMenu(
     ),
     PopupMenuItem<PopupMenuTile>(
       child: PopupMenuTile(
-        icon: Icons.playlist_add_rounded,
+          icon: Icons.playlist_play,
         title: 'Play next',
       ),
       onTap: () {
@@ -111,7 +114,7 @@ List<PopupMenuItem> buildMoreActionsMenu(
     ),
     PopupMenuItem<PopupMenuTile>(
       child: PopupMenuTile(
-        icon: Icons.playlist_add_rounded,
+          icon: Icons.playlist_add,
         title: 'Add to queue',
       ),
       onTap: () {
@@ -168,5 +171,12 @@ List<PopupMenuItem> buildMoreActionsMenu(
     //     print('TODO: Share ${song.title}');
     //   },
     // ),
-  ];
+    ];
+
+    if (currentPlaylistId == null) {
+      menuItems.removeAt(0);
+    }
+
+    return menuItems;
+  }
 }

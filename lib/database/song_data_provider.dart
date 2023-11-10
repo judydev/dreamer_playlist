@@ -152,13 +152,21 @@ class SongDataProvider extends ChangeNotifier {
     return songs;
   }
 
-  Future<void> removeSongFromPlaylist(String playlistSongId) async {
+  Future<void> removeSongsFromPlaylist(List<String> playlistSongIds) async {
     final db = await DatabaseUtil.getDatabase();
 
-    await db.delete(DatabaseUtil.playlistSongTableName,
-        where: 'id = ?', whereArgs: [playlistSongId]);
+    String sql = '''
+      DELETE FROM ${DatabaseUtil.playlistSongTableName} 
+      WHERE id IN (${playlistSongIds.map((id) => '"$id"').join(",")})
+    ''';
 
-    // TODO: handle exception
+    try {
+      await db.rawDelete(sql);
+    } catch (e) {
+      print('Error removing songs from playlist');
+      print(e);
+    }
+
     notifyListeners();
   }
 }

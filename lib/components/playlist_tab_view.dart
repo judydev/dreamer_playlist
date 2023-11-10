@@ -39,10 +39,10 @@ class PlaylistTabView extends StatelessWidget {
                 }
               },
             )),
-        Padding(
-          padding: EdgeInsets.all(20),
-          child: Icon(Icons.music_video, size: 64),
-        ),
+        // Padding(
+        //   padding: EdgeInsets.all(20),
+        //   child: Icon(Icons.music_video, size: 64),
+        // ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -65,6 +65,7 @@ class PlaylistTabView extends StatelessWidget {
                       context: context,
                       builder: (context) => EditPlaylistPopup(playlist));
                 },
+                tooltip: 'Edit',
                 icon: Icon(Icons.edit)),
             // Play
             IconButton(
@@ -73,12 +74,14 @@ class PlaylistTabView extends StatelessWidget {
                       hasShuffleModeChanged: GetitUtil
                           .audioHandler.audioPlayer.shuffleModeEnabled);
                 },
+                tooltip: 'Play',
                 icon: Icon(Icons.play_circle, size: 42)),
             // Shuffle
             IconButton(
                 onPressed: () async {
                   await shufflePlay();
                 },
+                tooltip: 'Shuffle Play',
                 icon: Icon(Icons.shuffle)),
             // More Actions
             PopupMenuButton(

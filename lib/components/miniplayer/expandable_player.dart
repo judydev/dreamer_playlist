@@ -74,7 +74,8 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                             } else {
                               return SongTile(
                                   Song.fromMediaItem(mediaItem),
-                                  onTapOverride: () {});
+                                disableTap: true,
+                              );
                             }
                           })),
                       Padding(

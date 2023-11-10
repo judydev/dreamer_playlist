@@ -1,3 +1,4 @@
+import 'package:dreamer_playlist/components/song_tile_select.dart';
 import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
@@ -112,8 +113,9 @@ class _AddMusicSongListState extends State<AddMusicSongList> {
           if (songs.isNotEmpty) {
             return Column(
               children: [
-                ...songs.map((song) => _SongTileForAddMusic(
+                ...songs.map((song) => SongTileSelect(
                       song: song,
+                      selectIcon: Icons.add_circle_outline,
                       callback: (updatedSong) {
                         if (selectedSongs.contains(updatedSong)) {
                           selectedSongs.remove(updatedSong);
@@ -132,40 +134,5 @@ class _AddMusicSongListState extends State<AddMusicSongList> {
         }),
       ],
     );
-  }
-}
-
-class _SongTileForAddMusic extends StatefulWidget {
-  final Song song;
-  final Function callback;
-  _SongTileForAddMusic({required this.song, required this.callback});
-
-  @override
-  State<_SongTileForAddMusic> createState() => _SongTileForAddMusicState();
-}
-
-class _SongTileForAddMusicState extends State<_SongTileForAddMusic> {
-  late Song song = widget.song;
-  late Function callback = widget.callback;
-  bool isSelected = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTileWrapper(
-        title: song.title!,
-        leading: Icon(Icons.play_circle_outline),
-        trailing: IconButton(
-          icon: isSelected
-              ? Icon(Icons.check_circle)
-              : Icon(Icons.add_circle_outline),
-          onPressed: () {
-            setState(() {
-              isSelected = !isSelected;
-            });
-
-            callback(song);
-          },
-        ),
-        onTap: null);
   }
 }

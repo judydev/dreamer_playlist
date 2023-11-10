@@ -42,12 +42,17 @@ class PlaylistDataProvider extends ChangeNotifier {
   Future<void> updatePlaylistName(String playlistId, String newName) async {
     final db = await DatabaseUtil.getDatabase();
 
-    await db.update(
-      DatabaseUtil.playlistTableName,
-      {'name': newName},
-      where: 'id = ?',
-      whereArgs: [playlistId],
-    );
+    try {
+      await db.update(
+        DatabaseUtil.playlistTableName,
+        {'name': newName},
+        where: 'id = ?',
+        whereArgs: [playlistId],
+      );
+    } catch (e) {
+      print('Error updating playlist name');
+      print(e);
+    }
 
     notifyListeners();
   }
