@@ -16,12 +16,11 @@ class PlaylistTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTileWrapper(
       title: playlist.name!,
-      leading: Icon(Icons.queue_music),
+      leading: const Icon(Icons.queue_music),
       onTap: () {
         if (isPlaylistsTab()) {
           Provider.of<AppStateDataProvider>(context, listen: false)
-              .updateAppState(AppStateKey.currentPlaylistId, playlist.id)
-              .catchError((e) => print('Error update state $e'));
+              .updateAppState(AppStateKey.currentPlaylistId, playlist.id);
         }
 
         if (isFavoriteTab()) {
@@ -29,23 +28,6 @@ class PlaylistTile extends StatelessWidget {
         }
       },
     );
-  }
-
-  deletePlaylist(context) {
-    PlaylistDataProvider playlistDataProvider =
-        Provider.of<PlaylistDataProvider>(context, listen: false);
-
-    return showAlertDialogPopup(context,
-        title: "Warning",
-        content:
-            Text("Are you sure you want to delete playlist ${playlist.name}?"),
-        actions: [
-      displayTextButton(context, "Yes", callback: () {
-        playlistDataProvider.deletePlaylist(playlist.id).then((value) =>
-            print('TODO: PlaylistTile.deletePlaylist success notification'));
-      }),
-      displayTextButton(context, "No")
-    ]);
   }
 }
 
@@ -57,9 +39,9 @@ class NewPlaylistTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTileWrapper(
-          leading: Icon(Icons.add),
+      leading: const Icon(Icons.add),
       title: 'New Playlist',
-          onTap: () => createNewPlaylist(context),
+      onTap: () => createNewPlaylist(context),
     );
   }
 

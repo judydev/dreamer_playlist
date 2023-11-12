@@ -46,8 +46,9 @@ class PlaylistTabView extends StatelessWidget {
           children: [
             // Favorite
             IconButton(
-                onPressed: () {
-                  Provider.of<PlaylistDataProvider>(context, listen: false)
+                onPressed: () async {
+                  await Provider.of<PlaylistDataProvider>(context,
+                          listen: false)
                       .updatePlaylistFavorite(playlist);                      
                   if (isFavoriteTab()) {
                     selectedFavoritePlaylistNotifier.value = null;
@@ -158,11 +159,17 @@ class PlaylistTabView extends StatelessWidget {
               content: Text(
                   "Are you sure you want to delete playlist ${playlist.name}?"),
               actions: [
-                displayTextButton(context, "Yes", callback: () {
-                  Provider.of<PlaylistDataProvider>(context, listen: false)
+                displayTextButton(context, "Yes", callback: () async {
+                  await Provider.of<PlaylistDataProvider>(context,
+                          listen: false)
                       .deletePlaylist(playlist.id);
-                  Provider.of<AppStateDataProvider>(context, listen: false)
+                  await Provider.of<AppStateDataProvider>(context,
+                          listen: false)
                       .updateAppState(AppStateKey.currentPlaylistId, null);
+
+                  if (isFavoriteTab()) {
+                    selectedFavoritePlaylistNotifier.value = null;
+                  }
                 }),
                 displayTextButton(context, "No")
               ]);

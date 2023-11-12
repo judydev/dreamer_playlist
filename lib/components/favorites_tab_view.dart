@@ -21,7 +21,7 @@ class _FavoritesTabViewState extends State<FavoritesTabView> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         AppBar(
-          title: Text("Favorites"),
+          title: const Text("Favorites"),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -32,7 +32,7 @@ class _FavoritesTabViewState extends State<FavoritesTabView> {
                     : TextButton.styleFrom(
                         side: const BorderSide(),
                       ),
-                child: Text('Songs'),
+                child: const Text('Songs'),
                 onPressed: () {
                   setState(() {
                     showPlaylists = false;
@@ -44,7 +44,7 @@ class _FavoritesTabViewState extends State<FavoritesTabView> {
                       side: const BorderSide(),
                     )
                   : null,
-              child: Text('Playlists'),
+              child: const Text('Playlists'),
               onPressed: () {
                 setState(() {
                   showPlaylists = true;

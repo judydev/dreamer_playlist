@@ -322,6 +322,7 @@ class SongDataProvider extends ChangeNotifier {
         where: 'id = ?',
         whereArgs: [playlistId]);
 
+    if (maps.isEmpty) return null;
     String? strIndices = maps[0]['indices'];
     if (strIndices == null) return null;
 
