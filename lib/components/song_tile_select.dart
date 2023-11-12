@@ -23,7 +23,6 @@ class _SongTileSelectState extends State<SongTileSelect> {
   Widget build(BuildContext context) {
     return ListTileWrapper(
         title: song.title!,
-        leading: Icon(Icons.music_video),
         trailing: IconButton(
           icon: isSelected
               ? Icon(Icons.check_circle)

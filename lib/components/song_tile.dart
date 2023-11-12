@@ -1,5 +1,5 @@
 import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
-import 'package:dreamer_playlist/components/popup_menu_tile.dart';
+import 'package:dreamer_playlist/helpers/popup_menu_tile.dart';
 import 'package:dreamer_playlist/components/select_playlist_popup.dart';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
@@ -18,7 +18,8 @@ class SongTile extends StatelessWidget {
   final Icon? trailingIcon;
 
   SongTile(this.song,
-      {this.songIndex,
+      {super.key,
+      this.songIndex,
       this.currentPlaylistId,
       this.disableTap = false,
       this.leadingIcon,
@@ -39,7 +40,6 @@ class SongTile extends StatelessWidget {
       onTap: disableTap
           ? null
           : () async {
-            print('onTapCallback, clicked on song tile, play this song');
             if (songIndex == null) {
               print('Unknown index');
               return;
@@ -70,10 +70,11 @@ class SongTile extends StatelessWidget {
         if (song.playlistSongId == null) {
           print(
               'Error when removing ${song.title} from playlist: invalid PlaylistSongId');
-          return;
-        }
-        await Provider.of<SongDataProvider>(context, listen: false)
-              .removeSongsFromPlaylist([song.playlistSongId!]);  
+          } else {
+            await Provider.of<SongDataProvider>(context, listen: false)
+                .removeSongsFromPlaylist(
+                    [song.playlistSongId!], currentPlaylistId!);
+          }
       },
     ),
     PopupMenuItem<PopupMenuTile>(
@@ -83,11 +84,7 @@ class SongTile extends StatelessWidget {
       ),
       onTap: () {
         Provider.of<SongDataProvider>(context, listen: false)
-            .deleteSong(song)
-            .then((value) => {
-                  // TODO: handle success and error
-                  print("SongTile.deleteFromLibrary handle success and error")
-                });
+              .deleteSong(song);
       },
     ),
     PopupMenuItem<PopupMenuTile>(
@@ -129,8 +126,7 @@ class SongTile extends StatelessWidget {
       onTap: () {
         print('Add ${song.title} to Favorite');
         Provider.of<SongDataProvider>(context, listen: false)
-            .updateSongFavorite(song.id!, song.loved ?? 0);
-        // TODO: handle exception
+              .updateSongFavorite(song.id!, song.loved ?? 0);
       },
     ),
     PopupMenuItem<PopupMenuTile>(
@@ -156,8 +152,7 @@ class SongTile extends StatelessWidget {
               displayTextButton(context, "OK", callback: () {
                 if (updatedSongTitle == null) return;
                 Provider.of<SongDataProvider>(context, listen: false)
-                    .updateSongName(song.id!, updatedSongTitle!);
-                // TODO:handle exception
+                      .updateSongName(song.id!, updatedSongTitle!);
               })
             ]);
       },

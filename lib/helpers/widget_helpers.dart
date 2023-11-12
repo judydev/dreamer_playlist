@@ -75,7 +75,8 @@ class ListTileWrapper extends StatelessWidget {
   final String? title;
   final void Function()? onTap;
 
-  ListTileWrapper({this.leading, this.trailing, this.title, this.onTap});
+  ListTileWrapper(
+      {super.key, this.leading, this.trailing, this.title, this.onTap});
 
   @override
   Widget build(BuildContext context) {

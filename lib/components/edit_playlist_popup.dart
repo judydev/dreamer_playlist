@@ -1,6 +1,5 @@
 import 'package:dreamer_playlist/components/playlist_edit_songlist.dart';
 import 'package:dreamer_playlist/database/playlist_data_provider.dart';
-import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,13 +14,13 @@ class EditPlaylistPopup extends StatefulWidget {
 
 class _EditPlaylistPopupState extends State<EditPlaylistPopup> {
   late Playlist playlist = widget.playlist;
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Edit Playlist')),
-      body: SingleChildScrollView(
-        child: Column(children: [
+      appBar: AppBar(title: const Text('Edit Playlist')),
+      body: Column(
+        children: [
           Padding(
             padding: const EdgeInsets.only(left: 10),
             child: EditableTextField(
@@ -34,12 +33,7 @@ class _EditPlaylistPopupState extends State<EditPlaylistPopup> {
             ),
           ),
           PlaylistEditSongList(playlist),
-          Padding(
-              padding: const EdgeInsets.all(10),
-              child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text('${GetitUtil.orderedSongList.length} tracks'))),
-        ]),
+        ],
       ),
     );
   }

@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
 class PlaylistDataProvider extends ChangeNotifier {
-  Future<void> addPlaylist(Playlist playlist) async {
+  Future<String> createPlaylist(String name) async {
     final db = await DatabaseUtil.getDatabase();
-    playlist.added = DateTime.now().millisecondsSinceEpoch;
+    Playlist playlist = Playlist(name: name);
 
     await db.insert(
       DatabaseUtil.playlistTableName,
@@ -15,6 +15,7 @@ class PlaylistDataProvider extends ChangeNotifier {
     );
 
     notifyListeners();
+    return playlist.id;
   }
 
   Future<List<Playlist>> getAllPlaylists() async {
@@ -36,7 +37,11 @@ class PlaylistDataProvider extends ChangeNotifier {
     if (maps.isEmpty) {
       return null;
     }
-    return Playlist().fromMapEntry(maps[0]);
+
+    Playlist playlist = Playlist().fromMapEntry(maps[0]);
+    // List<Song> songs = await SongDataProvider().getAllSongsFromPlaylist(id);
+    // playlist.songs = songs;
+    return playlist;
   }
 
   Future<void> updatePlaylistName(String playlistId, String newName) async {

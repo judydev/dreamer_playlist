@@ -37,7 +37,7 @@ class _SelectPlaylistPopupState extends State<SelectPlaylistPopup> {
           _getAllPlaylists,
           (context, snapshot) {
             List<Playlist> playlists = snapshot.data ?? [];
-            return Column(
+            return ListView(
               children: [
                 NewPlaylistTile(),
                 ...playlists.map((playlist) => ListTileWrapper(

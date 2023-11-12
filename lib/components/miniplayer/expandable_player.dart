@@ -5,12 +5,10 @@ import 'package:dreamer_playlist/components/miniplayer/mini_player_mode.dart';
 import 'package:dreamer_playlist/components/miniplayer/miniplayer.dart';
 import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/components/miniplayer/utils.dart';
-import 'package:dreamer_playlist/components/song_tile.dart';
 import 'package:dreamer_playlist/helpers/audio_handler.dart';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
-import 'package:dreamer_playlist/models/song.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -67,16 +65,11 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                           valueListenable:
                               GetitUtil.pageManager.currentPlayingNotifier,
                           builder: ((context, mediaItem, child) {
-                            if (mediaItem == null) {
-                              return ListTileWrapper(
-                                  leading: Icon(Icons.music_video),
-                                  title: 'Not playing');
-                            } else {
-                              return SongTile(
-                                  Song.fromMediaItem(mediaItem),
-                                disableTap: true,
-                              );
-                            }
+                            return ListTileWrapper(
+                                leading: Icon(Icons.music_video),
+                                title: mediaItem == null
+                                    ? 'Not playing'
+                                    : mediaItem.title);
                           })),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),

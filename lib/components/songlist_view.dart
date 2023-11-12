@@ -40,25 +40,48 @@ class _SongListViewState extends State<SongListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: FutureBuilderWrapper(_getSongs,
-          (context, snapshot) {
-        List<Song> songs = snapshot.data;
-        GetitUtil.orderedSongList = songs;
-        if (songs.isNotEmpty) {
-          GetitUtil.orderedSongList = songs;
-
-          return ListView(children: [
-            ...songs.asMap().entries.map((entry) => SongTile(
-                  entry.value,
-                  songIndex: entry.key,
-                  currentPlaylistId: playlist?.id,
-                ))
-          ]);
+    return FutureBuilderWrapper(_getSongs, (context, snapshot) {
+      List<Song> songs = snapshot.data;
+      GetitUtil.orderedSongList = songs;
+      if (songs.isNotEmpty) {
+        return SongList(
+          songs: songs,
+          playlist: playlist,
+        );
+      } else {
+        if (isFavoriteTab()) {
+          return Text("No favorite songs.");
         } else {
-          return Text("No songs.");
+          return Text('No songs.');
         }
-      }),
+      }
+    });
+  }
+}
+
+class SongList extends StatelessWidget {
+  final List<Song> songs;
+  final Playlist? playlist;
+
+  SongList({super.key, required this.songs, this.playlist});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: ListView(children: [
+        ...songs.asMap().entries.map((entry) => SongTile(
+              entry.value,
+              songIndex: entry.key,
+              currentPlaylistId: playlist?.id,
+            )),
+        songs.isEmpty
+            ? SizedBox.shrink()
+            : Padding(
+                padding: const EdgeInsets.all(10),
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('${songs.length} tracks'))),
+      ]),
     );
   }
 }

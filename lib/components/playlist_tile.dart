@@ -1,6 +1,6 @@
 import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
-import 'package:dreamer_playlist/components/edit_playlist_view.dart';
+import 'package:dreamer_playlist/components/new_playlist_popup.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/database/app_state_data_provider.dart';
@@ -50,7 +50,9 @@ class PlaylistTile extends StatelessWidget {
 }
 
 class NewPlaylistTile extends StatelessWidget {
-  NewPlaylistTile();
+  final bool updateAppState;
+
+  NewPlaylistTile({this.updateAppState = false});
 
   @override
   Widget build(BuildContext context) {
@@ -62,22 +64,22 @@ class NewPlaylistTile extends StatelessWidget {
   }
 
   createNewPlaylist(context) {
-    Playlist playlist = Playlist();
+    String playlistName = '';
 
     showAdaptiveDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("New Playlist"),
-          content: EditPlaylistView(playlist, (Playlist updated) {
-            playlist = updated;
+          title: const Text("New Playlist"),
+          content: NewPlaylistPopup(callback: (String name) {
+            playlistName = name;
           }),
           actions: [
             displayTextButton(context, "Cancel"),
             displayTextButton(context, "OK",
                 callback: () => {
                       // TODO: add empty input validator, or disable OK button when empty
-                      if (playlist.name == null)
+                      if (playlistName.trim().isEmpty)
                         {
                           print("name cannot be empty"),
                         }
@@ -85,15 +87,19 @@ class NewPlaylistTile extends StatelessWidget {
                         {
                           Provider.of<PlaylistDataProvider>(context,
                                   listen: false)
-                              .addPlaylist(playlist)
-                              .then((value) {
-                            print(
-                                "TODO: Playlist.addPlaylist handle success and error");
-                          }),
-                          Provider.of<AppStateDataProvider>(context,
-                                  listen: false)
-                              .updateAppState(
-                                  AppStateKey.currentPlaylistId, playlist.id),
+                              .createPlaylist(playlistName)
+                              .then((playlistId) => {
+                                    if (updateAppState)
+                                      {
+                                        Provider.of<AppStateDataProvider>(
+                                                context,
+                                                listen: false)
+                                            .updateAppState(
+                                                AppStateKey.currentPlaylistId,
+                                                playlistId),
+                                      }
+                                  }),
+
                         }
                     })
           ],

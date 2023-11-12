@@ -47,7 +47,7 @@ class Song {
 
   @override
   String toString() {
-    return title.toString();
-    // return 'Song{id: $id, name: $name, path: $path, loved: $loved, added: $added, lastPlayed: $lastPlayed}';
+    return '{title: $title, id: $id, playlistSongId: $playlistSongId}';
+    // return 'Song{id: $id, title: $title, path: $path, loved: $loved, added: $added, lastPlayed: $lastPlayed}';
   }
 }

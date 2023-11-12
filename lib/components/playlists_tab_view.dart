@@ -15,7 +15,7 @@ class PlaylistsTabView extends StatelessWidget {
       ),
       Expanded(
         child: ListView(
-          children: [NewPlaylistTile(), PlaylistsList()],
+          children: [NewPlaylistTile(updateAppState: true), PlaylistsList()],
         ),
       )
     ]));
@@ -51,9 +51,13 @@ class _PlaylistsListState extends State<PlaylistsList> {
       (context, snapshot) {
         List<Playlist> playlists = snapshot.data ?? [];
         if (playlists.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: Text('No favorite playlists.'),
+          return Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Text(
+                  isFavoriteTab() ? 'No favorite playlists.' : 'No playlists.'),
+            ),
           );
         }
         return Column(

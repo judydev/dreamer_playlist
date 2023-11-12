@@ -22,7 +22,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseUtil.initDatabase();
   await DataUtil.loadInitialData();
-
+  
   await setupServiceLocator();
 
   runApp(
@@ -76,6 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    DataUtil().healthCheck(context);
     GetitUtil.pageManager.init();
   }
 
@@ -174,7 +175,12 @@ class _MyHomePageState extends State<MyHomePage> {
             return FutureBuilderWrapper(
                 playlistDataProvider.getPlaylistById(currentPlaylistId),
                 (context, snapshot) {
-              Playlist playlist = snapshot.data;
+              Playlist? playlist = snapshot.data;
+              if (playlist == null) {
+                print(
+                    'Something wrong with currentPlaylistId: $currentPlaylistId');
+                return PlaylistsTabView();
+              }
               return PlaylistTabView(playlist: playlist);
             });
           } else {

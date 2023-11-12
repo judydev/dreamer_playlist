@@ -6,7 +6,7 @@ import 'package:dreamer_playlist/components/select_playlist_popup.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
-import 'package:dreamer_playlist/components/popup_menu_tile.dart';
+import 'package:dreamer_playlist/helpers/popup_menu_tile.dart';
 import 'package:dreamer_playlist/components/songlist_view.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
@@ -22,8 +22,6 @@ class PlaylistTabView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         AppBar(
             title: Text(playlist.name!),
