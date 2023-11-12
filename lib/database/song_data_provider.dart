@@ -91,13 +91,21 @@ class SongDataProvider extends ChangeNotifier {
 
       // remove songs from each playlist to update playlist indices
       for (String playlistId in grouped.keys) {
-        // await removeSongsFromPlaylist(playlistSongIds, playlistId);
         await updatePlaylistIndicesWhenRemovingSongsFromPlaylist(
             grouped[playlistId]!, playlistId);
       }
     }
 
-    // delete entry from database
+    // delete playlist song from database
+    try {
+      await db.delete(DatabaseUtil.playlistSongTableName,
+          where: 'songId = ?', whereArgs: [song.id]);
+    } catch (e) {
+      debugPrint(
+          'Error removing song playlist relations where songId = ${song.id}: $e');
+    }
+
+    // delete song entry from database
     try {
       await db.delete(
         DatabaseUtil.songTableName,

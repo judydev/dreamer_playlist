@@ -36,37 +36,31 @@ Future<void> showAlertDialogPopup(
 List<String> acceptedAudioExtensions =
     List.unmodifiable(["m4a", "mp3", "wav", "aiff"]);
 
-void openFilePicker(context, String? playlistId) {
-  Song song;
-  FilePicker.platform.pickFiles().then((selectedFile) async => {
-        if (selectedFile != null)
-          {
-            for (final file in selectedFile.files)
-              {
-                if (acceptedAudioExtensions.contains(file.extension))
-                  {
-                    song = await Provider.of<SongDataProvider>(context,
-                            listen: false)
-                        .addSong(file),
-                    if (playlistId != null)
-                      {
-                        await Provider.of<SongDataProvider>(context,
-                                listen: false)
-                            .associateSongToPlaylist(song.id!, playlistId),
-                      },
-                  }
-                else
-                  {
-                    showAlertDialogPopup(
-                        context,
-                        title: "Warning",
-                        content:
-                            Text("The file you selected is not an audio file."),
-                        actions: [displayTextButton(context, "OK")])
-                  }
-              }
-          }
-      });
+Future<bool> openFilePicker(context, String? playlistId) async {
+  FilePickerResult? selected = await FilePicker.platform.pickFiles(
+    allowedExtensions: acceptedAudioExtensions,
+    allowMultiple: true,
+  );
+
+  if (selected != null) {
+    for (final file in selected.files) {
+      if (acceptedAudioExtensions.contains(file.extension)) {
+        Song song = await Provider.of<SongDataProvider>(context, listen: false)
+            .addSong(file);
+        if (playlistId != null) {
+          await Provider.of<SongDataProvider>(context, listen: false)
+              .associateSongToPlaylist(song.id!, playlistId);
+        }
+      } else {
+        showAlertDialogPopup(context,
+            title: "Warning",
+            content: Text("The file you selected is not an audio file."),
+            actions: [displayTextButton(context, "OK")]);
+      }
+    }
+  }
+
+  return true;
 }
 
 class ListTileWrapper extends StatelessWidget {

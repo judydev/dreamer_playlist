@@ -29,8 +29,8 @@ class DataUtil {
     String sql_standalone_playlist_songs = '''
       SELECT * FROM ${DatabaseUtil.playlistSongTableName} 
       WHERE playlistId NOT IN (
-        SELECT id FROM ${DatabaseUtil.playlistTableName}
-      );
+        SELECT id FROM ${DatabaseUtil.playlistTableName})
+      OR songId NOT IN (SELECT id FROM ${DatabaseUtil.songTableName});
     ''';
     final playlistSongs = await db.rawQuery(sql_standalone_playlist_songs);
     if (playlistSongs.isNotEmpty) {
@@ -47,7 +47,8 @@ class DataUtil {
                   displayTextButton(context, "Yes", callback: () {
                     String sql_remove_standalone_playlist_songs = ''' 
                       DELETE FROM ${DatabaseUtil.playlistSongTableName}
-                      WHERE playlistId NOT IN (SELECT id FROM ${DatabaseUtil.playlistTableName});
+                      WHERE playlistId NOT IN (SELECT id FROM ${DatabaseUtil.playlistTableName})
+                      OR songId NOT IN (SELECT id FROM ${DatabaseUtil.songTableName});
                     ''';
 
                     db.rawDelete(sql_remove_standalone_playlist_songs);

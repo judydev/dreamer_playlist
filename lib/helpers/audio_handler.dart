@@ -288,7 +288,7 @@ class MyAudioHandler extends BaseAudioHandler
 
       mediaItem.add(playlist[index]);
 
-      // currentIndexNotifier.value = index;
+      currentIndexNotifier.value = index;
       // final seq = _audioPlayer.sequenceState?.effectiveSequence;
     });
   }

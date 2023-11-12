@@ -21,16 +21,6 @@ class MusicQueue extends StatelessWidget {
   }
 }
 
-void updateQueueIndicesNotifier() {
-  queueIndicesNotifier.value =
-      GetitUtil.audioHandler.audioPlayer.effectiveIndices ?? [];
-}
-
-bool isEmptyQueue() {
-  AudioPlayer audioPlayer = GetitUtil.audioHandler.audioPlayer;
-  return audioPlayer.sequence != null ? audioPlayer.sequence!.isEmpty : true;
-}
-
 class QueueSongTile extends StatelessWidget {
   final int queueIndex;
   QueueSongTile({required this.queueIndex});
@@ -60,9 +50,9 @@ class QueueSongTile extends StatelessWidget {
               ),
             ),
             child: Container(
-                // color: currentIndex != null && queueIndex == currentIndex
-                //     ? Theme.of(context).colorScheme.surfaceTint
-                //     : null,
+                color: currentIndex != null && queueIndex == currentIndex
+                    ? Theme.of(context).colorScheme.primary
+                    : null,
                 child: child),
           );
         }),
@@ -75,4 +65,14 @@ class QueueSongTile extends StatelessWidget {
               await _audioPlayer.play();
             }));
   }
+}
+
+void updateQueueIndicesNotifier() {
+  queueIndicesNotifier.value =
+      GetitUtil.audioHandler.audioPlayer.effectiveIndices ?? [];
+}
+
+bool isEmptyQueue() {
+  AudioPlayer audioPlayer = GetitUtil.audioHandler.audioPlayer;
+  return audioPlayer.sequence != null ? audioPlayer.sequence!.isEmpty : true;
 }

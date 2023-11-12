@@ -7,25 +7,34 @@ import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-class LibraryTabView extends StatelessWidget {
+class LibraryTabView extends StatefulWidget {
+  @override
+  State<LibraryTabView> createState() => _LibraryTabViewState();
+}
+
+class _LibraryTabViewState extends State<LibraryTabView> {
+  bool isPopupOpen = false;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        AppBar(title: Text('All Songs')),
+        AppBar(title: const Text('All Songs')),
         libraryButtonBar,
         TextButton(
-            onPressed: () {
-              openFilePicker(context, null);
+            onPressed: () async {
+              if (isPopupOpen) return;
+              isPopupOpen = true;
+              await openFilePicker(context, null);
+              isPopupOpen = false;
             },
-            child: Text("Import local file to Library")),
+            child: const Text("Import local file to Library")),
         SongListView()
       ],
     );
   }
 }
 
-// TODO: compare performance with using class
 ButtonBar libraryButtonBar = ButtonBar(
   alignment: MainAxisAlignment.spaceEvenly,
   children: [

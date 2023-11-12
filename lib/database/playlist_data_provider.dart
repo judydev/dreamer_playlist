@@ -65,11 +65,25 @@ class PlaylistDataProvider extends ChangeNotifier {
   Future<void> deletePlaylist(String id) async {
     final db = await DatabaseUtil.getDatabase();
 
-    await db.delete(
-      DatabaseUtil.playlistTableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    // delete playlist song from database
+    try {
+      await db.delete(DatabaseUtil.playlistSongTableName,
+          where: 'playlistId = ?', whereArgs: [id]);
+    } catch (e) {
+      debugPrint(
+          'Error removing song playlist relations where playlistId = $id: $e');
+    }
+
+    // delete playlist entry from database
+    try {
+      await db.delete(
+        DatabaseUtil.playlistTableName,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      debugPrint('Error deleting playlist from db: $e');
+    }
 
     notifyListeners();
   }
