@@ -54,7 +54,7 @@ Future<bool> openFilePicker(context, String? playlistId) async {
       } else {
         showAlertDialogPopup(context,
             title: "Warning",
-            content: Text("The file you selected is not an audio file."),
+            content: const Text("The file you selected is not an audio file."),
             actions: [displayTextButton(context, "OK")]);
       }
     }
@@ -80,7 +80,7 @@ class ListTileWrapper extends StatelessWidget {
           bottom: BorderSide(
         color: Colors.black54,
       )),
-      contentPadding: EdgeInsets.all(10),
+      contentPadding: const EdgeInsets.all(10),
       // parameters for ListTile
       title: Text(title ?? ""),
       leading: leading,
@@ -107,7 +107,7 @@ class FutureBuilderWrapper extends StatelessWidget {
           if (loadingText != null) {
             return Text(loadingText!);
           } else {
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           }
         }
         if (snapshot.hasError) {

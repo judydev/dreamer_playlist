@@ -13,10 +13,10 @@ class MusicQueue extends StatelessWidget {
           return queueIndices.isNotEmpty
               ? ListView(
                   children: queueIndices
-                      .map((queueIndex) {
-                  return QueueSongTile(queueIndex: queueIndex);
-                }).toList())
-              : SizedBox.shrink();
+                      .map(
+                          (queueIndex) => QueueSongTile(queueIndex: queueIndex))
+                      .toList())
+              : const SizedBox.shrink();
         }));
   }
 }
@@ -43,9 +43,8 @@ class QueueSongTile extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerRight,
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  // child: Icon(Icons.delete, color: Colors.white),
-                  child: Text('Remove'),
+                  padding: const EdgeInsets.all(16.0),
+                  child: const Text('Remove'),
                 ),
               ),
             ),
@@ -58,8 +57,8 @@ class QueueSongTile extends StatelessWidget {
         }),
         child: ListTileWrapper(
             title: GetitUtil.audioHandler.queue.value[queueIndex].title,
-            leading: Icon(Icons.music_video),
-            trailing: Icon(Icons.menu),
+            leading: const Icon(Icons.music_video),
+            trailing: const Icon(Icons.menu),
             onTap: () async {
               await _audioPlayer.seek(Duration.zero, index: queueIndex);
               await _audioPlayer.play();

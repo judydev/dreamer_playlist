@@ -29,11 +29,11 @@ class SongTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTileWrapper(
       title: song.title!,
-      leading: leadingIcon ?? Icon(Icons.play_circle_outline),
+      leading: leadingIcon ?? const Icon(Icons.play_circle_outline),
       trailing: trailingIcon ??
           PopupMenuButton(
         position: PopupMenuPosition.under,
-        child: Icon(Icons.more_vert),
+            child: const Icon(Icons.more_vert),
             itemBuilder: (context) =>
                 buildMoreActionsMenu(context, song, currentPlaylistId),
       ),
@@ -41,7 +41,7 @@ class SongTile extends StatelessWidget {
           ? null
           : () async {
             if (songIndex == null) {
-              print('Unknown index');
+                debugPrint('Unknown index');
               return;
             }
 
@@ -68,7 +68,7 @@ class SongTile extends StatelessWidget {
       ),
         onTap: () async {
         if (song.playlistSongId == null) {
-          print(
+            debugPrint(
               'Error when removing ${song.title} from playlist: invalid PlaylistSongId');
           } else {
             await Provider.of<SongDataProvider>(context, listen: false)
@@ -121,10 +121,9 @@ class SongTile extends StatelessWidget {
     PopupMenuItem<PopupMenuTile>(
       child: PopupMenuTile(
         icon: song.loved == 1 ? Icons.favorite : Icons.favorite_border,
-        title: song.loved == 1 ? 'Loved' : 'Love',
+          title: song.loved == 1 ? 'Loved' : 'Love',
       ),
-      onTap: () {
-        print('Add ${song.title} to Favorite');
+        onTap: () {
         Provider.of<SongDataProvider>(context, listen: false)
               .updateSongFavorite(song.id!, song.loved ?? 0);
       },

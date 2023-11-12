@@ -33,7 +33,10 @@ class PlaylistDataProvider extends ChangeNotifier {
   Future<Playlist?> getPlaylistById(String id) async {
     final db = await DatabaseUtil.getDatabase();
     final List<Map<String, dynamic>> maps =
-        await db.query(DatabaseUtil.playlistTableName, where: 'id = "$id"');
+      await db.query(
+        DatabaseUtil.playlistTableName,
+        where: 'id = ?',
+        whereArgs: [id]);
     if (maps.isEmpty) {
       return null;
     }
@@ -55,8 +58,7 @@ class PlaylistDataProvider extends ChangeNotifier {
         whereArgs: [playlistId],
       );
     } catch (e) {
-      print('Error updating playlist name');
-      print(e);
+      debugPrint('Error updating playlist name: $e');
     }
 
     notifyListeners();
@@ -104,10 +106,13 @@ class PlaylistDataProvider extends ChangeNotifier {
 
   Future<void> updatePlaylistFavorite(Playlist playlist) async {
     final db = await DatabaseUtil.getDatabase();
-    await db.update(
-        DatabaseUtil.playlistTableName, {'loved': playlist.loved == 0 ? 1 : 0},
-        where: 'id = ?', whereArgs: [playlist.id]);
-    // TODO: handle exceptions when update fails, and display error on UI
+    try {
+      await db.update(DatabaseUtil.playlistTableName,
+          {'loved': playlist.loved == 0 ? 1 : 0},
+          where: 'id = ?', whereArgs: [playlist.id]);
+    } catch (e) {
+      debugPrint('Error updating playlist favorite: $e');
+    }
     notifyListeners();
   }
 }

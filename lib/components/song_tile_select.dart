@@ -2,22 +2,18 @@ import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:flutter/material.dart';
 
-class SongTileSelect extends StatefulWidget {
+class SongTileSelect extends StatelessWidget {
   final Song song;
   final Function callback;
-  final IconData? selectIcon;
-  SongTileSelect({required this.song, required this.callback, this.selectIcon});
-
-  @override
-  State<SongTileSelect> createState() => _SongTileSelectState();
-}
-
-class _SongTileSelectState extends State<SongTileSelect> {
-  late Song song = widget.song;
-  late Function callback = widget.callback;
-  late IconData? selectIcon = widget.selectIcon;
-
-  bool isSelected = false;
+  final bool isSelected;
+  final Icon? selectIcon;
+ 
+  SongTileSelect({
+    required this.song,
+    required this.callback,
+    required this.isSelected,
+    this.selectIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +21,9 @@ class _SongTileSelectState extends State<SongTileSelect> {
         title: song.title!,
         trailing: IconButton(
           icon: isSelected
-              ? Icon(Icons.check_circle)
-              : Icon(selectIcon ?? Icons.circle_outlined),
+              ? const Icon(Icons.check_circle)
+              : selectIcon ?? const Icon(Icons.circle_outlined),
           onPressed: () {
-            setState(() {
-              isSelected = !isSelected;
-            });
-
             callback(song);
           },
         ),

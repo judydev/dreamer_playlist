@@ -26,7 +26,7 @@ class PlaylistTabView extends StatelessWidget {
         AppBar(
             title: Text(playlist.name!),
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios_new),
+              icon: const Icon(Icons.arrow_back_ios_new),
               onPressed: () {
                 if (isPlaylistsTab()) {
                 Provider.of<AppStateDataProvider>(context, listen: false)
@@ -38,8 +38,8 @@ class PlaylistTabView extends StatelessWidget {
               },
             )),
         // Padding(
-        //   padding: EdgeInsets.all(20),
-        //   child: Icon(Icons.music_video, size: 64),
+        //   padding: const EdgeInsets.all(20),
+        //   child: const Icon(Icons.music_video, size: 64),
         // ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -54,8 +54,8 @@ class PlaylistTabView extends StatelessWidget {
                   }
                 },
                 icon: playlist.loved == 1
-                    ? Icon(Icons.favorite)
-                    : Icon(Icons.favorite_border)),
+                    ? const Icon(Icons.favorite)
+                    : const Icon(Icons.favorite_border)),
             // Edit
             IconButton(
                 onPressed: () {
@@ -64,7 +64,7 @@ class PlaylistTabView extends StatelessWidget {
                       builder: (context) => EditPlaylistPopup(playlist));
                 },
                 tooltip: 'Edit',
-                icon: Icon(Icons.edit)),
+                icon: const Icon(Icons.edit)),
             // Play
             IconButton(
                 onPressed: () async {
@@ -73,18 +73,18 @@ class PlaylistTabView extends StatelessWidget {
                           .audioHandler.audioPlayer.shuffleModeEnabled);
                 },
                 tooltip: 'Play',
-                icon: Icon(Icons.play_circle, size: 42)),
+                icon: const Icon(Icons.play_circle, size: 42)),
             // Shuffle
             IconButton(
                 onPressed: () async {
                   await shufflePlay();
                 },
                 tooltip: 'Shuffle Play',
-                icon: Icon(Icons.shuffle)),
+                icon: const Icon(Icons.shuffle)),
             // More Actions
             PopupMenuButton(
                 position: PopupMenuPosition.under,
-                child: Icon(Icons.more_vert),
+              child: const Icon(Icons.more_vert),
               itemBuilder: (context) => _buildPlaylistMoreActionsMenu(context),
             ),
           ],
@@ -100,7 +100,7 @@ class PlaylistTabView extends StatelessWidget {
                       context: context,
                         builder: ((context) => AddMusicPopup(playlist)));
                 },
-                  child: Text('Add from library')),
+                  child: const Text('Add from library')),
             ),
             Flexible(
               fit: FlexFit.loose,
@@ -108,7 +108,7 @@ class PlaylistTabView extends StatelessWidget {
                   onPressed: () {
                     openFilePicker(context, playlist.id);
                   },
-                  child: Text('Import local file')),
+                  child: const Text('Import local file')),
             ),
           ],
         ),

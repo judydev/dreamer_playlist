@@ -66,7 +66,7 @@ class _FavoritesTabViewState extends State<FavoritesTabView> {
                     }))
                 : Column(
                     children: [
-                      libraryButtonBar,
+                      getLibraryButtonBar(context),
                       SongListView(),
                     ],
                   )),

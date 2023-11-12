@@ -1,3 +1,4 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:dreamer_playlist/helpers/popup_menu_tile.dart';
 import 'package:dreamer_playlist/components/select_playlist_popup.dart';
 import 'package:dreamer_playlist/components/song_tile_select.dart';
@@ -56,20 +57,23 @@ class _PlaylistEditSongListState extends State<PlaylistEditSongList> {
                                 selectMode = !selectMode;
                               });
                             },
-                            child: Text(selectMode ? 'Cancel' : 'Select')),
+                            child: selectMode
+                                ? const Text('Cancel')
+                                : const Text('Select')),
                         selectMode
                             ? PopupMenuButton(
                                 position: PopupMenuPosition.under,
-                                child: Text('Actions'),
+                                child: const Text('Actions'),
                                 itemBuilder: (context) =>
                                     buildMultiSelectMoreActionsMenu(
                                         context,
                                         selectedSongs: selectedSongs,
                                         playlistId: playlist.id))
-                            : PopupMenuButton(
-                                child: Text('Sort'),
-                                itemBuilder: (context) =>
-                                    buildSortMoreActionsMenu(context)),
+                            : const SizedBox.shrink()
+                        // PopupMenuButton(
+                        //     child: Text('Sort'),
+                        //     itemBuilder: (context) =>
+                        //         buildSortMoreActionsMenu(context)),
                       ])),
               Expanded(
                   child: selectMode
@@ -78,6 +82,8 @@ class _PlaylistEditSongListState extends State<PlaylistEditSongList> {
                               songs.length,
                               (index) => SongTileSelect(
                                     song: songs[index],
+                                    isSelected:
+                                        selectedSongs.contains(songs[index]),
                                     callback: (updatedSong) {
                                     List<Song> oldVal = selectedSongs;
                                     if (oldVal.contains(updatedSong)) {
@@ -109,7 +115,7 @@ class _PlaylistEditSongListState extends State<PlaylistEditSongList> {
                                     final int item = indices.removeAt(oldIndex);
                                     indices.insert(newIndex, item);
                                   } catch (e) {
-                                    print('error reordering playlist: $e');
+                                    debugPrint('Error reordering playlist: $e');
                                   }
                                 });
 
@@ -128,7 +134,7 @@ class _PlaylistEditSongListState extends State<PlaylistEditSongList> {
           ),
         );
       } else {
-        return Text("No songs in this playlist.");
+        return const Text("No songs in this playlist.");
       }
     });
   }
@@ -158,31 +164,43 @@ class _PlaylistEditSongListState extends State<PlaylistEditSongList> {
         onTap: () {
           showAdaptiveDialog(
             context: context,
-            builder: ((context) => SelectPlaylistPopup(selectedSongs)),
+            builder: (context) => SelectPlaylistPopup(selectedSongs),
           );
+        },
+      ),
+      PopupMenuItem<PopupMenuTile>(
+        enabled: selectedSongs.isNotEmpty,
+        child: PopupMenuTile(
+          icon: Icons.playlist_add,
+          title: 'Add to queue',
+        ),
+        onTap: () async {
+          List<MediaItem> mediaItems =
+              selectedSongs.map((song) => song.toMediaItem()).toList();
+          await GetitUtil.audioHandler.addQueueItems(mediaItems);
         },
       ),
     ];
   }
 
-  List<PopupMenuItem> buildSortMoreActionsMenu(context) {
-    return [
-      PopupMenuItem<PopupMenuTile>(
-        child: PopupMenuTile(
-          title: 'Name',
-        ),
-        onTap: () {
-          print('TODO: sort by name');
-        },
-      ),
-      PopupMenuItem<PopupMenuTile>(
-        child: PopupMenuTile(
-          title: 'Added',
-        ),
-        onTap: () {
-          print('TODO: sort by added');
-        },
-      ),
-    ];
-  }
+  // List<PopupMenuItem> buildSortMoreActionsMenu(context) {
+  //   return [
+  //     PopupMenuItem<PopupMenuTile>(
+  //       child: PopupMenuTile(
+  //         title: 'Name',
+  //       ),
+  //       onTap: () {
+  //         print('TODO: sort by name');
+  //       },
+  //     ),
+  //     PopupMenuItem<PopupMenuTile>(
+  //       child: PopupMenuTile(
+  //         title: 'Added',
+  //       ),
+  //       onTap: () {
+  //         print('TODO: sort by added');
+  //       },
+  //     ),
+  //   ];
+  // }
 }

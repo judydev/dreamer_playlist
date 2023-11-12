@@ -1,4 +1,3 @@
-import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/database/database_util.dart';
 import 'package:flutter/material.dart';

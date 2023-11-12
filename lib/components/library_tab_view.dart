@@ -1,3 +1,4 @@
+import 'package:dreamer_playlist/components/edit_library_popup.dart';
 import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/components/songlist_view.dart';
 import 'package:dreamer_playlist/helpers/audio_handler.dart';
@@ -20,7 +21,7 @@ class _LibraryTabViewState extends State<LibraryTabView> {
     return Column(
       children: <Widget>[
         AppBar(title: const Text('All Songs')),
-        libraryButtonBar,
+        getLibraryButtonBar(context),
         TextButton(
             onPressed: () async {
               if (isPopupOpen) return;
@@ -35,15 +36,16 @@ class _LibraryTabViewState extends State<LibraryTabView> {
   }
 }
 
-ButtonBar libraryButtonBar = ButtonBar(
+ButtonBar getLibraryButtonBar(context) => ButtonBar(
   alignment: MainAxisAlignment.spaceEvenly,
   children: [
     // Edit
     IconButton(
         onPressed: () {
-          print('TODO: batch edit songs (e.g. batch delete)');
+              showAdaptiveDialog(
+                  context: context, builder: (context) => EditLibraryPopup());
         },
-        icon: Icon(Icons.edit)),
+            icon: const Icon(Icons.edit)),
     // Play
     IconButton(
         onPressed: () {
@@ -51,13 +53,13 @@ ButtonBar libraryButtonBar = ButtonBar(
               hasShuffleModeChanged:
                   GetitUtil.audioHandler.audioPlayer.shuffleModeEnabled);
         },
-        icon: Icon(Icons.play_circle, size: 42)),
+            icon: const Icon(Icons.play_circle, size: 42)),
     // Shuffle
     IconButton(
         onPressed: () {
           shufflePlay();
         },
-        icon: Icon(Icons.shuffle)),
+            icon: const Icon(Icons.shuffle)),
   ],
 );
 

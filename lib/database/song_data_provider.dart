@@ -23,7 +23,8 @@ class SongDataProvider extends ChangeNotifier {
   Future<Song?> getSongById(String id) async {
     final db = await DatabaseUtil.getDatabase();
     final List<Map<String, dynamic>> maps =
-        await db.query(DatabaseUtil.songTableName, where: 'id = "$id"');
+        await db
+        .query(DatabaseUtil.songTableName, where: 'id = ?', whereArgs: [id]);
     if (maps.isEmpty) {
       return null;
     }
@@ -70,10 +71,11 @@ class SongDataProvider extends ChangeNotifier {
     final db = await DatabaseUtil.getDatabase();
 
     // find all playlist song associations where playlist indices exist
-    String sql = ''' 
-      SELECT ps.id as playlistSongId, ps.playlistId FROM ${DatabaseUtil.playlistSongTableName} AS ps JOIN ${DatabaseUtil.playlistTableName} AS p
-      ON ps.playlistId = p.id WHERE ps.songId = "${song.id}" AND p.indices IS NOT NULL;
-    ''';
+    String sql =
+        '''SELECT ps.id as playlistSongId, ps.playlistId FROM ${DatabaseUtil.playlistSongTableName} AS ps 
+        JOIN ${DatabaseUtil.playlistTableName} AS p ON ps.playlistId = p.id 
+        WHERE ps.songId = "${song.id}" AND p.indices IS NOT NULL;''';
+
     final maps = await db.rawQuery(sql);
 
     // for each association, check if playlist has indices defined
@@ -143,10 +145,31 @@ class SongDataProvider extends ChangeNotifier {
 
   Future<void> updateSongFavorite(String songId, int loved) async {
     final db = await DatabaseUtil.getDatabase();
-    await db.update(DatabaseUtil.songTableName, {'loved': loved == 1 ? 0 : 1},
+    try {
+      await db.update(DatabaseUtil.songTableName, {'loved': loved == 1 ? 0 : 1},
         where: 'id = ?', whereArgs: [songId]);
-    // TODO: handle exceptions when update fails, and display error on UI
+    } catch (e) {
+      debugPrint('Error updating song favorite: $e');
+    }
     notifyListeners();
+  }
+
+  Future<void> updateSongsFavorite(List<String> songIds, int loved) async {
+    final db = await DatabaseUtil.getDatabase();
+    String sql =
+        '''UPDATE ${DatabaseUtil.songTableName} SET loved = $loved WHERE id IN 
+        (${idsToString(songIds)});''';
+
+    try {
+      await db.rawUpdate(sql);
+    } catch (e) {
+      debugPrint('Error updating songs favorite: $e');
+    }
+    notifyListeners();
+  }
+
+  String idsToString(List<String> ids) {
+    return ids.map((id) => '"$id"').join(',');
   }
 
   // Playlist Songs
@@ -154,14 +177,10 @@ class SongDataProvider extends ChangeNotifier {
       List<String> songIds, String playlistId) async {
     final db = await DatabaseUtil.getDatabase();
 
-    String sql = '''
-          SELECT DISTINCT s.* FROM ${DatabaseUtil.songTableName} AS s JOIN ${DatabaseUtil.playlistSongTableName} AS ps
-          ON s.id = ps.songId WHERE playlistId = "$playlistId" AND songId IN (
-            ${songIds.map(
-              (id) => '"$id"',
-            ).toList().join(',')}
-          )
-        ''';
+    String sql = '''SELECT DISTINCT s.* FROM ${DatabaseUtil.songTableName} AS s 
+      JOIN ${DatabaseUtil.playlistSongTableName} AS ps
+      ON s.id = ps.songId WHERE playlistId = "$playlistId" 
+      AND songId IN (${idsToString(songIds)});''';
 
     List<Map<String, dynamic>> maps = await db.rawQuery(sql);
     Set<String> res = maps.map((e) => e['id'] as String).toSet();
@@ -198,11 +217,10 @@ class SongDataProvider extends ChangeNotifier {
 
   Future<List<Song>> getAllSongsFromPlaylist(String playlistId) async {
     final db = await DatabaseUtil.getDatabase();
-    String sql = '''
-            SELECT s.name, s.path, s.loved, s.added, s.lastPlayed, s.id AS id, ps.id AS playlistSongId 
-            FROM ${DatabaseUtil.songTableName} AS s JOIN ${DatabaseUtil.playlistSongTableName} AS ps 
-            ON s.id = ps.songId WHERE ps.playlistId = "$playlistId"
-          ''';
+    String sql =
+        '''SELECT s.name, s.path, s.loved, s.added, s.lastPlayed, s.id AS id, ps.id AS playlistSongId 
+          FROM ${DatabaseUtil.songTableName} AS s JOIN ${DatabaseUtil.playlistSongTableName} AS ps 
+          ON s.id = ps.songId WHERE ps.playlistId = "$playlistId";''';
     List<Map<String, dynamic>> maps = await db.rawQuery(sql);
 
     List<int>? indices = await getPlaylistIndices(playlistId);
@@ -238,10 +256,8 @@ class SongDataProvider extends ChangeNotifier {
         playlistSongIds, playlistId);
     
     // remove association of playlist and song
-    String sql = '''
-      DELETE FROM ${DatabaseUtil.playlistSongTableName} 
-      WHERE id IN (${playlistSongIds.map((id) => '"$id"').join(",")})
-    ''';
+    String sql = '''DELETE FROM ${DatabaseUtil.playlistSongTableName} 
+      WHERE id IN (${idsToString(playlistSongIds)});''';
 
     try {
       await db.rawDelete(sql);
@@ -284,10 +300,9 @@ class SongDataProvider extends ChangeNotifier {
       List<String> playlistSongIds, String playlistId) async {
     final db = await DatabaseUtil.getDatabase();
 
-    String sql = ''' 
-      SELECT DISTINCT playlistId FROM ${DatabaseUtil.playlistSongTableName} WHERE id IN
-        ${playlistSongIds.map((id) => '"$id"')}
-    ''';
+    String sql =
+        '''SELECT DISTINCT playlistId FROM ${DatabaseUtil.playlistSongTableName} 
+        WHERE id IN (${idsToString(playlistSongIds)});''';
 
     final List<Map<String, dynamic>> maps = await db.rawQuery(sql);
     if (maps.length != 1) {
@@ -378,10 +393,9 @@ class SongDataProvider extends ChangeNotifier {
     }
 
     // verify indices length matches playlist songs count
-    String sqlCount = ''' 
-          SELECT COUNT(*) AS count FROM ${DatabaseUtil.playlistSongTableName} 
-          WHERE playlistId = "$playlistId";
-        ''';
+    String sqlCount =
+        '''SELECT COUNT(*) AS count FROM ${DatabaseUtil.playlistSongTableName} 
+          WHERE playlistId = "$playlistId";''';
 
     final countMap = await db.rawQuery(sqlCount);
     int count = int.parse(countMap[0]['count'].toString());

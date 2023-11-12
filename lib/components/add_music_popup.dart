@@ -1,5 +1,4 @@
 import 'package:dreamer_playlist/components/song_tile_select.dart';
-import 'package:dreamer_playlist/database/playlist_data_provider.dart';
 import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
@@ -18,12 +17,23 @@ class AddMusicPopup extends StatefulWidget {
 class _AddMusicPopupState extends State<AddMusicPopup> {
   late Playlist playlist = widget.playlist;
 
+  late SongDataProvider songDataProvider;
+  late Future<List<Song>> _getSongs;
+
   List<Song> selectedSongs = [];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    songDataProvider = Provider.of<SongDataProvider>(context);
+    _getSongs = songDataProvider.getAllSongs();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(actions: [
+      appBar: AppBar(title: const Text('Add from library'), actions: [
         TextButton(
             onPressed: () async {
               if (selectedSongs.isNotEmpty) {
@@ -32,15 +42,60 @@ class _AddMusicPopupState extends State<AddMusicPopup> {
                 Navigator.pop(context, true);
               }
             },
-            child: Text('Done')),
+            child: const Text('Done')),
       ]),
-      body: SingleChildScrollView(
-          child: Column(children: [
-        // MusicSearchBar(), // TODO
-        AddMusicSongList(callback: (selected) {
-          selectedSongs = selected;
-        }),
-      ])),
+      body: FutureBuilderWrapper(_getSongs, (context, snapshot) {
+        List<Song> songs = snapshot.data;
+        if (songs.isNotEmpty) {
+          return Column(
+            children: [
+              // MusicSearchBar(), // TODO
+              ButtonBar(alignment: MainAxisAlignment.start, children: [
+                TextButton(
+                    onPressed: () {
+                      setState(() {
+                        if (selectedSongs.length == songs.length) {
+                          selectedSongs = [];
+                        } else {
+                          selectedSongs = songs;
+                        }
+                      });
+                    },
+                    child: selectedSongs.length == songs.length
+                        ? const Text('Unselect All')
+                        : const Text('Select All')),
+              ]),
+              Expanded(
+                child: ListView(
+                    children: songs
+                        .map((song) => SongTileSelect(
+                              song: song,
+                              selectIcon: const Icon(Icons.add_circle_outline),
+                              isSelected: selectedSongs.contains(song),
+                              callback: (updatedSong) {
+                                List<Song> oldSelected =
+                                    List.from(selectedSongs);
+                                if (oldSelected.contains(updatedSong)) {
+                                  oldSelected.remove(updatedSong);
+                                } else {
+                                  oldSelected.add(updatedSong);
+                                }
+
+                                setState(() {
+                                  selectedSongs = oldSelected;
+                                });
+                              },
+                            ))
+                        .toList()),
+              ),
+            ],
+          );
+        } else {
+          return Center(
+            child: const Text("No songs in library."),
+          );
+        }
+      }),
     );
   }
 }
@@ -77,59 +132,4 @@ Future<void> addSongsToPlaylist(
   
   if (!context.mounted) return;
   Navigator.pop(context, true);
-}
-
-class AddMusicSongList extends StatefulWidget {
-  final Function callback;
-  AddMusicSongList({required this.callback});
-
-  @override
-  State<AddMusicSongList> createState() => _AddMusicSongListState();
-}
-
-class _AddMusicSongListState extends State<AddMusicSongList> {
-  late Function callback = widget.callback;
-
-  late SongDataProvider songDataProvider;
-  late Future<List<Song>> _getSongs;
-
-  List<Song> selectedSongs = [];
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    songDataProvider = Provider.of<SongDataProvider>(context);
-    _getSongs = songDataProvider.getAllSongs();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilderWrapper(_getSongs, (context, snapshot) {
-      List<Song> songs = snapshot.data;
-      if (songs.isNotEmpty) {
-        return Column(
-          children: [
-            ...songs.map((song) => SongTileSelect(
-                  song: song,
-                  selectIcon: Icons.add_circle_outline,
-                  callback: (updatedSong) {
-                    if (selectedSongs.contains(updatedSong)) {
-                      selectedSongs.remove(updatedSong);
-                    } else {
-                      selectedSongs.add(updatedSong);
-                    }
-
-                    callback(selectedSongs);
-                  },
-                ))
-          ],
-        );
-      } else {
-        return Center(
-          child: Text("No songs in library."),
-        );
-      }
-    });
-  }
 }
