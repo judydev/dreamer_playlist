@@ -50,9 +50,9 @@ class _SongListViewState extends State<SongListView> {
         );
       } else {
         if (isFavoriteTab()) {
-          return Text("No favorite songs.");
+          return const Text("No favorite songs.");
         } else {
-          return Text('No songs.');
+          return const Text('No songs.');
         }
       }
     });
@@ -75,7 +75,7 @@ class SongList extends StatelessWidget {
               currentPlaylistId: playlist?.id,
             )),
         songs.isEmpty
-            ? SizedBox.shrink()
+            ? const SizedBox.shrink()
             : Padding(
                 padding: const EdgeInsets.all(10),
                 child: Align(

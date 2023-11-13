@@ -1,5 +1,7 @@
 import 'package:dreamer_playlist/components/playlist_edit_songlist.dart';
 import 'package:dreamer_playlist/database/playlist_data_provider.dart';
+import 'package:dreamer_playlist/helpers/notifiers.dart';
+import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,10 +27,14 @@ class _EditPlaylistPopupState extends State<EditPlaylistPopup> {
             padding: const EdgeInsets.only(left: 10),
             child: EditableTextField(
               initialValue: playlist.name!,
-              updateValueCallback: (String newName) {
+              updateValueCallback: (String newName) async {
                 if (newName.isEmpty) return;
-                Provider.of<PlaylistDataProvider>(context, listen: false)
+                await Provider.of<PlaylistDataProvider>(context, listen: false)
                     .updatePlaylistName(playlist.id, newName);
+
+                if (isFavoriteTab()) {
+                  selectedFavoritePlaylistNotifier.value!.name = newName;
+                }
               },
             ),
           ),
@@ -63,7 +69,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
     if (isEditing) {
       return TextField(
         autofocus: true,
-        decoration: InputDecoration(border: InputBorder.none),
+        decoration: const InputDecoration(border: InputBorder.none),
         controller: TextEditingController(text: updatedValue),
         onChanged: (text) => {updatedValue = text},
         onTapOutside: (event) {
@@ -79,14 +85,14 @@ class _EditableTextFieldState extends State<EditableTextField> {
       children: [
         Text(updatedValue),
         isEditing
-            ? SizedBox.shrink()
+            ? const SizedBox.shrink()
             : IconButton(
                 onPressed: () {
                   setState(() {
                     isEditing = true;
                   });
                 },
-                icon: Icon(Icons.edit),
+                icon: const Icon(Icons.edit),
               )
       ],
     );
