@@ -134,24 +134,24 @@ class SongTile extends StatelessWidget {
         title: 'Rename',
       ),
       onTap: () {
-        String? updatedSongTitle;
+          String updatedSongTitle = '';
         showAlertDialogPopup(context,
             title: "Rename Song",
             content: TextField(
               decoration: InputDecoration(
-                border: UnderlineInputBorder(),
+                  border: const UnderlineInputBorder(),
                 hintText: song.title,
               ),
               onChanged: (value) {
-                updatedSongTitle = value;
+                  updatedSongTitle = value.trim();
               },
             ),
             actions: [
               displayTextButton(context, "Cancel"),
               displayTextButton(context, "OK", callback: () {
-                if (updatedSongTitle == null) return;
+                  if (updatedSongTitle.trim().isEmpty) return;
                 Provider.of<SongDataProvider>(context, listen: false)
-                      .updateSongName(song.id!, updatedSongTitle!);
+                      .updateSongName(song.id!, updatedSongTitle);
               })
             ]);
       },

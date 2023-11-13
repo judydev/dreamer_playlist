@@ -6,8 +6,8 @@ import 'package:sqflite/sqflite.dart';
 class PlaylistDataProvider extends ChangeNotifier {
   Future<String> createPlaylist(String name) async {
     final db = await DatabaseUtil.getDatabase();
-    Playlist playlist = Playlist(name: name);
 
+    Playlist playlist = Playlist(name: name);
     await db.insert(
       DatabaseUtil.playlistTableName,
       playlist.toMap(),
