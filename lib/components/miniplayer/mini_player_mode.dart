@@ -30,7 +30,7 @@ class MiniPlayerMode extends StatelessWidget {
             children: [
               Padding(
                   padding: const EdgeInsets.only(right: 10),
-                  child: Icon(Icons.music_note)),
+                  child: const Icon(Icons.music_note)),
               Flexible(
                   fit: FlexFit.loose,
                   child: Align(

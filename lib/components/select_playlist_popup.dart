@@ -32,21 +32,24 @@ class _SelectPlaylistPopupState extends State<SelectPlaylistPopup> {
   @override
   Widget build(BuildContext context) {
     return (Scaffold(
-        appBar: AppBar(title: Text('Select a playlist')),
+        appBar: AppBar(title: const Text('Select a playlist')),
         body: FutureBuilderWrapper(
           _getAllPlaylists,
           (context, snapshot) {
             List<Playlist> playlists = snapshot.data ?? [];
-            return ListView(
-              children: [
-                NewPlaylistTile(),
-                ...playlists.map((playlist) => ListTileWrapper(
+            return Align(
+              alignment: Alignment.topCenter,
+              child: ListView(
+                children: [
+                  NewPlaylistTile(),
+                  ...playlists.map((playlist) => ListTileWrapper(
                       title: playlist.name!,
-                    leading: Icon(Icons.queue_music),
-                    onTap: () {
-                      addSongsToPlaylist(context, songs, playlist);
-                    }))
-              ],
+                      leading: const Icon(Icons.queue_music),
+                      onTap: () {
+                        addSongsToPlaylist(context, songs, playlist);
+                      }))
+                ],
+              ),
             );
           },
         )));

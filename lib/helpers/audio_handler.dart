@@ -2,6 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/models/song.dart';
+import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
 Future<MyAudioHandler> initAudioService() async {
@@ -161,12 +162,22 @@ class MyAudioHandler extends BaseAudioHandler
   @override
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
     // manage Just Audio
-    final audioSource = mediaItems.map(_createAudioSource);
-    _playlist.addAll(audioSource.toList());
+    try {
+      final audioSource = mediaItems.map(_createAudioSource);
+      _playlist.addAll(audioSource.toList());
+    } catch (e) {
+      debugPrint('addQueueItems, error creating audio source: $e');
+      rethrow;
+    }
 
     // notify system
-    final newQueue = queue.value..addAll(mediaItems);
-    queue.add(newQueue); // notify AudioHandler about changes to the playlist
+    try {
+      final newQueue = queue.value..addAll(mediaItems);
+      queue.add(newQueue); // notify AudioHandler about changes to the playlist
+    } catch (e) {
+      debugPrint('error adding to queue: $e');
+      rethrow;
+    }
 
     // update MusicQueue
     updateQueueIndicesNotifier();
@@ -305,44 +316,6 @@ class MyAudioHandler extends BaseAudioHandler
 
       // GetitUtil.pageManager.playlistNotifier.value = sequence;
       updateQueueIndicesNotifier();
-    });
-
-    _audioPlayer.sequenceStateStream.listen((sequenceState) {
-      if (sequenceState == null) return;
-      // TODO: update current song title
-      // final currentItem = sequenceState.currentSource;
-      // final title = currentItem?.tag as String?;
-      // currentSongTitleNotifier.value = title ?? '';
-      // print('sequenceState.currentindex = ${sequenceState.currentIndex}');
-
-      // TODO: update playlist
-      // final playlist = sequenceState.effectiveSequence;
-      // print('sequenceState playlist change');
-      // print(playlist
-      //     .map(
-      //       (e) => (e.tag as MediaItem).title,
-      //     )
-      //     .toList());
-      // final titles = playlist.map((item) => item.tag as String).toList();
-      // playlistNotifier.value = titles;
-      // GetitUtil.pageManager.playlistNotifier.value = playlist;
-
-      // TODO: update shuffle mode, handled in _listenForShuffleModeChanges()
-      // print('sequenceState.shuffleMode = ${sequenceState.shuffleModeEnabled}');
-      // shuffleModeNotifier.value = sequenceState.shuffleModeEnabled;
-      // GetitUtil.pageManager.isShuffleModeEnabledNotifier.value =
-      //     sequenceState.shuffleModeEnabled;
-
-      // TODO: update previous and next buttons
-      // if (playlist.isEmpty || currentItem == null) {
-      //   GetitUtil.pageManager.isFirstSongNotifier.value = true;
-      //   GetitUtil.pageManager.isLastSongNotifier.value = true;
-      // } else {
-      //   GetitUtil.pageManager.isFirstSongNotifier.value =
-      //       playlist.first == currentItem;
-      //   GetitUtil.pageManager.isLastSongNotifier.value =
-      //       playlist.last == currentItem;
-      // }
     });
   }
 }

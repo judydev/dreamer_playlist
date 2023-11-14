@@ -152,10 +152,15 @@ class _EditLibraryPopupState extends State<EditLibraryPopup> {
         onTap: () async {
           List<MediaItem> mediaItems =
               selectedSongs.map((song) => song.toMediaItem()).toList();
-          await GetitUtil.audioHandler.addQueueItems(mediaItems);
+          try {
+            await GetitUtil.audioHandler.addQueueItems(mediaItems);
+          } catch (e) {
+            debugPrint('Error adding to queue from library: $e');
+          }
         },
       ),
       PopupMenuItem<PopupMenuTile>(
+        enabled: selectedSongIds.isNotEmpty,
         child: PopupMenuTile(
           icon: favoriteTab ? Icons.favorite : Icons.favorite_outline,
           title: favoriteTab ? 'Remove from favorites' : 'Add to favorites',

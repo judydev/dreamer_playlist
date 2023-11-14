@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:audio_service/audio_service.dart';
 import 'package:dreamer_playlist/helpers/popup_menu_tile.dart';
 import 'package:dreamer_playlist/components/select_playlist_popup.dart';
@@ -128,6 +130,9 @@ class _PlaylistEditSongListState extends State<PlaylistEditSongList> {
                                   songs.length,
                                   (index) => ListTileWrapper(
                                       title: songs[index].title,
+                                      trailing: Platform.isIOS
+                                          ? Icon(Icons.menu)
+                                          : null,
                                       key: Key(index.toString()))));
                         }))),
             ],

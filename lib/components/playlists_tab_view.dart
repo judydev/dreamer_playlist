@@ -9,16 +9,11 @@ import 'package:provider/provider.dart';
 class PlaylistsTabView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return (Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      AppBar(
-        title: Text("All Playlists"),
-      ),
-      Expanded(
-        child: ListView(
+    return Scaffold(
+        appBar: AppBar(title: const Text("All Playlists")),
+        body: ListView(
           children: [NewPlaylistTile(updateAppState: true), PlaylistsList()],
-        ),
-      )
-    ]));
+        ));
   }
 }
 
@@ -55,16 +50,21 @@ class _PlaylistsListState extends State<PlaylistsList> {
             alignment: Alignment.topCenter,
             child: Padding(
               padding: const EdgeInsets.only(top: 20),
-              child: Text(
-                  isFavoriteTab() ? 'No favorite playlists.' : 'No playlists.'),
+              child: isFavoriteTab()
+                  ? const Text('No favorite playlists.')
+                  : const Text('No playlists.'),
             ),
           );
         }
         return Column(
-          children: [
-            ...playlists.asMap().entries.map((entry) =>
-                PlaylistTile(entry.value))
-          ],
+          children:
+              playlists
+              .asMap()
+              .entries
+              .map((entry) => PlaylistTile(
+                  playlist: entry.value,
+                  tileColor: entry.key.isEven ? highlightTileColor : null))
+              .toList(),
         );
       },
     );

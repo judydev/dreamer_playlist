@@ -37,6 +37,7 @@ class SongTile extends StatelessWidget {
             itemBuilder: (context) =>
                 buildMoreActionsMenu(context, song, currentPlaylistId),
       ),
+      tileColor: songIndex?.isEven == true ? highlightTileColor : null,
       onTap: disableTap
           ? null
           : () async {
@@ -138,6 +139,7 @@ class SongTile extends StatelessWidget {
         showAlertDialogPopup(context,
             title: "Rename Song",
             content: TextField(
+                autofocus: true,
               decoration: InputDecoration(
                   border: const UnderlineInputBorder(),
                 hintText: song.title,

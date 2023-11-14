@@ -9,12 +9,14 @@ import 'package:provider/provider.dart';
 
 class PlaylistTile extends StatelessWidget {
   final Playlist playlist;
-  PlaylistTile(this.playlist);
+  final Color? tileColor;
+  PlaylistTile({required this.playlist, this.tileColor});
 
   @override
   Widget build(BuildContext context) {
     return ListTileWrapper(
       title: playlist.name!,
+      tileColor: tileColor,
       leading: const Icon(Icons.queue_music),
       onTap: () async {
         if (isPlaylistsTab()) {

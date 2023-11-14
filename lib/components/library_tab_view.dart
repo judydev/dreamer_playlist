@@ -18,20 +18,22 @@ class _LibraryTabViewState extends State<LibraryTabView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        AppBar(title: const Text('All Songs')),
-        getLibraryButtonBar(context),
-        TextButton(
-            onPressed: () async {
-              if (isPopupOpen) return;
-              isPopupOpen = true;
-              await openFilePicker(context, null);
-              isPopupOpen = false;
-            },
-            child: const Text("Import local file to Library")),
-        SongListView()
-      ],
+    return Scaffold(
+      appBar: AppBar(title: const Text('All Songs')),
+      body: Column(
+        children: <Widget>[
+          getLibraryButtonBar(context),
+          TextButton(
+              onPressed: () async {
+                if (isPopupOpen) return;
+                isPopupOpen = true;
+                await openFilePicker(context, null);
+                isPopupOpen = false;
+              },
+              child: const Text("Import local file to Library")),
+          Expanded(child: SongListView())
+        ],
+      ),
     );
   }
 }

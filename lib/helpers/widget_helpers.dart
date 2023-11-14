@@ -38,6 +38,7 @@ List<String> acceptedAudioExtensions =
 
 Future<bool> openFilePicker(context, String? playlistId) async {
   FilePickerResult? selected = await FilePicker.platform.pickFiles(
+    type: FileType.custom,
     allowedExtensions: acceptedAudioExtensions,
     allowMultiple: true,
   );
@@ -63,23 +64,27 @@ Future<bool> openFilePicker(context, String? playlistId) async {
   return true;
 }
 
+Color highlightTileColor = Colors.grey[200]!;
 class ListTileWrapper extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
   final String? title;
+  final Color? tileColor;
   final void Function()? onTap;
 
   ListTileWrapper(
-      {super.key, this.leading, this.trailing, this.title, this.onTap});
+      {super.key,
+      this.leading,
+      this.trailing,
+      this.title,
+      this.tileColor,
+      this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       // custom styles
-      shape: Border(
-          bottom: BorderSide(
-        color: Colors.black54,
-      )),
+      tileColor: tileColor,
       contentPadding: const EdgeInsets.all(10),
       // parameters for ListTile
       title: Text(title ?? ""),
@@ -89,7 +94,6 @@ class ListTileWrapper extends StatelessWidget {
     );
   }
 }
-
 
 class FutureBuilderWrapper extends StatelessWidget {
   final Future future;

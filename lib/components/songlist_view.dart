@@ -67,21 +67,19 @@ class SongList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView(children: [
-        ...songs.asMap().entries.map((entry) => SongTile(
-              entry.value,
-              songIndex: entry.key,
-              currentPlaylistId: playlist?.id,
-            )),
-        songs.isEmpty
-            ? const SizedBox.shrink()
-            : Padding(
-                padding: const EdgeInsets.all(10),
-                child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('${songs.length} tracks'))),
-      ]),
-    );
+    return ListView(children: [
+      ...songs.asMap().entries.map((entry) => SongTile(
+            entry.value,
+            songIndex: entry.key,
+            currentPlaylistId: playlist?.id,
+          )),
+      songs.isEmpty
+          ? const SizedBox.shrink()
+          : Padding(
+              padding: const EdgeInsets.all(10),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('${songs.length} tracks'))),
+    ]);
   }
 }

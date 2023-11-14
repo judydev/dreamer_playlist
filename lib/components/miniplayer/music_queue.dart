@@ -38,31 +38,29 @@ class QueueSongTile extends StatelessWidget {
             onDismissed: (direction) {
               GetitUtil.audioHandler.removeQueueItemAt(queueIndex);
             },
-            background: ColoredBox(
+            background: const ColoredBox(
               color: Colors.red,
               child: Align(
                 alignment: Alignment.centerRight,
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: const Text('Remove'),
+                  padding: EdgeInsets.all(16.0),
+                  child: Text('Remove'),
                 ),
               ),
-            ),
-            child: Container(
-                color: currentIndex != null && queueIndex == currentIndex
-                    ? Theme.of(context).colorScheme.primary
-                    : null,
-                child: child),
-          );
-        }),
-        child: ListTileWrapper(
+          ),
+          child: ListTileWrapper(
             title: GetitUtil.audioHandler.queue.value[queueIndex].title,
-            leading: const Icon(Icons.music_video),
+              leading: currentIndex != null && queueIndex == currentIndex
+                  ? const Icon(Icons.music_video)
+                  : const Icon(Icons.music_note),
             trailing: const Icon(Icons.menu),
             onTap: () async {
               await _audioPlayer.seek(Duration.zero, index: queueIndex);
               await _audioPlayer.play();
-            }));
+              }),
+        );
+      }),
+    );
   }
 }
 

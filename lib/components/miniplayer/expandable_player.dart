@@ -30,7 +30,7 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
 
   @override
   Widget build(BuildContext context) {
-    double playerMaxHeight = MediaQuery.sizeOf(context).height;
+    double playerMaxHeight = MediaQuery.sizeOf(context).height - 40;
 
     return Miniplayer(
       valueNotifier: playerExpandProgress,
@@ -41,8 +41,10 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
       curve: Curves.easeOut,
       builder: (height, percentage) {
         final bool isMiniPlayer = percentage < miniplayerPercentageDeclaration;
-
-        if (!isMiniPlayer) {
+        if (isMiniPlayer) {
+          // Mini Player
+          return MiniPlayerMode(height);
+        } else {
           // Full Screen Player
           var percentageExpandedPlayer = percentageFromValueInRange(
               min: playerMaxHeight * miniplayerPercentageDeclaration +
@@ -53,113 +55,101 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
 
           return Column(
             children: [
-              Expanded(
-                child: Opacity(
-                  opacity: percentageExpandedPlayer,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Icon(Icons.horizontal_rule),
-                      // Currently playing
-                      ValueListenableBuilder(
-                          valueListenable:
-                              GetitUtil.pageManager.currentPlayingNotifier,
-                          builder: ((context, mediaItem, child) {
-                            return ListTileWrapper(
-                                leading: Icon(Icons.music_video),
-                                title: mediaItem == null
-                                    ? 'Not playing'
-                                    : mediaItem.title);
-                          })),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Queue'),
-                            Row(
-                              children: [
-                                getQueueShuffleButton(),
-                                getQueueLoopButton(),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                      Expanded(child: MusicQueue()),
-                      height > 350 // prevent bottom overflow
-                          ? Column(
-                              children: [
-                                Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10),
-                                    child: ValueListenableBuilder(
-                                      valueListenable: GetitUtil
-                                          .pageManager.progressBarValueNotifier,
-                                      builder:
-                                          ((context, progressValue, child) {
-                                        Duration? duration = _audioHandler
-                                            .mediaItem.value?.duration;
-
-                                        return Column(children: [
-                                          Slider(
-                                            min: 0,
-                                            max: 1,
-                                            value: progressValue > 1
-                                                ? 1
-                                                : progressValue,
-                                            onChanged: (newProgressValue) {
-                                              if (duration == null) return;
-
-                                              Duration newPosition =
-                                                  duration * newProgressValue;
-                                              _audioHandler.seek(newPosition);
-                                            },
-                                          ),
-                                          Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 20),
-                                              child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                        convertDurationToTimeDisplay(
-                                                            duration != null
-                                                                ? duration *
-                                                                    progressValue
-                                                                : Duration
-                                                                    .zero),
-                                                        style: TextStyle(
-                                                            fontSize: 12)),
-                                                    Text(
-                                                        convertDurationToTimeDisplay(
-                                                            duration ??
-                                                                Duration.zero),
-                                                        style: TextStyle(
-                                                            fontSize: 12))
-                                                  ])),
-                                        ]);
-                                      }),
-                                    )), // slide bar
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 30),
-                                  child: PlayerButtonbar(isMiniPlayer: false),
-                                ),
-                              ],
-                            )
-                          : SizedBox.shrink()
-                    ],
-                  ),
+              const Icon(Icons.horizontal_rule),
+              // Currently playing
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: const Text('Currently Playing'),
                 ),
               ),
+              ValueListenableBuilder(
+                  valueListenable: GetitUtil.pageManager.currentPlayingNotifier,
+                  builder: ((context, mediaItem, child) {
+                    return ListTileWrapper(
+                        leading: const Icon(Icons.music_video),
+                        title: mediaItem == null
+                            ? 'Not playing'
+                            : mediaItem.title);
+                  })),
+              Padding(
+                padding: const EdgeInsets.only(left: 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Text('Queue'),
+                    Row(
+                      children: [
+                        getQueueShuffleButton(),
+                        getQueueLoopButton(),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+              Expanded(child: MusicQueue()),
+              height > 350 // prevent bottom overflow
+                  ? Column(
+                      children: [
+                        // Progress Bar Slider
+                        Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: ValueListenableBuilder(
+                              valueListenable: GetitUtil
+                                  .pageManager.progressBarValueNotifier,
+                              builder: ((context, progressValue, child) {
+                                Duration? duration =
+                                    _audioHandler.mediaItem.value?.duration;
+
+                                return Column(children: [
+                                  Slider(
+                                    min: 0,
+                                    max: 1,
+                                    value:
+                                        progressValue > 1 ? 1 : progressValue,
+                                    onChanged: (newProgressValue) {
+                                      if (duration == null) return;
+
+                                      Duration newPosition =
+                                          duration * newProgressValue;
+                                      _audioHandler.seek(newPosition);
+                                    },
+                                  ),
+                                  Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20),
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                                convertDurationToTimeDisplay(
+                                                    duration != null
+                                                        ? duration *
+                                                            progressValue
+                                                        : Duration.zero),
+                                                style: const TextStyle(
+                                                    fontSize: 12)),
+                                            Text(
+                                                convertDurationToTimeDisplay(
+                                                    duration ?? Duration.zero),
+                                                style: const TextStyle(
+                                                    fontSize: 12))
+                                          ])),
+                                ]);
+                              }),
+                            )),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 30),
+                          child: PlayerButtonbar(isMiniPlayer: false),
+                        ),
+                      ],
+                    )
+                  : const SizedBox.shrink()
             ],
           );
-        } else {
-          // Mini Player
-          return MiniPlayerMode(height);
         }
       },
     );
@@ -171,7 +161,6 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
         builder: (context, isShuffleModeEnabled, child) {
           return IconButton(
               onPressed: () async {
-                print('queue shuffle button');
                 if (isEmptyQueue()) return;
 
                 if (isShuffleModeEnabled) {
@@ -186,8 +175,8 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                 updateQueueIndicesNotifier();
               },
               icon: isShuffleModeEnabled
-                  ? Icon(Icons.shuffle_on_outlined)
-                  : Icon(Icons.shuffle_outlined));
+                  ? const Icon(Icons.shuffle_on_outlined)
+                  : const Icon(Icons.shuffle_outlined));
         });
   }
 
@@ -195,13 +184,13 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
     return ValueListenableBuilder(
         valueListenable: loopModeNotifier,
         builder: ((context, LoopMode loopModeValue, child) {
-          Icon icon = Icon(Icons.repeat_outlined);
+          Icon icon = const Icon(Icons.repeat_outlined);
           switch (loopModeValue) {
             case LoopMode.all:
-              icon = Icon(Icons.repeat_on_outlined);
+              icon = const Icon(Icons.repeat_on_outlined);
               break;
             case LoopMode.one:
-              icon = Icon(Icons.repeat_one_on_outlined);
+              icon = const Icon(Icons.repeat_one_on_outlined);
               break;
             default:
           }
@@ -251,8 +240,12 @@ class PlayerButtonbar extends StatelessWidget {
 
             return IconButton(
               icon: isPlaying
-                  ? Icon(isMiniPlayer ? Icons.pause : Icons.pause_circle_filled)
-                  : Icon(isMiniPlayer ? Icons.play_arrow : Icons.play_circle),
+                  ? isMiniPlayer
+                      ? const Icon(Icons.pause)
+                      : const Icon(Icons.pause_circle_filled)
+                  : isMiniPlayer
+                      ? const Icon(Icons.play_arrow)
+                      : const Icon(Icons.play_circle),
               iconSize: isMiniPlayer ? 25 : 50,
               onPressed: () async {
                 if (isEmptyQueue()) return;
@@ -272,7 +265,7 @@ class PlayerButtonbar extends StatelessWidget {
         GetitUtil.pageManager.onPreviousSongButtonPressed();
       },
       iconSize: isMiniPlayer ? 25 : 35,
-      icon: Icon(Icons.skip_previous));
+      icon: const Icon(Icons.skip_previous));
 
   IconButton getButtonPlayNext() => IconButton(
       onPressed: () {
@@ -280,7 +273,7 @@ class PlayerButtonbar extends StatelessWidget {
         GetitUtil.pageManager.onNextSongButtonPressed();
       },
       iconSize: isMiniPlayer ? 25 : 35,
-      icon: Icon(Icons.skip_next));
+      icon: const Icon(Icons.skip_next));
 }
 
 String convertDurationToTimeDisplay(Duration duration) {

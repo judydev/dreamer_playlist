@@ -21,100 +21,99 @@ class PlaylistTabView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        AppBar(
-            title: Text(playlist.name!),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new),
-              onPressed: () {
-                if (isPlaylistsTab()) {
+    return Scaffold(
+      appBar: AppBar(
+          title: Text(playlist.name!),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new),
+            onPressed: () {
+              if (isPlaylistsTab()) {
                 Provider.of<AppStateDataProvider>(context, listen: false)
                     .updateAppState(AppStateKey.currentPlaylistId, null);
-                }
-                if (isFavoriteTab()) {
-                  selectedFavoritePlaylistNotifier.value = null;
-                }
-              },
-            )),
-        // Padding(
-        //   padding: const EdgeInsets.all(20),
-        //   child: const Icon(Icons.music_video, size: 64),
-        // ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            // Favorite
-            IconButton(
-                onPressed: () async {
-                  await Provider.of<PlaylistDataProvider>(context,
-                          listen: false)
-                      .updatePlaylistFavorite(playlist);                      
-                  if (isFavoriteTab()) {
-                    selectedFavoritePlaylistNotifier.value = null;
-                  }
-                },
-                icon: playlist.loved == 1
-                    ? const Icon(Icons.favorite)
-                    : const Icon(Icons.favorite_border)),
-            // Edit
-            IconButton(
-                onPressed: () {
-                  showAdaptiveDialog(
-                      context: context,
-                      builder: (context) => EditPlaylistPopup(playlist));
-                },
-                tooltip: 'Edit',
-                icon: const Icon(Icons.edit)),
-            // Play
-            IconButton(
-                onPressed: () async {
-                  await play(
-                      hasShuffleModeChanged: GetitUtil
-                          .audioHandler.audioPlayer.shuffleModeEnabled);
-                },
-                tooltip: 'Play',
-                icon: const Icon(Icons.play_circle, size: 42)),
-            // Shuffle
-            IconButton(
-                onPressed: () async {
-                  await shufflePlay();
-                },
-                tooltip: 'Shuffle Play',
-                icon: const Icon(Icons.shuffle)),
-            // More Actions
-            PopupMenuButton(
-                position: PopupMenuPosition.under,
-              child: const Icon(Icons.more_vert),
-              itemBuilder: (context) => _buildPlaylistMoreActionsMenu(context),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Flexible(
-              fit: FlexFit.loose,
-              child: TextButton(
-                onPressed: () {
-                  showAdaptiveDialog(
-                      context: context,
-                        builder: ((context) => AddMusicPopup(playlist)));
-                },
-                  child: const Text('Add from library')),
-            ),
-            Flexible(
-              fit: FlexFit.loose,
-              child: TextButton(
-                  onPressed: () {
-                    openFilePicker(context, playlist.id);
+              }
+              if (isFavoriteTab()) {
+                selectedFavoritePlaylistNotifier.value = null;
+              }
+            },
+          )),
+      body: Column(
+        children: <Widget>[
+          ButtonBar(
+            alignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // Favorite
+              IconButton(
+                  onPressed: () async {
+                    await Provider.of<PlaylistDataProvider>(context,
+                            listen: false)
+                        .updatePlaylistFavorite(playlist);
+                    if (isFavoriteTab()) {
+                      selectedFavoritePlaylistNotifier.value = null;
+                    }
                   },
-                  child: const Text('Import local file')),
-            ),
-          ],
-        ),
-        SongListView(playlist: playlist),
-      ],
+                  icon: playlist.loved == 1
+                      ? const Icon(Icons.favorite)
+                      : const Icon(Icons.favorite_border)),
+              // Edit
+              IconButton(
+                  onPressed: () {
+                    showAdaptiveDialog(
+                        context: context,
+                        builder: (context) => EditPlaylistPopup(playlist));
+                  },
+                  tooltip: 'Edit',
+                  icon: const Icon(Icons.edit)),
+              // Play
+              IconButton(
+                  onPressed: () async {
+                    await play(
+                        hasShuffleModeChanged: GetitUtil
+                            .audioHandler.audioPlayer.shuffleModeEnabled);
+                  },
+                  tooltip: 'Play',
+                  icon: const Icon(Icons.play_circle, size: 42)),
+              // Shuffle
+              IconButton(
+                  onPressed: () async {
+                    await shufflePlay();
+                  },
+                  tooltip: 'Shuffle Play',
+                  icon: const Icon(Icons.shuffle)),
+              // More Actions
+              PopupMenuButton(
+                position: PopupMenuPosition.under,
+                child: const Icon(Icons.more_vert),
+                itemBuilder: (context) =>
+                    _buildPlaylistMoreActionsMenu(context),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Flexible(
+                fit: FlexFit.loose,
+                child: TextButton(
+                    onPressed: () {
+                      showAdaptiveDialog(
+                          context: context,
+                          builder: ((context) => AddMusicPopup(playlist)));
+                    },
+                    child: const Text('Add from library')),
+              ),
+              Flexible(
+                fit: FlexFit.loose,
+                child: TextButton(
+                    onPressed: () {
+                      openFilePicker(context, playlist.id);
+                    },
+                    child: const Text('Import local file')),
+              ),
+            ],
+          ),
+          Expanded(child: SongListView(playlist: playlist)),
+        ],
+      ),
     );
   }
 

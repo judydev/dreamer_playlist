@@ -91,7 +91,8 @@ class _AddMusicPopupState extends State<AddMusicPopup> {
             ],
           );
         } else {
-          return Center(
+          return Align(
+            alignment: Alignment.topCenter,
             child: const Text("No songs in library."),
           );
         }

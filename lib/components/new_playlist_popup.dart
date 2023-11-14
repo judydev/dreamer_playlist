@@ -31,6 +31,7 @@ class _NewPlaylistPopupState extends State<NewPlaylistPopup> {
       mainAxisSize: MainAxisSize.min,
       children: [
         TextField(
+            autofocus: true,
             decoration: InputDecoration(
               labelText: "Name",
               errorText: errorText,

@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Dreamer Playlist',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
         useMaterial3: true,
@@ -96,13 +97,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    const offset = 0; //126;
     return Scaffold(
       body: Stack(
         children: [
           SizedBox(
               // prevent list from being hidden behind miniplayer
-              height: MediaQuery.sizeOf(context).height - 126 > 0
-                  ? MediaQuery.sizeOf(context).height - 126
+              height: MediaQuery.sizeOf(context).height - offset > 0
+                  ? MediaQuery.sizeOf(context).height - offset
                   : null,
               child: buildTabView(context, _selectedTabIndex)),
           ExpandablePlayer()
@@ -177,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 (context, snapshot) {
               Playlist? playlist = snapshot.data;
               if (playlist == null) {
-                print(
+                debugPrint(
                     'Something wrong with currentPlaylistId: $currentPlaylistId');
                 return PlaylistsTabView();
               }
