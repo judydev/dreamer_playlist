@@ -33,6 +33,8 @@
 		<key>NSAllowsArbitraryLoadsForMedia</key>
 		<false/>
 	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string></string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
