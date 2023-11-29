@@ -8,12 +8,12 @@ import 'package:just_audio/just_audio.dart';
 Future<MyAudioHandler> initAudioService() async {
   return await AudioService.init(
     builder: () => MyAudioHandler(),
-    config: const AudioServiceConfig(
-        // androidNotificationChannelId: 'com.mycompany.myapp.audio',
-        // androidNotificationChannelName: 'Audio Service Demo',
-        // androidNotificationOngoing: true,
-        // androidStopForegroundOnPause: true,
-        ),
+    // config: const AudioServiceConfig(
+    //     // androidNotificationChannelId: 'com.mycompany.myapp.audio',
+    //     // androidNotificationChannelName: 'Audio Service Demo',
+    //     // androidNotificationOngoing: true,
+    //     // androidStopForegroundOnPause: true,
+    //     ),
   );
 }
 
@@ -100,7 +100,7 @@ class MyAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> play() => _audioPlayer.play();
-
+ 
   @override
   Future<void> pause() => _audioPlayer.pause();
 

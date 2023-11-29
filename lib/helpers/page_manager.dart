@@ -46,7 +46,9 @@ class PageManager {
   // void shuffle() {}
   // void add() {}
   // void remove() {}
-  void dispose() {}
+  void dispose() {
+    _audioHandler.audioPlayer.dispose();
+  }
 
   // void _listenToChangesInPlaylist() {
   //   _audioHandler.queue.listen((queue) {
