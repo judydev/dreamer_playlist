@@ -3,10 +3,14 @@
 import 'package:dreamer_playlist/database/app_state_data_provider.dart';
 import 'package:dreamer_playlist/database/database_util.dart';
 import 'package:dreamer_playlist/database/song_data_provider.dart';
+import 'package:dreamer_playlist/database/storage_provider.dart';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
+import 'package:dreamer_playlist/models/song.dart';
 import 'package:flutter/material.dart';
+// import 'package:path_provider/path_provider.dart';
+// import 'dart:io' as io;
 
 class DataUtil {
   static Future<Map<String, dynamic>> loadInitialData() async {
@@ -82,6 +86,49 @@ class DataUtil {
             error: errorMessage);
       }
     }
+
+    // check for storage files
+    final allSongs = await SongDataProvider().getAllSongs();
+    if (!context.mounted) return;
+    List<Song> missingSongs = await checkIfSongFilesExist(allSongs);
+    for (Song song in missingSongs) {
+      if (!context.mounted) return;
+      await showAdaptiveDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: const Text("Warning"),
+                content: Text("File missing for song ${song.title}, remove?"),
+                actions: [
+                  displayTextButton(context, "Ignore"),
+                  displayTextButton(context, "Yes", callback: () {
+                    db.delete(DatabaseUtil.songTableName,
+                        where: 'id = ?', whereArgs: [song.id]);
+                  })
+                ]);
+          });
+    }
+
+    // final dir = await getApplicationDocumentsDirectory();
+    // final fileList = io.Directory(dir.path).listSync();
+    // print('Documents Dir Filelist');
+    // for (io.FileSystemEntity entity in fileList) {
+    // print(entity.path);
+    // TODO: check if song exists in allSongs
+    // }
+  }
+
+  Future<List<Song>> checkIfSongFilesExist(List<Song> songs) async {
+    List<Song> res = [];
+    for (Song song in songs) {
+      try {
+        StorageProvider().getAudioFile(song.relativePath!);
+      } catch (e) {
+        res.add(song);
+      }
+    }
+
+    return res;
   }
 
   static void resetPlaylistIndicesPopup(

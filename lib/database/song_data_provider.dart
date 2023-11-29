@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/models/playlist_song.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:dreamer_playlist/database/database_util.dart';
 import 'package:dreamer_playlist/database/storage_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SongDataProvider extends ChangeNotifier {
@@ -39,12 +41,27 @@ class SongDataProvider extends ChangeNotifier {
     // build a song instance and add to database
     String strippedName = StorageProvider.getFilenameFromPlatformFile(
         selectedFile.name, selectedFile.extension!);
-    Song song = Song(title: strippedName, path: songFile.path);
+
+    String relativePath = await getRelativePath(songFile.path);
+    Song song = Song(title: strippedName, relativePath: relativePath);
     await addSongToDb(song);
 
     notifyListeners();
     return song;
   }
+
+  Future<String> getRelativePath(String path) async {
+    String? dir = GetitUtil.appDocumentsDir;
+    dir ??= (await getApplicationDocumentsDirectory()).path;
+    final relativePath = path.replaceAll(dir, '');
+    return relativePath;
+  }
+
+  // Future<String> getAppDocDir() async {
+  //   String? dir = GetitUtil.appDocumentsDir;
+  //   dir ??= (await getApplicationDocumentsDirectory()).path;
+  //   return dir;
+  // }
 
   Future<void> addSongToDb(Song song) async {
     final db = await DatabaseUtil.getDatabase();
@@ -120,14 +137,14 @@ class SongDataProvider extends ChangeNotifier {
     }
 
     // remove local storage file
-    StorageProvider().deleteSongFileFromLocalStorage(song.path!);
+    StorageProvider().deleteSongFileFromLocalStorage(song.relativePath!);
 
     // verify there is no Song left with given path (is this necessary?)
     final checkSongs = await db.query(DatabaseUtil.songTableName,
-        where: 'path = ?', whereArgs: [song.path]);
+        where: 'path = ?', whereArgs: [song.relativePath]);
     if (checkSongs.isNotEmpty) {
       debugPrint(
-          'Something wrong: song not cleaned up where path=${song.path}');
+          'Something wrong: song not cleaned up where path=${song.relativePath}');
     }
 
     notifyListeners();

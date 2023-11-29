@@ -39,10 +39,6 @@ class StorageProvider extends ChangeNotifier {
     String newPathWithoutFileExtension = '$path/$filename';
     int i = 0;
     while (File("$newPathWithoutFileExtension.$extension").existsSync()) {
-      if (i > 3) {
-        print("please change a file name");
-        throw Exception("please change file name");
-      }
 
       // append " copy" at the end of the file name when there is a duplicate
       newPathWithoutFileExtension = "$newPathWithoutFileExtension copy";

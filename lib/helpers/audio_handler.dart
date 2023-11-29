@@ -1,9 +1,11 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:path_provider/path_provider.dart';
 
 Future<MyAudioHandler> initAudioService() async {
   return await AudioService.init(
@@ -154,8 +156,10 @@ class MyAudioHandler extends BaseAudioHandler
 
   Future<void> resetQueueFromSonglist(List<Song> songs) async {
     _playlist.clear();
+    final dir = await getApplicationDocumentsDirectory();
     _playlist.addAll(songs
-        .map((song) => AudioSource.file(song.path!, tag: song.toMediaItem()))
+        .map((song) => AudioSource.file(dir.path + song.relativePath!,
+            tag: song.toMediaItem()))
         .toList());
   }
 
@@ -163,7 +167,7 @@ class MyAudioHandler extends BaseAudioHandler
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
     // manage Just Audio
     try {
-      final audioSource = mediaItems.map(_createAudioSource);
+      final audioSource = await Future.wait(mediaItems.map(_createAudioSource));
       _playlist.addAll(audioSource.toList());
     } catch (e) {
       debugPrint('addQueueItems, error creating audio source: $e');
@@ -185,7 +189,7 @@ class MyAudioHandler extends BaseAudioHandler
 
   @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
-    final audioSource = _createAudioSource(mediaItem);
+    final audioSource = await _createAudioSource(mediaItem);
     _playlist.add(audioSource);
 
     final newQueue = queue.value..add(mediaItem);
@@ -195,7 +199,7 @@ class MyAudioHandler extends BaseAudioHandler
   }
 
   Future<void> addQueueItemAt(MediaItem mediaItem, int index) async {
-    final audioSource = _createAudioSource(mediaItem);
+    final audioSource = await _createAudioSource(mediaItem);
     if (_playlist.length > index) {
       index += 1;
     } else {
@@ -210,8 +214,10 @@ class MyAudioHandler extends BaseAudioHandler
     updateQueueIndicesNotifier();
   }
 
-  UriAudioSource _createAudioSource(MediaItem mediaItem) {
-    return AudioSource.file(mediaItem.extras!['path'], tag: mediaItem);
+  Future<UriAudioSource> _createAudioSource(MediaItem mediaItem) async {
+    String? dir = GetitUtil.appDocumentsDir;
+    dir ??= (await getApplicationDocumentsDirectory()).path;
+    return AudioSource.file(dir + mediaItem.extras!['path'], tag: mediaItem);
   }
 
   // UriAudioSource _createAudioSourceFromUrl(MediaItem mediaItem) {

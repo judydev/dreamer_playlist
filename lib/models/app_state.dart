@@ -7,6 +7,7 @@ class AppStates {
   String? lastPlayed;
   String language = 'EN';
   bool darkMode = false;
+  String? appDocumentsDir;
 
   @override
   String toString() {

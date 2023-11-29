@@ -2,25 +2,25 @@ import 'package:dreamer_playlist/database/app_state_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PreferencesTabView extends StatefulWidget {
+class SettingsTabView extends StatefulWidget {
   @override
-  State<PreferencesTabView> createState() => _PreferencesTabViewState();
+  State<SettingsTabView> createState() => _SettingsTabViewState();
 }
 
-class _PreferencesTabViewState extends State<PreferencesTabView> {
+class _SettingsTabViewState extends State<SettingsTabView> {
   late AppStateDataProvider appStateDataProvider;
-  late Future<Map<String, dynamic>> _getPreferences;
+  late Future<Map<String, dynamic>> _getSettings;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     appStateDataProvider = Provider.of<AppStateDataProvider>(context);
-    _getPreferences = appStateDataProvider.getAppStates();
+    _getSettings = appStateDataProvider.getAppStates();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Text("Preferences View");
+    return Text("Settings View");
   }
 }

@@ -192,7 +192,7 @@ class PageManager {
               id: song.id ?? '',
               // album: song['album'] ?? '',
               title: song.title ?? '',
-              extras: {'path': song.path},
+              extras: {'path': song.relativePath},
             ))
         .toList();
     _audioHandler.addQueueItems(mediaItems);

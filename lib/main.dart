@@ -4,7 +4,7 @@ import 'package:dreamer_playlist/components/favorites_tab_view.dart';
 import 'package:dreamer_playlist/components/library_tab_view.dart';
 import 'package:dreamer_playlist/components/playlist_tab_view.dart';
 import 'package:dreamer_playlist/components/playlists_tab_view.dart';
-import 'package:dreamer_playlist/components/preferences_tab_view.dart';
+import 'package:dreamer_playlist/components/settings_tab_view.dart';
 import 'package:dreamer_playlist/database/data_util.dart';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
@@ -158,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
               BottomNavigationBarItem(
                   icon: Icon(Icons.favorite), label: 'Favorite'),
               // BottomNavigationBarItem(
-              //     icon: Icon(Icons.settings), label: 'Preferences'),
+              //     icon: Icon(Icons.settings), label: 'Settings'),
             ],
           ),
         ]),
@@ -194,7 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case 2:
         return FavoritesTabView();
       case 3:
-        return PreferencesTabView();
+        return SettingsTabView();
       default:
         return LibraryTabView();
     }
