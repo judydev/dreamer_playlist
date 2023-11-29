@@ -12,6 +12,7 @@ class MusicQueue extends StatelessWidget {
         builder: ((context, queueIndices, child) {
           return queueIndices.isNotEmpty
               ? ListView(
+                  padding: EdgeInsets.zero,
                   children: queueIndices
                       .map(
                           (queueIndex) => QueueSongTile(queueIndex: queueIndex))
@@ -53,7 +54,6 @@ class QueueSongTile extends StatelessWidget {
               leading: currentIndex != null && queueIndex == currentIndex
                   ? const Icon(Icons.music_video)
                   : const Icon(Icons.music_note),
-            trailing: const Icon(Icons.menu),
             onTap: () async {
               await _audioPlayer.seek(Duration.zero, index: queueIndex);
               await _audioPlayer.play();

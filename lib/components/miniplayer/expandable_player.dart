@@ -30,7 +30,8 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
 
   @override
   Widget build(BuildContext context) {
-    double playerMaxHeight = MediaQuery.sizeOf(context).height - 40;
+    double screenHeight = MediaQuery.sizeOf(context).height;
+    double playerMaxHeight = screenHeight - 40;
 
     return Miniplayer(
       valueNotifier: playerExpandProgress,
@@ -73,24 +74,22 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                             ? 'Not playing'
                             : mediaItem.title);
                   })),
-              Padding(
-                padding: const EdgeInsets.only(left: 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text('Queue'),
-                    Row(
-                      children: [
-                        getQueueShuffleButton(),
-                        getQueueLoopButton(),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-              Expanded(child: MusicQueue()),
-              height > 350 // prevent bottom overflow
+              height > 200
+                  ? Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text('Queue'),
+                            Row(children: [
+                              getQueueShuffleButton(),
+                              getQueueLoopButton()
+                            ])
+                          ]))
+                  : SizedBox.shrink(),
+              height > 200 ? Expanded(child: MusicQueue()) : SizedBox.shrink(),
+              height > screenHeight - 200 // prevent bottom overflow
                   ? Column(
                       children: [
                         // Progress Bar Slider

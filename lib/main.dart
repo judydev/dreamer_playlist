@@ -142,12 +142,14 @@ class _MyHomePageState extends State<MyHomePage> {
             type: BottomNavigationBarType.fixed,
             currentIndex: _selectedTabIndex,
             selectedItemColor: Colors.red,
-            onTap: (index) => setState(() {
-              _selectedTabIndex = index;
+            onTap: (index) {
+              setState(() {
+                _selectedTabIndex = index;
+              });
               GetitUtil.appStates.currentTab = menuTabs[index];
               Provider.of<AppStateDataProvider>(context, listen: false)
                   .updateAppState(AppStateKey.currentTab, menuTabs[index]);
-            }),
+            },
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                   icon: Icon(Icons.library_music_outlined), label: 'Library'),
