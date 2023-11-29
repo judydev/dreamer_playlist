@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -18,7 +19,6 @@ class StorageProvider extends ChangeNotifier {
   File getAudioFile(String path) {
     File file = File(path);
     if (!file.existsSync()) {
-      // TODO: better handling this
       throw Exception("Cannot find file");
     }
     return file;
@@ -37,12 +37,9 @@ class StorageProvider extends ChangeNotifier {
     // copy song to local storage
     final path = await getLocalStoragePath();
     String newPathWithoutFileExtension = '$path/$filename';
-    int i = 0;
     while (File("$newPathWithoutFileExtension.$extension").existsSync()) {
-
       // append " copy" at the end of the file name when there is a duplicate
       newPathWithoutFileExtension = "$newPathWithoutFileExtension copy";
-      i += 1;
     }
 
     return await File(selectedFile.path!)
@@ -54,5 +51,11 @@ class StorageProvider extends ChangeNotifier {
     if (file.existsSync()) {
       file.deleteSync();
     }
+  }
+
+  Future<String> getRelativePath(String path) async {
+    final dir = (await getApplicationDocumentsDirectory()).path;
+    final relativePath = path.replaceAll(dir, '');
+    return relativePath;
   }
 }

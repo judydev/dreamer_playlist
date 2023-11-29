@@ -42,26 +42,14 @@ class SongDataProvider extends ChangeNotifier {
     String strippedName = StorageProvider.getFilenameFromPlatformFile(
         selectedFile.name, selectedFile.extension!);
 
-    String relativePath = await getRelativePath(songFile.path);
+    String relativePath =
+        await StorageProvider().getRelativePath(songFile.path);
     Song song = Song(title: strippedName, relativePath: relativePath);
     await addSongToDb(song);
 
     notifyListeners();
     return song;
   }
-
-  Future<String> getRelativePath(String path) async {
-    String? dir = GetitUtil.appDocumentsDir;
-    dir ??= (await getApplicationDocumentsDirectory()).path;
-    final relativePath = path.replaceAll(dir, '');
-    return relativePath;
-  }
-
-  // Future<String> getAppDocDir() async {
-  //   String? dir = GetitUtil.appDocumentsDir;
-  //   dir ??= (await getApplicationDocumentsDirectory()).path;
-  //   return dir;
-  // }
 
   Future<void> addSongToDb(Song song) async {
     final db = await DatabaseUtil.getDatabase();

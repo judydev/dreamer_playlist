@@ -1,26 +1,60 @@
-import 'package:dreamer_playlist/database/app_state_data_provider.dart';
+import 'package:dreamer_playlist/components/settings/settings_controller.dart';
+import 'package:dreamer_playlist/database/data_util.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-class SettingsTabView extends StatefulWidget {
-  @override
-  State<SettingsTabView> createState() => _SettingsTabViewState();
-}
+/// Displays the various settings that can be customized by the user.
+///
+/// When a user changes a setting, the SettingsController is updated and
+/// Widgets that listen to the SettingsController are rebuilt.
+class SettingsTabView extends StatelessWidget {
+  const SettingsTabView({super.key, required this.controller});
 
-class _SettingsTabViewState extends State<SettingsTabView> {
-  late AppStateDataProvider appStateDataProvider;
-  late Future<Map<String, dynamic>> _getSettings;
+  static const routeName = '/settings';
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    appStateDataProvider = Provider.of<AppStateDataProvider>(context);
-    _getSettings = appStateDataProvider.getAppStates();
-  }
+  final SettingsController controller;
 
   @override
   Widget build(BuildContext context) {
-    return Text("Settings View");
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Settings'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        // Glue the SettingsController to the theme selection DropdownButton.
+        //
+        // When a user selects a theme from the dropdown list, the
+        // SettingsController is updated, which rebuilds the MaterialApp.
+        child: Column(
+          children: [
+            DropdownButton<ThemeMode>(
+              // Read the selected themeMode from the controller
+              value: controller.themeMode,
+              // Call the updateThemeMode method any time the user selects a theme.
+              onChanged: controller.updateThemeMode,
+              items: const [
+                DropdownMenuItem(
+                  value: ThemeMode.system,
+                  child: Text('System Theme'),
+                ),
+                DropdownMenuItem(
+                  value: ThemeMode.light,
+                  child: Text('Light Theme'),
+                ),
+                DropdownMenuItem(
+                  value: ThemeMode.dark,
+                  child: Text('Dark Theme'),
+                )
+              ],
+            ),
+            TextButton(
+                onPressed: () {
+                  DataUtil().healthCheck(context);
+                },
+                child: const Text('Health Check'))
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -215,8 +215,7 @@ class MyAudioHandler extends BaseAudioHandler
   }
 
   Future<UriAudioSource> _createAudioSource(MediaItem mediaItem) async {
-    String? dir = GetitUtil.appDocumentsDir;
-    dir ??= (await getApplicationDocumentsDirectory()).path;
+    final dir = (await getApplicationDocumentsDirectory()).path;
     return AudioSource.file(dir + mediaItem.extras!['path'], tag: mediaItem);
   }
 

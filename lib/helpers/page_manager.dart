@@ -1,7 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
-import 'package:dreamer_playlist/models/song.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -23,7 +22,6 @@ class PageManager {
   final isFirstSongNotifier = ValueNotifier<bool>(true);
   final playButtonNotifier = PlayButtonNotifier();
   final isLastSongNotifier = ValueNotifier<bool>(true);
-  // final isShuffleModeEnabledNotifier = ValueNotifier<bool>(false);
 
   // Events: Calls coming from the UI
   void init() async {
@@ -50,17 +48,6 @@ class PageManager {
     await AudioPlayer.clearAssetCache();
     _audioHandler.audioPlayer.dispose(); 
   }
-
-  // void _listenToChangesInPlaylist() {
-  //   _audioHandler.queue.listen((queue) {
-  //     print('listenToChangesInPlaylist');
-  //     if (queue.isEmpty) return;
-  //     final newList = queue.map((item) => item.title).toList();
-  //     print('newList: $newList');
-  //     // playlistNotifier.value = queue;
-  //     playlistTitlesNotifier.value = newList;
-  //   });
-  // }
 
   void _listenToPlaybackState() {
     _audioHandler.playbackState.listen((playbackState) {
@@ -91,8 +78,6 @@ class PageManager {
       double val = position.inMilliseconds / duration.inMilliseconds;
       if (val <= 1) {
         GetitUtil.pageManager.progressBarValueNotifier.value = val;
-      } else {
-        // print('progress $val > 1');
       }
     });
   }
@@ -139,10 +124,8 @@ class PageManager {
   }
 
   Future<void> onShuffleButtonPressed() async {
-    print('onShuffleButtonPressed');
     final enable = _audioHandler.playbackState.value.shuffleMode ==
         AudioServiceShuffleMode.none;
-    print(_audioHandler.playbackState.value.shuffleMode);
     if (enable) {
       await _audioHandler.shuffle();
       await _audioHandler.setShuffleMode(AudioServiceShuffleMode.all);
@@ -150,52 +133,13 @@ class PageManager {
       await _audioHandler.setShuffleMode(AudioServiceShuffleMode.none);
     }
 
-    // isShuffleModeEnabledNotifier.value = enable;
     shuffleModeNotifier.value = enable;
-  }
-
-  // void onRepeatButtonPressed() {
-  //   repeat();
-  //   // repeatButtonNotifier.nextState();
-  //   // switch (repeatButtonNotifier.value) {
-  //   //   case RepeatState.off:
-  //   //     _audioHandler.setLoopMode(LoopMode.off);
-  //   //     break;
-  //   //   case RepeatState.one:
-  //   //     _audioPlayer.setLoopMode(LoopMode.one);
-  //   //     break;
-  //   //   case RepeatState.all:
-  //   //     _audioPlayer.setLoopMode(LoopMode.all);
-  //   // }
-  // }
-
-  void addSong() {
-    // addSongToQueue
-    // final songNumber = _playlist.length + 1;
-    // const prefix = 'https://www.soundhelix.com/examples/mp3';
-    // final song = Uri.parse('$prefix/SoundHelix-Song-$songNumber.mp3');
-    // _playlist.add(AudioSource.uri(song, tag: 'Song $songNumber'));
   }
 
   void removeSong() {
     final index = _playlist.length - 1;
     if (index < 0) return;
     _playlist.removeAt(index);
-  }
-
-  Future<void> _loadPlaylist() async {
-    // final songRepository = getIt<PlaylistRepository>();
-    // final playlist = await songRepository.fetchInitialPlaylist();
-    List<Song> playlist = [];
-    final mediaItems = playlist
-        .map((Song song) => MediaItem(
-              id: song.id ?? '',
-              // album: song['album'] ?? '',
-              title: song.title ?? '',
-              extras: {'path': song.relativePath},
-            ))
-        .toList();
-    _audioHandler.addQueueItems(mediaItems);
   }
 }
 
@@ -226,7 +170,6 @@ class ProgressNotifier extends ValueNotifier<ProgressBarState> {
   ProgressNotifier() : super(_initialValue);
   static final _initialValue = ProgressBarState(
     current: Duration.zero,
-    // buffered: Duration.zero,
     total: Duration.zero,
   );
 }
@@ -234,13 +177,11 @@ class ProgressNotifier extends ValueNotifier<ProgressBarState> {
 class ProgressBarState {
   ProgressBarState({
     required this.current,
-    // required this.buffered,
     required this.total,
   }) : percent = total.inMilliseconds > 0
             ? current.inMilliseconds / total.inMilliseconds
             : 0;
   final Duration current;
-  // final Duration buffered;
   final Duration total;
   final double percent;
 }

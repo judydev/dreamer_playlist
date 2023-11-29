@@ -9,8 +9,8 @@ import 'package:dreamer_playlist/helpers/widget_helpers.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:flutter/material.dart';
-// import 'package:path_provider/path_provider.dart';
-// import 'dart:io' as io;
+import 'package:path_provider/path_provider.dart';
+import 'dart:io' as io;
 
 class DataUtil {
   static Future<Map<String, dynamic>> loadInitialData() async {
@@ -109,20 +109,54 @@ class DataUtil {
           });
     }
 
-    // final dir = await getApplicationDocumentsDirectory();
-    // final fileList = io.Directory(dir.path).listSync();
-    // print('Documents Dir Filelist');
-    // for (io.FileSystemEntity entity in fileList) {
-    // print(entity.path);
-    // TODO: check if song exists in allSongs
-    // }
+    final dir = await getApplicationDocumentsDirectory();
+    final fileList = io.Directory(dir.path).listSync();
+    List<String> allPaths = allSongs.map((song) => song.relativePath!).toList();
+    for (io.FileSystemEntity entity in fileList) {
+      final relativePath = await StorageProvider().getRelativePath(entity.path);
+      if (relativePath.endsWith('dreamer_playlist.db')) {
+        continue;
+      }
+      if (!allPaths.contains(relativePath)) {
+        if (!context.mounted) return;
+        await showAdaptiveDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                  title: const Text("Warning"),
+                  content: Text("Unassociated song $relativePath, remove?"),
+                  actions: [
+                    displayTextButton(context, "Ignore"),
+                    displayTextButton(context, "Yes", callback: () {
+                      entity.deleteSync();
+                    })
+                  ]);
+            });
+      }
+
+      if (!context.mounted) return;
+      await showAdaptiveDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+                title: const Text("Info"),
+                content: Text("Everything looks good"),
+                actions: [displayTextButton(context, "OK")]);
+          });
+    }
   }
 
   Future<List<Song>> checkIfSongFilesExist(List<Song> songs) async {
     List<Song> res = [];
+    final dir = (await getApplicationDocumentsDirectory()).path;
+
     for (Song song in songs) {
+      if (song.relativePath == null) {
+        continue;
+      }
+      
       try {
-        StorageProvider().getAudioFile(song.relativePath!);
+        StorageProvider().getAudioFile(dir + song.relativePath!);
       } catch (e) {
         res.add(song);
       }

@@ -4,6 +4,8 @@ import 'package:dreamer_playlist/components/favorites_tab_view.dart';
 import 'package:dreamer_playlist/components/library_tab_view.dart';
 import 'package:dreamer_playlist/components/playlist_tab_view.dart';
 import 'package:dreamer_playlist/components/playlists_tab_view.dart';
+import 'package:dreamer_playlist/components/settings/settings_controller.dart';
+import 'package:dreamer_playlist/components/settings/settings_service.dart';
 import 'package:dreamer_playlist/components/settings_tab_view.dart';
 import 'package:dreamer_playlist/database/data_util.dart';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
@@ -25,6 +27,11 @@ void main() async {
   
   await setupServiceLocator();
 
+  final settingsController = SettingsController(SettingsService());
+  // Load the user's preferred theme while the splash screen is displayed.
+  // This prevents a sudden theme change when the app is first displayed.
+  await settingsController.loadSettings();
+
   runApp(
     MultiProvider(providers: [
       ChangeNotifierProvider<AppStateDataProvider>(
@@ -39,12 +46,13 @@ void main() async {
       ChangeNotifierProvider<StorageProvider>(
         create: (context) => StorageProvider(),
       ),
-    ], child: const MyApp()),
+    ], child: MyApp(settingsController: settingsController)),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp();
+  const MyApp({required this.settingsController});
+  final SettingsController settingsController;
 
   @override
   Widget build(BuildContext context) {
@@ -52,22 +60,27 @@ class MyApp extends StatelessWidget {
       title: 'Dreamer Playlist',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+        // colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
         useMaterial3: true,
       ),
-      home: const MyHomePage(),
+      darkTheme: ThemeData.dark(),
+      themeMode: settingsController.themeMode,
+      home: MyHomePage(settingsController: settingsController),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage();
+  const MyHomePage({required this.settingsController});
+  final SettingsController settingsController;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late SettingsController settingsController = widget.settingsController;
+
   late AppStateDataProvider appStateDataProvider;
   late PlaylistDataProvider playlistDataProvider;
   int _selectedTabIndex = GetitUtil.appStates.currentTab != null
@@ -77,7 +90,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    DataUtil().healthCheck(context);
     GetitUtil.pageManager.init();
   }
 
@@ -156,9 +168,9 @@ class _MyHomePageState extends State<MyHomePage> {
               BottomNavigationBarItem(
                   icon: Icon(Icons.queue_music), label: 'Playlists'),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.favorite), label: 'Favorite'),
-              // BottomNavigationBarItem(
-              //     icon: Icon(Icons.settings), label: 'Settings'),
+                  icon: Icon(Icons.favorite), label: 'Favorites'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.settings), label: 'Settings'),
             ],
           ),
         ]),
@@ -194,7 +206,9 @@ class _MyHomePageState extends State<MyHomePage> {
       case 2:
         return FavoritesTabView();
       case 3:
-        return SettingsTabView();
+        return SettingsTabView(
+          controller: settingsController,
+        );
       default:
         return LibraryTabView();
     }
