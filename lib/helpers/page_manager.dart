@@ -36,7 +36,7 @@ class PageManager {
     _listenToChangesInSong();
   }
 
-  Future<void> play() => _audioHandler.play();
+  void play() => _audioHandler.play();
   void pause() => _audioHandler.pause();
   void seek(Duration position) => _audioHandler.seek(position);
   void previous() => _audioHandler.skipToPrevious();
@@ -46,8 +46,9 @@ class PageManager {
   // void shuffle() {}
   // void add() {}
   // void remove() {}
-  void dispose() {
-    _audioHandler.audioPlayer.dispose();
+  Future<void> dispose() async {
+    await AudioPlayer.clearAssetCache();
+    _audioHandler.audioPlayer.dispose(); 
   }
 
   // void _listenToChangesInPlaylist() {
