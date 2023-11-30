@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
       title: 'Dreamer Playlist',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
         useMaterial3: true,
       ),
       darkTheme: ThemeData.dark(),
@@ -169,8 +169,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: Icon(Icons.queue_music), label: 'Playlists'),
               BottomNavigationBarItem(
                   icon: Icon(Icons.favorite), label: 'Favorites'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.settings), label: 'Settings'),
+              // BottomNavigationBarItem(
+              //     icon: Icon(Icons.settings), label: 'Settings'),
             ],
           ),
         ]),

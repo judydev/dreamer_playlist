@@ -29,6 +29,8 @@ class DataUtil {
     debugPrint('health check');
     final db = await DatabaseUtil.getDatabase();
 
+    bool ok = true;
+
     // check for standalone PlaylistSong relations
     String sql_standalone_playlist_songs = '''
       SELECT * FROM ${DatabaseUtil.playlistSongTableName} 
@@ -38,6 +40,7 @@ class DataUtil {
     ''';
     final playlistSongs = await db.rawQuery(sql_standalone_playlist_songs);
     if (playlistSongs.isNotEmpty) {
+      ok = false;
       if (!context.mounted) return;
       await showAdaptiveDialog(
           context: context,
@@ -81,6 +84,9 @@ class DataUtil {
           strIndices: strIndices);
 
       if (errorMessage.isNotEmpty) {
+        if (ok) {
+          ok = false;
+        }
         if (!context.mounted) return;
         resetPlaylistIndicesPopup(context, playlistName, playlistId,
             error: errorMessage);
@@ -91,6 +97,10 @@ class DataUtil {
     final allSongs = await SongDataProvider().getAllSongs();
     if (!context.mounted) return;
     List<Song> missingSongs = await checkIfSongFilesExist(allSongs);
+    if (ok && missingSongs.isNotEmpty) {
+      ok = false;
+    }
+
     for (Song song in missingSongs) {
       if (!context.mounted) return;
       await showAdaptiveDialog(
@@ -118,6 +128,9 @@ class DataUtil {
         continue;
       }
       if (!allPaths.contains(relativePath)) {
+        if (ok) {
+          ok = false;
+        }
         if (!context.mounted) return;
         await showAdaptiveDialog(
             context: context,
@@ -133,7 +146,9 @@ class DataUtil {
                   ]);
             });
       }
+    }
 
+    if (ok) {
       if (!context.mounted) return;
       await showAdaptiveDialog(
           context: context,
@@ -154,7 +169,7 @@ class DataUtil {
       if (song.relativePath == null) {
         continue;
       }
-      
+
       try {
         StorageProvider().getAudioFile(dir + song.relativePath!);
       } catch (e) {

@@ -1,13 +1,11 @@
 import 'dart:io';
 
-import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/models/playlist_song.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:dreamer_playlist/database/database_util.dart';
 import 'package:dreamer_playlist/database/storage_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SongDataProvider extends ChangeNotifier {
