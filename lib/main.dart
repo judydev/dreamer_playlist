@@ -109,14 +109,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    const offset = 0; //126;
     return Scaffold(
       body: Stack(
         children: [
           SizedBox(
               // prevent list from being hidden behind miniplayer
-              height: MediaQuery.sizeOf(context).height - offset > 0
-                  ? MediaQuery.sizeOf(context).height - offset
+              height: MediaQuery.sizeOf(context).height > 0
+                  ? MediaQuery.sizeOf(context).height
                   : null,
               child: buildTabView(context, _selectedTabIndex)),
           ExpandablePlayer()

@@ -64,7 +64,7 @@ Future<bool> openFilePicker(context, String? playlistId) async {
   return true;
 }
 
-Color highlightTileColor = Colors.grey[200]!;
+Color highlightTileColor = Colors.grey[500]!;
 class ListTileWrapper extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
