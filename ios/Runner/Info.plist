@@ -32,9 +32,9 @@
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
-		<!-- <key>NSAllowsArbitraryLoadsForMedia</key>
-		<false/> -->
 	</dict>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>App stores local audio file</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string></string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
