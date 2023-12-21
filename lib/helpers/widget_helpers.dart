@@ -1,3 +1,5 @@
+import 'package:dreamer_playlist/helpers/permission_service.dart';
+import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:dreamer_playlist/database/song_data_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -37,6 +39,8 @@ List<String> acceptedAudioExtensions =
     List.unmodifiable(["m4a", "mp3", "wav", "aiff"]);
 
 Future<bool> openFilePicker(context, String? playlistId) async {
+  getIt<PermissionService>().requestStoragePermission();
+
   FilePickerResult? selected = await FilePicker.platform.pickFiles(
     type: FileType.custom,
     allowedExtensions: acceptedAudioExtensions,
