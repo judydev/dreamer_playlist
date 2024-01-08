@@ -28,15 +28,10 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
-	</dict>
 	<key>NSDocumentsFolderUsageDescription</key>
-	<string>App stores local audio file</string>
+	<string>This app requires access to the documents folder to display audio files in a file picker.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string></string>
+	<string>This app does not require access to the photo library.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
