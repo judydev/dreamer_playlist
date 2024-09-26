@@ -1,3 +1,4 @@
+import 'package:dreamer_playlist/components/account_tab_view.dart';
 import 'package:dreamer_playlist/components/miniplayer/utils.dart';
 import 'package:dreamer_playlist/components/miniplayer/expandable_player.dart';
 import 'package:dreamer_playlist/components/favorites_tab_view.dart';
@@ -6,7 +7,6 @@ import 'package:dreamer_playlist/components/playlist_tab_view.dart';
 import 'package:dreamer_playlist/components/playlists_tab_view.dart';
 import 'package:dreamer_playlist/components/settings/settings_controller.dart';
 import 'package:dreamer_playlist/components/settings/settings_service.dart';
-import 'package:dreamer_playlist/components/settings_tab_view.dart';
 import 'package:dreamer_playlist/database/data_util.dart';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
 import 'package:dreamer_playlist/helpers/widget_helpers.dart';
@@ -168,8 +168,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: Icon(Icons.queue_music), label: 'Playlists'),
               BottomNavigationBarItem(
                   icon: Icon(Icons.favorite), label: 'Favorites'),
-              // BottomNavigationBarItem(
-              //     icon: Icon(Icons.settings), label: 'Settings'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.account_circle), label: 'Account'),
             ],
           ),
         ]),
@@ -205,9 +205,11 @@ class _MyHomePageState extends State<MyHomePage> {
       case 2:
         return FavoritesTabView();
       case 3:
-        return SettingsTabView(
-          controller: settingsController,
-        );
+        return AccountTabView();
+      // case 3:
+      //   return SettingsTabView(
+      //     controller: settingsController,
+      //   );
       default:
         return LibraryTabView();
     }

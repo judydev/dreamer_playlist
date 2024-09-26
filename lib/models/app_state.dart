@@ -42,7 +42,7 @@ enum AppStateKey {
   darkMode
 }
 
-const menuTabs = ['Library', 'Playlists', 'Favorites', 'Settings'];
+const menuTabs = ['Library', 'Playlists', 'Favorites', 'Account'];
 bool isFavoriteTab() {
   return GetitUtil.appStates.currentTab == menuTabs[2];
 }
