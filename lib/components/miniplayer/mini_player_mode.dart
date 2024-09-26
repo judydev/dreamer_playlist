@@ -22,7 +22,10 @@ class MiniPlayerMode extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-            child: Padding(
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 240, 230, 200),    
+            ),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Flex(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
