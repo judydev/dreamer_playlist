@@ -82,10 +82,7 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const Text('Queue'),
-                            Row(children: [
-                              getQueueShuffleButton(),
-                              getQueueLoopButton()
-                            ])
+                            PlaylistModeControl()
                           ]))
                   : SizedBox.shrink(),
               height > 200 ? Expanded(child: MusicQueue()) : SizedBox.shrink(),
@@ -152,6 +149,23 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
         }
       },
     );
+  }
+}
+
+class PlaylistModeControl extends StatefulWidget {
+  @override
+  State<PlaylistModeControl> createState() => _PlaylistModeControlState();
+}
+
+class _PlaylistModeControlState extends State<PlaylistModeControl> {
+  MyAudioHandler _audioHandler = GetitUtil.audioHandler;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      getQueueShuffleButton(),
+      getQueueLoopButton()
+    ]);
   }
 
   ValueListenableBuilder<bool> getQueueShuffleButton() {

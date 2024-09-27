@@ -31,14 +31,9 @@ class MiniPlayerMode extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             direction: Axis.horizontal,
             children: [
-              Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: const Icon(Icons.music_note)),
-              Flexible(
-                  fit: FlexFit.loose,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: ValueListenableBuilder(
+              Row(children: [
+                Icon(Icons.music_note),
+                ValueListenableBuilder(
                       valueListenable:
                           GetitUtil.pageManager.currentPlayingNotifier,
                       builder: (context, mediaItem, child) {
@@ -48,9 +43,10 @@ class MiniPlayerMode extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                         );
                       },
-                    ),
-                  )),
+                    )
+              ]),
               PlayerButtonbar(isMiniPlayer: true),
+              PlaylistModeControl()
             ],
           ),
         )),
