@@ -84,8 +84,8 @@ class _MyHomePageState extends State<MyHomePage> {
   late AppStateDataProvider appStateDataProvider;
   late PlaylistDataProvider playlistDataProvider;
   int _selectedTabIndex = GetitUtil.appStates.currentTab != null
-      ? menuTabs.indexOf(GetitUtil.appStates.currentTab!)
-      : 0;
+      ? (menuTabs.contains(GetitUtil.appStates.currentTab!)
+      ? menuTabs.indexOf(GetitUtil.appStates.currentTab!) : 0) : 0;
 
   @override
   void initState() {

@@ -2,7 +2,6 @@
 
 import 'dart:async';
 
-import 'package:dreamer_playlist/components/miniplayer/miniplayer_will_pop_scope.dart';
 import 'package:dreamer_playlist/components/miniplayer/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -62,7 +61,7 @@ class Miniplayer extends StatefulWidget {
   });
 
   @override
-  _MiniplayerState createState() => _MiniplayerState();
+  State<Miniplayer> createState() => _MiniplayerState();
 }
 
 class _MiniplayerState extends State<Miniplayer> with TickerProviderStateMixin {
@@ -146,19 +145,10 @@ class _MiniplayerState extends State<Miniplayer> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     if (dismissed) {
-      // return Container();
       return SizedBox.shrink();
     }
 
-    return MiniplayerWillPopScope(
-      onWillPop: () async {
-        if (heightNotifier.value > widget.minHeight) {
-          _snapToPosition(PanelState.MIN);
-          return false;
-        }
-        return true;
-      },
-      child: ValueListenableBuilder(
+    return ValueListenableBuilder(
         valueListenable: heightNotifier,
         builder: (BuildContext context, double height, Widget? _) {
           var percentage = ((height - widget.minHeight)) /
@@ -293,7 +283,6 @@ class _MiniplayerState extends State<Miniplayer> with TickerProviderStateMixin {
             ],
           );
         },
-      ),
     );
   }
 
