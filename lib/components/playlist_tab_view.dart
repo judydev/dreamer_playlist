@@ -38,7 +38,7 @@ class PlaylistTabView extends StatelessWidget {
           )),
       body: Column(
         children: <Widget>[
-          ButtonBar(
+          OverflowBar(
             alignment: MainAxisAlignment.spaceEvenly,
             children: [
               // Favorite

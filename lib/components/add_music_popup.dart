@@ -50,7 +50,7 @@ class _AddMusicPopupState extends State<AddMusicPopup> {
           return Column(
             children: [
               // MusicSearchBar(), // TODO
-              ButtonBar(alignment: MainAxisAlignment.start, children: [
+              OverflowBar(alignment: MainAxisAlignment.start, children: [
                 TextButton(
                     onPressed: () {
                       setState(() {

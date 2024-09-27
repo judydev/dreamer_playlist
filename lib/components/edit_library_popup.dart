@@ -46,7 +46,7 @@ class _EditLibraryPopupState extends State<EditLibraryPopup> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
-                  child: ButtonBar(
+                  child: OverflowBar(
                       alignment: MainAxisAlignment.spaceBetween,
                       children: [
                         TextButton(

@@ -45,7 +45,7 @@ class _NewPlaylistPopupState extends State<NewPlaylistPopup> {
                 setState(() => errorText = null);
               }
             }),
-        ButtonBar(
+        OverflowBar(
           alignment: MainAxisAlignment.end,
           children: [
             displayTextButton(context, 'Cancel'),

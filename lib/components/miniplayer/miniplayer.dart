@@ -7,10 +7,10 @@ import 'package:dreamer_playlist/components/miniplayer/utils.dart';
 import 'package:flutter/material.dart';
 
 ///Type definition for the builder function
-typedef Widget MiniplayerBuilder(double height, double percentage);
+typedef MiniplayerBuilder = Widget Function(double height, double percentage);
 
 ///Type definition for onDismiss. Will be used in a future version.
-typedef void DismissCallback(double percentage);
+typedef DismissCallback = void Function(double percentage);
 
 ///Miniplayer class
 class Miniplayer extends StatefulWidget {
@@ -47,7 +47,7 @@ class Miniplayer extends StatefulWidget {
   final Color backgroundBoxShadow;
 
   const Miniplayer({
-    Key? key,
+    super.key,
     required this.minHeight,
     required this.maxHeight,
     required this.builder,
@@ -59,7 +59,7 @@ class Miniplayer extends StatefulWidget {
     this.onDismissed,
     this.controller,
     this.backgroundBoxShadow = Colors.black45,
-  }) : super(key: key);
+  });
 
   @override
   _MiniplayerState createState() => _MiniplayerState();

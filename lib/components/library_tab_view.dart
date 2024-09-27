@@ -38,7 +38,7 @@ class _LibraryTabViewState extends State<LibraryTabView> {
   }
 }
 
-ButtonBar getLibraryButtonBar(context) => ButtonBar(
+OverflowBar getLibraryButtonBar(context) => OverflowBar(
   alignment: MainAxisAlignment.spaceEvenly,
   children: [
     // Edit

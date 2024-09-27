@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 
 class MiniplayerWillPopScope extends StatefulWidget {
   const MiniplayerWillPopScope({
-    Key? key,
+    super.key,
     required this.child,
     required this.onWillPop,
-  }) : super(key: key);
+  });
 
   final Widget child;
   final WillPopCallback onWillPop;
