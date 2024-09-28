@@ -31,7 +31,7 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.sizeOf(context).height;
-    double playerMaxHeight = screenHeight - 40;
+    double playerMaxHeight = screenHeight + kBottomNavigationBarHeight * 2 + 40;
 
     return Miniplayer(
       valueNotifier: playerExpandProgress,

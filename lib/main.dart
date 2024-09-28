@@ -110,16 +110,19 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          SizedBox(
-              // prevent list from being hidden behind miniplayer
-              height: MediaQuery.sizeOf(context).height > 0
-                  ? MediaQuery.sizeOf(context).height
-                  : null,
-              child: buildTabView(context, _selectedTabIndex)),
-          ExpandablePlayer()
-        ],
+      body: SafeArea(
+        top: true,
+        child: Stack(
+          children: [
+            SizedBox(
+                // prevent list from being hidden behind miniplayer
+                height: MediaQuery.sizeOf(context).height > 0
+                    ? MediaQuery.sizeOf(context).height
+                    : null,
+                child: buildTabView(context, _selectedTabIndex)),
+            ExpandablePlayer()
+          ],
+        ),
       ),
       // bottomNavigationBar gets pushed down when player is in full screen mode
       bottomNavigationBar: ValueListenableBuilder(
@@ -129,30 +132,22 @@ class _MyHomePageState extends State<MyHomePage> {
           final value = percentageFromValueInRange(
               min: playerMinHeight, max: playerMaxHeight, value: height);
 
-          var opacity = 1 - value;
-          if (opacity < 0) opacity = 0;
-          if (opacity > 1) opacity = 1;
-
           return SizedBox(
             height:
-                kBottomNavigationBarHeight - kBottomNavigationBarHeight * value,
+                kBottomNavigationBarHeight - kBottomNavigationBarHeight * value + 20,
             child: Transform.translate(
               offset: Offset(0.0, kBottomNavigationBarHeight * value * 0.5),
-              child: Opacity(
-                opacity: opacity,
-                child: OverflowBox(
-                  maxHeight: kBottomNavigationBarHeight,
-                  child: child,
-                ),
+              child: OverflowBox(
+                maxHeight: kBottomNavigationBarHeight + 20,
+                child: child,
               ),
             ),
           );
         },
         child: Wrap(children: [
           BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
             currentIndex: _selectedTabIndex,
-            selectedItemColor: Colors.red,
+            selectedItemColor: Colors.deepOrange,
             onTap: (index) {
               setState(() {
                 _selectedTabIndex = index;
