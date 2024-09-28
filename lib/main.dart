@@ -27,7 +27,7 @@ void main() async {
   runApp(
     MultiProvider(providers: [
       ChangeNotifierProvider<AppStateDataProvider>(
-        create: (context) => AppStateDataProvider(),
+        create: (context) => AppStateDataProvider(AppStateDataService()),
       ),
       ChangeNotifierProvider<SongDataProvider>(
         create: (context) => SongDataProvider(),
