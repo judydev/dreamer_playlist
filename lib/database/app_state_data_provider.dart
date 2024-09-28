@@ -26,6 +26,12 @@ class AppStateDataProvider extends ChangeNotifier {
 }
 
 class AppStateDataService {
+  AppStateDataService._privateConstructor();
+  static AppStateDataService _instance = AppStateDataService._privateConstructor();
+  factory AppStateDataService() {
+    return _instance;
+  }
+
   Future<Map<String, dynamic>> getAppStates() async {
     final db = await DatabaseUtil.getDatabase();
     final List<Map<String, dynamic>> maps =
