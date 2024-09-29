@@ -163,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
         return LibraryTabView();
       case 1:
         return FutureBuilderWrapper(
-            appStateDataProvider.getAppStateByKey(
+            AppStateDataService().getAppStateByKey(
                 AppStateKey.currentPlaylistId), (context, snapshot) {
           String? currentPlaylistId = snapshot.data;
           if (currentPlaylistId != null) {

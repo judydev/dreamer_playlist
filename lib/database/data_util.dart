@@ -16,7 +16,7 @@ class DataUtil {
   static Future<Map<String, dynamic>> loadInitialData() async {
     Map<String, dynamic> res = {};
     String? currentTab =
-        await AppStateDataProvider(AppStateDataService()).getAppStateByKey(AppStateKey.currentTab);
+        await AppStateDataService().getAppStateByKey(AppStateKey.currentTab);
 
     AppStates appStates = AppStates();
     appStates.currentTab = currentTab;
