@@ -33,7 +33,7 @@ void main() async {
         create: (context) => SongDataProvider(),
       ),
       ChangeNotifierProvider<PlaylistDataProvider>(
-        create: (context) => PlaylistDataProvider(),
+        create: (context) => PlaylistDataProvider(PlaylistDataService()),
       ),
       ChangeNotifierProvider<StorageProvider>(
         create: (context) => StorageProvider(),
@@ -69,7 +69,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late AppStateDataProvider appStateDataProvider;
-  late PlaylistDataProvider playlistDataProvider;
   int _selectedTabIndex = GetitUtil.appStates.currentTab != null
       ? (menuTabs.contains(GetitUtil.appStates.currentTab!)
       ? menuTabs.indexOf(GetitUtil.appStates.currentTab!) : 0) : 0;
@@ -85,7 +84,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.didChangeDependencies();
 
     appStateDataProvider = Provider.of<AppStateDataProvider>(context);
-    playlistDataProvider = Provider.of<PlaylistDataProvider>(context);
   }
 
   @override
@@ -135,14 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBar(
             currentIndex: _selectedTabIndex,
             selectedItemColor: Colors.deepOrange,
-            onTap: (index) {
-              setState(() {
-                _selectedTabIndex = index;
-              });
-              GetitUtil.appStates.currentTab = menuTabs[index];
-              Provider.of<AppStateDataProvider>(context, listen: false)
-                  .updateAppState(AppStateKey.currentTab, menuTabs[index]);
-            },
+            onTap: onTapButtomNavbar,
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                   icon: Icon(Icons.library_music_outlined), label: 'Library'),
@@ -157,6 +148,15 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  onTapButtomNavbar(index) {
+    setState(() {
+      _selectedTabIndex = index;
+    });
+    GetitUtil.appStates.currentTab = menuTabs[index];
+    Provider.of<AppStateDataProvider>(context, listen: false)
+      .updateAppState(AppStateKey.currentTab, menuTabs[index]);
+  }
+
   buildTabView(context, int tabIndex) {
     switch (tabIndex) {
       case 0:
@@ -168,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
           String? currentPlaylistId = snapshot.data;
           if (currentPlaylistId != null) {
             return FutureBuilderWrapper(
-                playlistDataProvider.getPlaylistById(currentPlaylistId),
+                PlaylistDataService().getPlaylistById(currentPlaylistId),
                 (context, snapshot) {
               Playlist? playlist = snapshot.data;
               if (playlist == null) {

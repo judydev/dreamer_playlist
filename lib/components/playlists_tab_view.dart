@@ -4,7 +4,6 @@ import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/database/playlist_data_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class PlaylistsTabView extends StatelessWidget {
   @override
@@ -12,30 +11,31 @@ class PlaylistsTabView extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(title: const Text("All Playlists")),
         body: ListView(
-          children: [NewPlaylistTile(updateAppState: true), PlaylistsList()],
+          children: [NewPlaylistTile(updateAppState: true), PlaylistsList(PlaylistDataService())],
         ));
   }
 }
 
 class PlaylistsList extends StatefulWidget {
+  final PlaylistDataService playlistDataService;
+  PlaylistsList(this.playlistDataService);
+
   @override
   State<PlaylistsList> createState() => _PlaylistsListState();
 }
 
 class _PlaylistsListState extends State<PlaylistsList> {
-  late PlaylistDataProvider playlistDataProvider;
+  late PlaylistDataService playlistDataService = widget.playlistDataService;
   late Future<List<Playlist>> _getPlaylists;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    playlistDataProvider = Provider.of<PlaylistDataProvider>(context);
-
     if (isFavoriteTab()) {
-      _getPlaylists = playlistDataProvider.getFavoritePlaylists();
+      _getPlaylists = playlistDataService.getFavoritePlaylists();
     } else {
-      _getPlaylists = playlistDataProvider.getAllPlaylists();
+      _getPlaylists = playlistDataService.getAllPlaylists();
     }
   }
 

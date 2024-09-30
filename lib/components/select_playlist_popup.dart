@@ -5,7 +5,6 @@ import 'package:dreamer_playlist/models/playlist.dart';
 import 'package:dreamer_playlist/database/playlist_data_provider.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class SelectPlaylistPopup extends StatefulWidget {
   final List<Song> songs; // songs to be added to selected playlist
@@ -18,15 +17,13 @@ class SelectPlaylistPopup extends StatefulWidget {
 class _SelectPlaylistPopupState extends State<SelectPlaylistPopup> {
   late List<Song> songs = widget.songs;
 
-  late PlaylistDataProvider playlistDataProvider;
   late Future<List<Playlist>> _getAllPlaylists;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    playlistDataProvider = Provider.of<PlaylistDataProvider>(context);
-    _getAllPlaylists = playlistDataProvider.getAllPlaylists();
+    _getAllPlaylists = PlaylistDataService().getAllPlaylists();
   }
 
   @override

@@ -113,7 +113,7 @@ class FutureBuilderWrapper extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           if (loadingText != null) {
-            return Text(loadingText!);
+            return CircularProgressIndicator();
           } else {
             return const SizedBox.shrink();
           }

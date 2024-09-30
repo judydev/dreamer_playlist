@@ -4,6 +4,57 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
 class PlaylistDataProvider extends ChangeNotifier {
+  final PlaylistDataService _playlistDataService;
+  PlaylistDataProvider(this._playlistDataService);
+  
+  Future<String> createPlaylist(String name) async {
+    String playlistId = await _playlistDataService.createPlaylist(name);
+    notifyListeners();
+    return playlistId;
+  }
+
+  Future<void> updatePlaylistName(String playlistId, String newName) async {
+    await _playlistDataService.updatePlaylistName(playlistId, newName);
+    notifyListeners();
+  }
+
+  Future<void> deletePlaylist(String id) async {
+    await _playlistDataService.deletePlaylist(id);
+    notifyListeners();
+  }
+
+  Future<void> updatePlaylistFavorite(Playlist playlist) async {
+    _playlistDataService.updatePlaylistFavorite(playlist);
+    notifyListeners();
+  }
+}
+
+class PlaylistFavoriteNotifier with ChangeNotifier {
+  int? _loved;
+  int? get loved => _loved;
+
+  PlaylistFavoriteNotifier(this._loved);
+
+  Future<int?> updatePlaylistFavorite(Playlist playlist) async {
+    if (_loved == null) {
+      _loved = 1;
+    } else {
+      _loved = _loved == 1 ? 0 : 1;
+    }
+    notifyListeners();
+    return _loved;
+  }
+}
+
+class PlaylistDataService {
+  // singleton
+  PlaylistDataService._privateConstructor();
+  static final PlaylistDataService _instance = PlaylistDataService._privateConstructor();
+  // static PlaylistDataService get instance => _instance;
+  factory PlaylistDataService() {
+    return _instance;
+  }
+
   Future<String> createPlaylist(String name) async {
     final db = await DatabaseUtil.getDatabase();
 
@@ -14,7 +65,6 @@ class PlaylistDataProvider extends ChangeNotifier {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
-    notifyListeners();
     return playlist.id;
   }
 
@@ -42,8 +92,6 @@ class PlaylistDataProvider extends ChangeNotifier {
     }
 
     Playlist playlist = Playlist().fromMapEntry(maps[0]);
-    // List<Song> songs = await SongDataProvider().getAllSongsFromPlaylist(id);
-    // playlist.songs = songs;
     return playlist;
   }
 
@@ -60,8 +108,6 @@ class PlaylistDataProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('Error updating playlist name: $e');
     }
-
-    notifyListeners();
   }
 
   Future<void> deletePlaylist(String id) async {
@@ -86,8 +132,6 @@ class PlaylistDataProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('Error deleting playlist from db: $e');
     }
-
-    notifyListeners();
   }
 
   Future<List<Playlist>> getFavoritePlaylists() async {
@@ -113,6 +157,5 @@ class PlaylistDataProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('Error updating playlist favorite: $e');
     }
-    notifyListeners();
   }
 }
