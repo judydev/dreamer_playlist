@@ -67,8 +67,7 @@ class _PlaylistEditSongListState extends State<PlaylistEditSongList> {
                                 position: PopupMenuPosition.under,
                                 child: const Text('Actions'),
                                 itemBuilder: (context) =>
-                                    buildMultiSelectMoreActionsMenu(
-                                        context,
+                                    buildMultiSelectMoreActionsMenu(context,
                                         selectedSongs: selectedSongs,
                                         playlistId: playlist.id))
                             : const SizedBox.shrink()
@@ -87,16 +86,16 @@ class _PlaylistEditSongListState extends State<PlaylistEditSongList> {
                                     isSelected:
                                         selectedSongs.contains(songs[index]),
                                     callback: (updatedSong) {
-                                    List<Song> oldVal = selectedSongs;
-                                    if (oldVal.contains(updatedSong)) {
-                                      oldVal.remove(updatedSong);
-                                    } else {
-                                      oldVal.add(updatedSong);
-                                    }
+                                      List<Song> oldVal = selectedSongs;
+                                      if (oldVal.contains(updatedSong)) {
+                                        oldVal.remove(updatedSong);
+                                      } else {
+                                        oldVal.add(updatedSong);
+                                      }
 
-                                    setState(() {
-                                      selectedSongs = oldVal;
-                                    });
+                                      setState(() {
+                                        selectedSongs = oldVal;
+                                      });
                                     },
                                   )))
                       : FutureBuilderWrapper(_getPlaylistIndices,
@@ -143,7 +142,7 @@ class _PlaylistEditSongListState extends State<PlaylistEditSongList> {
       }
     });
   }
-  
+
   List<PopupMenuItem> buildMultiSelectMoreActionsMenu(context,
       {required List<Song> selectedSongs, required String playlistId}) {
     return [
@@ -154,10 +153,39 @@ class _PlaylistEditSongListState extends State<PlaylistEditSongList> {
           title: 'Remove from playlist', // only for songs in current playlist
         ),
         onTap: () {
-          Provider.of<SongDataProvider>(context, listen: false)
-              .removeSongsFromPlaylist(
-                  selectedSongs.map((s) => s.playlistSongId!).toList(),
-                  playlistId);
+          // Show confirmation dialog before removing
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Confirm Removal'),
+                content: Text(
+                    'Are you sure you want to remove the selected song(s) from the playlist?'),
+                actions: [
+                  TextButton(
+                    child: Text('Cancel'),
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pop(); // Close the dialog without action
+                    },
+                  ),
+                  TextButton(
+                    child: Text('Remove'),
+                    onPressed: () {
+                      // Perform the removal
+                      Provider.of<SongDataProvider>(context, listen: false)
+                          .removeSongsFromPlaylist(
+                        selectedSongs.map((s) => s.playlistSongId!).toList(),
+                        playlistId,
+                      );
+                      Navigator.of(context)
+                          .pop(); // Close the dialog after action
+                    },
+                  ),
+                ],
+              );
+            },
+          );
         },
       ),
       PopupMenuItem<PopupMenuTile>(
