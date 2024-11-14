@@ -20,23 +20,23 @@ class _EditPlaylistPopupState extends State<EditPlaylistPopup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Playlist')),
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: const Text('Edit Playlist')),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: EditableTextField(
-              initialValue: playlist.name!,
-              updateValueCallback: (String newName) async {
-                if (newName.isEmpty) return;
-                await Provider.of<PlaylistDataProvider>(context, listen: false)
-                    .updatePlaylistName(playlist.id, newName);
-
-                if (isFavoriteTab()) {
-                  selectedFavoritePlaylistNotifier.value!.name = newName;
-                }
-              },
-            ),
+          _EditableTextField(
+            initialValue: playlist.name!,                            
+            updateValueCallback: (String newName) async {
+              if (newName.isEmpty) return;
+              await Provider.of<PlaylistDataProvider>(context, listen: false)
+                  .updatePlaylistName(playlist.id, newName);
+          
+              if (isFavoriteTab()) {
+                selectedFavoritePlaylistNotifier.value!.name = newName;
+              }
+            },
           ),
           PlaylistEditSongList(playlist),
         ],
@@ -45,18 +45,18 @@ class _EditPlaylistPopupState extends State<EditPlaylistPopup> {
   }
 }
 
-class EditableTextField extends StatefulWidget {
+class _EditableTextField extends StatefulWidget {
   final String initialValue;
   final Function updateValueCallback;
 
-  const EditableTextField(
+  const _EditableTextField(
       {required this.initialValue, required this.updateValueCallback});
 
   @override
-  State<EditableTextField> createState() => _EditableTextFieldState();
+  State<_EditableTextField> createState() => _EditableTextFieldState();
 }
 
-class _EditableTextFieldState extends State<EditableTextField> {
+class _EditableTextFieldState extends State<_EditableTextField> {
   late String initialValue = widget.initialValue;
   late Function updateValueCallback = widget.updateValueCallback;
 
@@ -68,6 +68,7 @@ class _EditableTextFieldState extends State<EditableTextField> {
   Widget build(BuildContext context) {
     if (isEditing) {
       return TextField(
+        textAlign: TextAlign.center,
         autofocus: true,
         decoration: const InputDecoration(border: InputBorder.none),
         controller: TextEditingController(text: updatedValue),
@@ -82,6 +83,8 @@ class _EditableTextFieldState extends State<EditableTextField> {
     }
 
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(updatedValue),
         isEditing

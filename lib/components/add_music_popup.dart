@@ -33,9 +33,13 @@ class _AddMusicPopupState extends State<AddMusicPopup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add from library'), actions: [
-        TextButton(
-            onPressed: () async {
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: const Text('Add from library'),
+        actions: [
+          TextButton(
+              onPressed: () async {
               if (selectedSongs.isNotEmpty) {
                 await addSongsToPlaylist(context, selectedSongs, playlist);
               } else {

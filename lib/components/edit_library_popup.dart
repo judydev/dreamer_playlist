@@ -36,7 +36,11 @@ class _EditLibraryPopupState extends State<EditLibraryPopup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Edit Songs')),
+        appBar: AppBar(
+          title: const Text('Edit Songs'),
+          scrolledUnderElevation: 0,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+        ),
         body: FutureBuilderWrapper(_getSongs, (context, snapshot) {
           List<Song> songs = snapshot.data;
           List<String> songIds = songs.map((s) => s.id!).toList();

@@ -10,9 +10,20 @@ class PlaylistsTabView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("All Playlists")),
+        appBar: AppBar(
+          title: const Text("All Playlists"),
+          scrolledUnderElevation: 0,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          bottom: PreferredSize(
+            preferredSize: const Size(0, 50),
+            child: Container(
+              color: Theme.of(context).colorScheme.surface,
+              child: NewPlaylistTile(updateAppState: true),
+            ),
+          ),
+        ),
         body: ListView(
-          children: [NewPlaylistTile(updateAppState: true), PlaylistsList()],
+          children: [PlaylistsList()],
         ));
   }
 }
@@ -63,7 +74,8 @@ class _PlaylistsListState extends State<PlaylistsList> {
               .entries
               .map((entry) => PlaylistTile(
                   playlist: entry.value,
-                  tileColor: entry.key.isEven ? highlightTileColor : null))
+                  tileColor: entry.key.isEven ? Theme.of(context).colorScheme.primaryContainer : null
+                ))
               .toList(),
         );
       },

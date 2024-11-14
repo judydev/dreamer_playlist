@@ -96,14 +96,14 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                         Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: ValueListenableBuilder(
-                              valueListenable: GetitUtil
-                                  .pageManager.progressBarValueNotifier,
+                              valueListenable: GetitUtil.pageManager.progressBarValueNotifier,
                               builder: ((context, progressValue, child) {
-                                Duration? duration =
-                                    _audioHandler.mediaItem.value?.duration;
+                                Duration? duration = _audioHandler.mediaItem.value?.duration;
 
                                 return Column(children: [
                                   Slider(
+                                    activeColor: Theme.of(context).colorScheme.primary,
+                                    inactiveColor: Theme.of(context).colorScheme.primaryContainer,
                                     min: 0,
                                     max: 1,
                                     value:
@@ -126,8 +126,7 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                                             Text(
                                                 convertDurationToTimeDisplay(
                                                     duration != null
-                                                        ? duration *
-                                                            progressValue
+                                                        ? duration * progressValue
                                                         : Duration.zero),
                                                 style: const TextStyle(
                                                     fontSize: 12)),

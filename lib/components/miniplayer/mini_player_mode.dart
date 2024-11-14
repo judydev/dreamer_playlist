@@ -24,7 +24,7 @@ class MiniPlayerMode extends StatelessWidget {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 240, 230, 200),    
+              color: Theme.of(context).colorScheme.primaryFixedDim,    
             ),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Flex(

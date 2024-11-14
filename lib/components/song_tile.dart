@@ -37,7 +37,7 @@ class SongTile extends StatelessWidget {
             itemBuilder: (context) =>
                 buildMoreActionsMenu(context, song, currentPlaylistId),
       ),
-      tileColor: songIndex?.isEven == true ? highlightTileColor : null,
+      tileColor: songIndex?.isEven == true ? Theme.of(context).colorScheme.primaryContainer : null,
       onTap: disableTap
           ? null
           : () async {
@@ -67,15 +67,15 @@ class SongTile extends StatelessWidget {
         icon: Icons.delete_outline,
         title: 'Remove from playlist', // only for songs in current playlist
       ),
-        onTap: () async {
-        if (song.playlistSongId == null) {
-            debugPrint(
-              'Error when removing ${song.title} from playlist: invalid PlaylistSongId');
-          } else {
-            await Provider.of<SongDataProvider>(context, listen: false)
-                .removeSongsFromPlaylist(
-                    [song.playlistSongId!], currentPlaylistId!);
-          }
+      onTap: () async {
+      if (song.playlistSongId == null) {
+          debugPrint(
+            'Error when removing ${song.title} from playlist: invalid PlaylistSongId');
+        } else {
+          await Provider.of<SongDataProvider>(context, listen: false)
+              .removeSongsFromPlaylist(
+                  [song.playlistSongId!], currentPlaylistId!);
+        }
       },
     ),
     PopupMenuItem<PopupMenuTile>(

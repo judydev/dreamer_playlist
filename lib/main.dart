@@ -51,7 +51,12 @@ class MyApp extends StatelessWidget {
       title: 'Dreamer Playlist',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.amber.shade100,
+          primary: Colors.brown,
+          secondary: Color.fromARGB(0, 190, 165, 125), // lightbrown
+          surface: Colors.amber.shade100,
+        ),
         useMaterial3: true,
       ),
       darkTheme: ThemeData.dark(),
@@ -134,7 +139,10 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Wrap(children: [
           BottomNavigationBar(
             currentIndex: _selectedTabIndex,
-            selectedItemColor: Colors.deepOrange,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.8),
+            selectedItemColor: Theme.of(context).colorScheme.primaryFixedDim,
+            unselectedItemColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.6),
             onTap: (index) {
               setState(() {
                 _selectedTabIndex = index;
