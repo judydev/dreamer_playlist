@@ -135,27 +135,17 @@ class SongTile extends StatelessWidget {
         title: 'Rename',
       ),
       onTap: () {
-          String updatedSongTitle = '';
-        showAlertDialogPopup(context,
-            title: "Rename Song",
-            content: TextField(
-                autofocus: true,
-              decoration: InputDecoration(
-                  border: const UnderlineInputBorder(),
-                hintText: song.title,
-              ),
-              onChanged: (value) {
-                  updatedSongTitle = value.trim();
-              },
-            ),
-            actions: [
-              displayTextButton(context, "Cancel"),
-              displayTextButton(context, "OK", callback: () {
-                  if (updatedSongTitle.trim().isEmpty) return;
-                Provider.of<SongDataProvider>(context, listen: false)
-                      .updateSongName(song.id!, updatedSongTitle);
-              })
-            ]);
+        showAlertDialogPopup(
+          context,
+          title: "Rename Song",
+          content: RenameSongPopup(
+            initialValue: song.title!,
+            onSave: (newTitle) {
+              Provider.of<SongDataProvider>(context, listen: false)
+                  .updateSongName(song.id!, newTitle);
+            },
+          ),
+        );
       },
     ),
     // PopupMenuItem<PopupMenuTile>(
@@ -174,5 +164,95 @@ class SongTile extends StatelessWidget {
     }
 
     return menuItems;
+  }
+}
+
+class RenameSongPopup extends StatefulWidget {
+  final String initialValue;
+  final Function(String) onSave;
+
+  const RenameSongPopup({
+    required this.initialValue,
+    required this.onSave,
+    super.key,
+  });
+
+  @override
+  State<RenameSongPopup> createState() => _RenameSongPopupState();
+}
+
+class _RenameSongPopupState extends State<RenameSongPopup> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.text = widget.initialValue;
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextFormField(
+            controller: controller,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Song title cannot be empty';
+              }
+              return null;
+            },
+            autofocus: true,
+            decoration: InputDecoration(
+              border: const UnderlineInputBorder(),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  setState(() {
+                    controller.clear();
+                  });
+                },
+              ),
+            ),
+            onChanged: (_) {},
+            onFieldSubmitted: (_) {
+              if (_formKey.currentState!.validate() && controller.text.trim().isNotEmpty) {
+                widget.onSave(controller.text.trim());
+              }
+            },
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate() && controller.text.trim().isNotEmpty) {
+                    widget.onSave(controller.text.trim());
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
