@@ -128,9 +128,31 @@ class _EditLibraryPopupState extends State<EditLibraryPopup> {
           title: 'Delete from library',
         ),
         onTap: () async {
-          for (Song song in selectedSongs) {
-            await Provider.of<SongDataProvider>(context, listen: false)
-                .deleteSong(song);
+          // Show confirmation dialog
+          bool? confirm = await showDialog<bool>(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: const Text('Confirm Delete'),
+              content: Text('Delete ${selectedSongs.length} song${selectedSongs.length == 1 ? '' : 's'} from your library?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Delete'),
+                ),
+              ],
+            ),
+          );
+
+          // Only proceed with deletion if user confirmed
+          if (confirm == true) {
+            for (Song song in selectedSongs) {
+              await Provider.of<SongDataProvider>(context, listen: false)
+                  .deleteSong(song);
+            }
           }
         },
       ),
