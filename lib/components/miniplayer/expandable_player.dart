@@ -1,5 +1,7 @@
 // Modified from: https://github.com/dxvid-pts/miniplayer/blob/master/example/lib/widgets/player.dart
 
+import 'dart:async';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:dreamer_playlist/components/miniplayer/mini_player_mode.dart';
 import 'package:dreamer_playlist/components/miniplayer/miniplayer.dart';
@@ -96,41 +98,49 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                         Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: ValueListenableBuilder(
-                              valueListenable: GetitUtil
-                                  .pageManager.progressBarValueNotifier,
+                              valueListenable: GetitUtil.pageManager.progressBarValueNotifier,
                               builder: ((context, progressValue, child) {
-                                Duration? duration =
-                                    _audioHandler.mediaItem.value?.duration;
+                                Duration? duration = _audioHandler.mediaItem.value?.duration;
 
                                 return Column(children: [
                                   Slider(
+                                    activeColor: Theme.of(context).colorScheme.primary,
+                                    inactiveColor: Theme.of(context).colorScheme.primaryContainer,
                                     min: 0,
                                     max: 1,
-                                    value:
-                                        progressValue > 1 ? 1 : progressValue,
+                                    value: progressValue > 1 ? 1 : progressValue,
                                     onChanged: (newProgressValue) {
                                       if (duration == null) return;
 
-                                      Duration newPosition =
-                                          duration * newProgressValue;
+                                      Duration newPosition = duration * newProgressValue;
                                       _audioHandler.seek(newPosition);
                                     },
                                   ),
                                   Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20),
+                                      padding: const EdgeInsets.symmetric(horizontal: 20),
                                       child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
+                                            // Current song position
                                             Text(
                                                 convertDurationToTimeDisplay(
                                                     duration != null
-                                                        ? duration *
-                                                            progressValue
+                                                        ? duration * progressValue
                                                         : Duration.zero),
                                                 style: const TextStyle(
                                                     fontSize: 12)),
+                                            // Sleep Timer
+                                            ValueListenableBuilder<int>(
+                                              valueListenable: sleepTimerNotifier,
+                                              builder: (context, sleepTimerCountdown, child) {
+                                                return sleepTimerCountdown > 0 ? Text(
+                                                  'Sleep Timer: ${convertDurationToTimeDisplay(
+                                                    Duration(seconds: sleepTimerCountdown))}',
+                                                  style: const TextStyle(
+                                                    fontSize: 12)) : const SizedBox.shrink();
+                                              }
+                                            ),
+                                            // Song length
                                             Text(
                                                 convertDurationToTimeDisplay(
                                                     duration ?? Duration.zero),
@@ -220,11 +230,21 @@ class PlayerButtonbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        getButtonPlayPrev(),
-        getButtonPlayPause(),
-        getButtonPlayNext(),
+        // Speed control
+        isMiniPlayer ? SizedBox.shrink() : SpeedButton(),
+        // Playback controls
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            getButtonPlayPrev(),
+            getButtonPlayPause(),
+            getButtonPlayNext(),
+          ],
+        ),
+        // Sleep timer
+        isMiniPlayer ? SizedBox.shrink() : TimerButton(),
       ],
     );
   }
@@ -291,4 +311,193 @@ String convertToTwoDigits(int num) {
     return '0$s';
   }
   return s;
+}
+
+/// Speed control button
+class SpeedButton extends StatefulWidget {
+  const SpeedButton({super.key});
+
+  @override
+  State<SpeedButton> createState() => _SpeedButtonState();
+}
+
+class _SpeedButtonState extends State<SpeedButton> {
+  final _audioHandler = GetitUtil.audioHandler;
+  late double _speed;
+
+  @override
+  void initState() {
+    super.initState();
+    _speed = _audioHandler.audioPlayer.speed;
+  }
+
+  void _updateSpeed(double speed) async {
+    await _audioHandler.audioPlayer.setSpeed(speed);
+    setState(() {
+      _speed = speed;
+    });
+  }
+
+  PopupMenuItem<double> _buildSpeedMenuItem(double speed) {
+    return PopupMenuItem(
+      height:20,
+      value: speed,
+      child: Text('${speed.toString()}x'),
+      onTap: () => _updateSpeed(speed),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        margin: const EdgeInsets.only(left: 30),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          color: _speed != 1.0 ? Theme.of(context).colorScheme.secondaryContainer : null,
+        ),
+        child: PopupMenuButton<double>(
+          offset: const Offset(-10, -260),
+          position: PopupMenuPosition.over,
+          child: Text("${_speed.toString()}x",
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+          itemBuilder: (context) => [
+            _buildSpeedMenuItem(2.0),
+            const PopupMenuDivider(),
+            _buildSpeedMenuItem(1.75),
+            const PopupMenuDivider(),
+            _buildSpeedMenuItem(1.5),
+            const PopupMenuDivider(),
+            _buildSpeedMenuItem(1.25),
+            const PopupMenuDivider(),
+            _buildSpeedMenuItem(1.0),
+            const PopupMenuDivider(),
+            _buildSpeedMenuItem(0.75),
+            const PopupMenuDivider(),
+            _buildSpeedMenuItem(0.5),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Sleep timer button
+class TimerButton extends StatefulWidget {
+  const TimerButton({super.key});
+
+  @override
+  State<TimerButton> createState() => _TimerButtonState();
+}
+
+class _TimerButtonState extends State<TimerButton> {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 60,
+      child: ValueListenableBuilder<int>(
+        valueListenable: sleepTimerNotifier,
+        builder: (context, sleepTimerValue, child) {
+          return Container(
+            padding: const EdgeInsets.all(2),
+            margin: const EdgeInsets.only(right: 30),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              color: sleepTimerValue > 0
+                ? Theme.of(context).colorScheme.secondaryContainer 
+                : null,
+            ),
+            child: _SleepTimerButton(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SleepTimerButton extends StatelessWidget {
+  const _SleepTimerButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      offset: const Offset(10, -260),
+      position: PopupMenuPosition.over,
+      child: Icon(
+        Icons.timer_outlined,
+        color: Theme.of(context).colorScheme.secondary,
+      ),
+      itemBuilder: (context) => [
+        _buildTimerMenuItem('1 Hour'),
+        const PopupMenuDivider(),
+        _buildTimerMenuItem('45 Minutes'),
+        const PopupMenuDivider(),
+        _buildTimerMenuItem('30 Minutes'),
+        const PopupMenuDivider(),
+        _buildTimerMenuItem('15 Minutes'),
+        const PopupMenuDivider(),
+        _buildTimerMenuItem('10 Minutes'),
+        const PopupMenuDivider(),
+        _buildTimerMenuItem('5 Minutes'),
+        const PopupMenuDivider(),
+        _buildTimerMenuItem('Off'),
+      ],
+    );
+  }
+
+  PopupMenuItem<String> _buildTimerMenuItem(String label) {
+    return PopupMenuItem(
+      height: 20,
+      value: label,
+      child: Text(
+        label,
+        softWrap: true,
+      ),
+      onTap: () {
+        if (label != 'Off') {
+          // Set a sleep timer
+          Duration duration;
+          switch (label) {
+            case '1 Hour':
+              duration = const Duration(hours: 1);
+              break;
+            case '45 Minutes':
+              duration = const Duration(minutes: 45);
+              break;
+            case '30 Minutes':
+              duration = const Duration(minutes: 30);
+              break;
+            case '15 Minutes':
+              duration = const Duration(minutes: 15);
+              break;
+            case '10 Minutes':
+              duration = const Duration(minutes: 10);
+              break;
+            case '5 Minutes':
+              duration = const Duration(minutes: 5);
+              break;
+            default:
+              return;
+          }
+
+          GetitUtil.appStates.sleepTimer?.cancel();
+          sleepTimerNotifier.value = duration.inSeconds;
+          GetitUtil.appStates.sleepTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+            if (sleepTimerNotifier.value <= 0) {
+              GetitUtil.audioHandler.audioPlayer.pause();
+              GetitUtil.appStates.sleepTimer = null;
+              timer.cancel();
+              return;
+            }
+            sleepTimerNotifier.value--;
+          });
+        } else {
+          sleepTimerNotifier.value = 0;
+          GetitUtil.appStates.sleepTimer?.cancel();
+          GetitUtil.appStates.sleepTimer = null;
+        }
+      },
+    );
+  }
 }

@@ -19,18 +19,30 @@ class _LibraryTabViewState extends State<LibraryTabView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('All Songs')),
+      appBar: AppBar(
+        title: const Text('All Songs'),
+        scrolledUnderElevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+      ),
       body: Column(
         children: <Widget>[
-          getLibraryButtonBar(context),
-          TextButton(
-              onPressed: () async {
-                if (isPopupOpen) return;
-                isPopupOpen = true;
-                await openFilePicker(context, null);
-                isPopupOpen = false;
-              },
-              child: const Text("Import local file to Library")),
+          Container(
+            color: Theme.of(context).colorScheme.surface,
+            child: Column(
+              children: [
+                getLibraryButtonBar(context),
+                TextButton(
+                  onPressed: () async {
+                    if (isPopupOpen) return;
+                    isPopupOpen = true;
+                    await openFilePicker(context, null);
+                    isPopupOpen = false;
+                  },
+                  child: const Text("Import local file to Library"),
+                ),
+              ],
+            ),
+          ),
           Expanded(child: SongListView())
         ],
       ),
@@ -43,25 +55,25 @@ OverflowBar getLibraryButtonBar(context) => OverflowBar(
   children: [
     // Edit
     IconButton(
-        onPressed: () {
-              showAdaptiveDialog(
-                  context: context, builder: (context) => EditLibraryPopup());
-        },
-            icon: const Icon(Icons.edit)),
+      onPressed: () {
+        showAdaptiveDialog(
+            context: context, builder: (context) => EditLibraryPopup());
+      },
+      icon: const Icon(Icons.edit)),
     // Play
     IconButton(
-        onPressed: () {
-          play(
-              hasShuffleModeChanged:
-                  GetitUtil.audioHandler.audioPlayer.shuffleModeEnabled);
-        },
-            icon: const Icon(Icons.play_circle, size: 42)),
+      onPressed: () {
+        play(
+          hasShuffleModeChanged:
+              GetitUtil.audioHandler.audioPlayer.shuffleModeEnabled);
+      },
+      icon: const Icon(Icons.play_circle, size: 42)),
     // Shuffle
     IconButton(
-        onPressed: () {
-          shufflePlay();
-        },
-            icon: const Icon(Icons.shuffle)),
+      onPressed: () {
+        shufflePlay();
+      },
+      icon: const Icon(Icons.shuffle)),
   ],
 );
 

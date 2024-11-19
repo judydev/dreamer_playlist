@@ -51,10 +51,22 @@ class MyApp extends StatelessWidget {
       title: 'Dreamer Playlist',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.amber,
+          onPrimary: Colors.white,
+          onSecondary: Colors.amber.shade900,
+        ),
         useMaterial3: true,
       ),
-      darkTheme: ThemeData.dark(),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          brightness: Brightness.dark,
+          seedColor: Colors.blueGrey,
+          onPrimary: Colors.white,
+          onSecondary: Colors.brown.shade900,
+        ),
+        useMaterial3: true,
+      ),
       home: MyHomePage(),
     );
   }
@@ -91,6 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     GetitUtil.pageManager.dispose();
+    GetitUtil.appStates.sleepTimer?.cancel();
     super.dispose();
   }
 
@@ -134,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Wrap(children: [
           BottomNavigationBar(
             currentIndex: _selectedTabIndex,
-            selectedItemColor: Colors.deepOrange,
+            type: BottomNavigationBarType.fixed,
             onTap: (index) {
               setState(() {
                 _selectedTabIndex = index;

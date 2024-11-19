@@ -36,7 +36,11 @@ class _EditLibraryPopupState extends State<EditLibraryPopup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Edit Songs')),
+        appBar: AppBar(
+          title: const Text('Edit Songs'),
+          scrolledUnderElevation: 0,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+        ),
         body: FutureBuilderWrapper(_getSongs, (context, snapshot) {
           List<Song> songs = snapshot.data;
           List<String> songIds = songs.map((s) => s.id!).toList();
@@ -47,35 +51,35 @@ class _EditLibraryPopupState extends State<EditLibraryPopup> {
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: OverflowBar(
-                      alignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton(
-                            onPressed: () {
-                              setState(() {
-                                if (selectedSongIds.length == songs.length) {
-                                  selectedSongIds = [];
-                                } else {
-                                  selectedSongIds = songIds;
-                                }
-                              });
-                            },
-                            child: selectedSongIds.length == songs.length
-                                ? const Text('Unselect All')
-                                : const Text('Select All')),
-                        PopupMenuButton(
-                            position: PopupMenuPosition.under,
-                            child: const Text('Actions'),
-                            itemBuilder: (context) =>
-                                buildMultiSelectMoreActionsMenu(
-                                  context,
-                                  selectedSongs: selectedSongIds.isEmpty
-                                      ? []
-                                      : songs
-                                          .where((song) => selectedSongIds
-                                              .contains(song.id!))
-                                          .toList(),
-                                ))
-                      ]),
+                    alignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            if (selectedSongIds.length == songs.length) {
+                              selectedSongIds = [];
+                            } else {
+                              selectedSongIds = songIds;
+                            }
+                          });
+                        },
+                        child: selectedSongIds.length == songs.length
+                          ? const Text('Unselect All')
+                          : const Text('Select All')),
+                      PopupMenuButton(
+                        position: PopupMenuPosition.under,
+                        child: const Text('Actions'),
+                        itemBuilder: (context) =>
+                          buildMultiSelectMoreActionsMenu(
+                            context,
+                            selectedSongs: selectedSongIds.isEmpty
+                              ? []
+                              : songs
+                                  .where((song) => selectedSongIds
+                                      .contains(song.id!))
+                                  .toList(),
+                          ))
+                    ]),
                 ),
                 Expanded(
                     child: ListView(
@@ -124,9 +128,31 @@ class _EditLibraryPopupState extends State<EditLibraryPopup> {
           title: 'Delete from library',
         ),
         onTap: () async {
-          for (Song song in selectedSongs) {
-            await Provider.of<SongDataProvider>(context, listen: false)
-                .deleteSong(song);
+          // Show confirmation dialog
+          bool? confirm = await showDialog<bool>(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: const Text('Confirm Delete'),
+              content: Text('Delete ${selectedSongs.length} song${selectedSongs.length == 1 ? '' : 's'} from your library?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Delete'),
+                ),
+              ],
+            ),
+          );
+
+          // Only proceed with deletion if user confirmed
+          if (confirm == true) {
+            for (Song song in selectedSongs) {
+              await Provider.of<SongDataProvider>(context, listen: false)
+                  .deleteSong(song);
+            }
           }
         },
       ),

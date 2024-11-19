@@ -139,7 +139,11 @@ class _PlaylistEditSongListState extends State<PlaylistEditSongList> {
           ),
         );
       } else {
-        return const Text("No songs in this playlist.");
+        return Padding(
+          padding: const EdgeInsets.only(top: 20),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: const Text("No songs in this playlist.")));
       }
     });
   }

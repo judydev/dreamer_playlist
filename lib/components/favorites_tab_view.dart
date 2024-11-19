@@ -16,29 +16,35 @@ class _FavoritesTabViewState extends State<FavoritesTabView> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedButtonStyle = TextButton.styleFrom(
+      side: BorderSide(color: Theme.of(context).colorScheme.primary),
+    );
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Favorites")),
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: const Text("Favorites")),
       body: Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              TextButton(
-                  style: showPlaylists
-                      ? null
-                      : TextButton.styleFrom(side: const BorderSide()),
-                  child: const Text('Songs'),
-                  onPressed: () => setState(() => showPlaylists = false)),
-              TextButton(
-                style: showPlaylists
-                    ? TextButton.styleFrom(side: const BorderSide())
-                    : null,
-                child: const Text('Playlists'),
-                onPressed: () => setState(() => showPlaylists = true),
-              ),
-            ],
+          Container(
+            color: Theme.of(context).colorScheme.surface,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                    style: showPlaylists ? null : selectedButtonStyle,
+                    child: const Text('Songs'),
+                    onPressed: () => setState(() => showPlaylists = false)),
+                TextButton(
+                  style: showPlaylists ? selectedButtonStyle : null,
+                  child: const Text('Playlists'),
+                  onPressed: () => setState(() => showPlaylists = true),
+                ),
+              ],
+            ),
           ),
           Expanded(
               child: showPlaylists
@@ -46,14 +52,17 @@ class _FavoritesTabViewState extends State<FavoritesTabView> {
                       valueListenable: selectedFavoritePlaylistNotifier,
                       builder: ((context, selectedPlaylist, child) {
                         if (selectedPlaylist == null) {
-                          return PlaylistsList();
+                          return ListView(children: [PlaylistsList()]);
                         } else {
                           return PlaylistTabView(playlist: selectedPlaylist);
                         }
                       }))
                   : Column(
                       children: [
-                        getLibraryButtonBar(context),
+                        Container(
+                          color: Theme.of(context).colorScheme.surface,
+                          child: getLibraryButtonBar(context),
+                        ),
                         Expanded(child: SongListView()),
                       ],
                     )),

@@ -8,16 +8,15 @@ class MusicQueue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: queueIndicesNotifier,
-        builder: ((context, queueIndices, child) {
-          return queueIndices.isNotEmpty
-              ? ListView(
-                  padding: EdgeInsets.zero,
-                  children: queueIndices
-                      .map(
-                          (queueIndex) => QueueSongTile(queueIndex: queueIndex))
-                      .toList())
-              : const SizedBox.shrink();
+      valueListenable: queueIndicesNotifier,
+      builder: ((context, queueIndices, child) {
+        return queueIndices.isNotEmpty
+          ? ListView(
+            padding: EdgeInsets.zero,
+            children: queueIndices
+              .map((queueIndex) => QueueSongTile(queueIndex: queueIndex))
+              .toList())
+          : const SizedBox.shrink();
         }));
   }
 }
@@ -49,15 +48,20 @@ class QueueSongTile extends StatelessWidget {
                 ),
               ),
           ),
-          child: ListTileWrapper(
-            title: GetitUtil.audioHandler.queue.value[queueIndex].title,
-              leading: currentIndex != null && queueIndex == currentIndex
-                  ? const Icon(Icons.music_video)
-                  : const Icon(Icons.music_note),
-            onTap: () async {
-              await _audioPlayer.seek(Duration.zero, index: queueIndex);
-              await _audioPlayer.play();
-              }),
+          child: Container(
+            decoration: currentIndex != null && queueIndex == currentIndex ? BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainer,
+            ) : null,
+            child: ListTileWrapper(
+              title: GetitUtil.audioHandler.queue.value[queueIndex].title,
+              leading: currentIndex != null && queueIndex == currentIndex 
+                ? const Icon(Icons.music_video) 
+                : const Icon(Icons.music_note),
+              onTap: () async {
+                await _audioPlayer.seek(Duration.zero, index: queueIndex);
+                await _audioPlayer.play();
+                }),
+          ),
         );
       }),
     );
