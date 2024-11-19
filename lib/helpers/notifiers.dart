@@ -20,3 +20,4 @@ ValueNotifier<bool> shuffleModeNotifier = ValueNotifier(false);
 
 final selectedFavoritePlaylistNotifier = ValueNotifier<Playlist?>(null);
 
+ValueNotifier<int> sleepTimerNotifier = ValueNotifier(0);
