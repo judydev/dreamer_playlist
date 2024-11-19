@@ -4,7 +4,6 @@ import 'package:dreamer_playlist/helpers/permission_service.dart';
 import 'package:dreamer_playlist/models/app_state.dart';
 import 'package:dreamer_playlist/models/song.dart';
 import 'package:get_it/get_it.dart';
-import 'package:path_provider/path_provider.dart';
 
 final getIt = GetIt.instance;
 
@@ -14,9 +13,6 @@ Future<void> setupServiceLocator() async {
 
   getIt.registerSingleton<PermissionService>(PermissionHandler());
 
-  final dir = await getApplicationDocumentsDirectory();
-  appStates.appDocumentsDir = dir.path;
-
   getIt.registerSingleton<MyAudioHandler>(await initAudioService());
   getIt.registerSingleton<List<Song>>([]);
   getIt.registerLazySingleton<PageManager>(() => PageManager());
@@ -24,7 +20,6 @@ Future<void> setupServiceLocator() async {
 
 class GetitUtil {
   static AppStates appStates = getIt<AppStates>();
-  static String? appDocumentsDir = appStates.appDocumentsDir;
   static MyAudioHandler audioHandler = getIt<MyAudioHandler>();
   static List<Song> orderedSongList = getIt<List<Song>>();
   static PageManager pageManager = getIt<PageManager>();

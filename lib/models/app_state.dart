@@ -1,13 +1,14 @@
+import 'dart:async';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
 
 class AppStates {
   String? currentTab;
   String? currentPlaying;
   String? currentPlaylistId;
+  Timer? sleepTimer;
+  // TODO
   String? lastPlayed;
   String language = 'EN';
-  bool darkMode = false;
-  String? appDocumentsDir;
 
   @override
   String toString() {
@@ -39,7 +40,6 @@ enum AppStateKey {
   currentPlaylistId,
   lastPlayed,
   language,
-  darkMode
 }
 
 const menuTabs = ['Library', 'Playlists', 'Favorites', 'Settings'];
