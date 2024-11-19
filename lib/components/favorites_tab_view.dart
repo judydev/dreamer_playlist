@@ -16,9 +16,8 @@ class _FavoritesTabViewState extends State<FavoritesTabView> {
 
   @override
   Widget build(BuildContext context) {
-    final _selectedButtonStyle = TextButton.styleFrom(
-      side: BorderSide(color: Theme.of(context).colorScheme.primaryFixedDim),
-      backgroundColor: Theme.of(context).colorScheme.primaryFixed,
+    final selectedButtonStyle = TextButton.styleFrom(
+      side: BorderSide(color: Theme.of(context).colorScheme.primary),
     );
 
     return Scaffold(
@@ -36,11 +35,11 @@ class _FavoritesTabViewState extends State<FavoritesTabView> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton(
-                    style: showPlaylists ? null : _selectedButtonStyle,
+                    style: showPlaylists ? null : selectedButtonStyle,
                     child: const Text('Songs'),
                     onPressed: () => setState(() => showPlaylists = false)),
                 TextButton(
-                  style: showPlaylists ? _selectedButtonStyle : null,
+                  style: showPlaylists ? selectedButtonStyle : null,
                   child: const Text('Playlists'),
                   onPressed: () => setState(() => showPlaylists = true),
                 ),

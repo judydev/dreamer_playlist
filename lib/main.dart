@@ -52,14 +52,21 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.amber.shade100,
-          primary: Colors.brown,
-          secondary: Color.fromARGB(0, 190, 165, 125), // lightbrown
-          surface: Colors.amber.shade100,
+          seedColor: Colors.amber,
+          onPrimary: Colors.white,
+          onSecondary: Colors.amber.shade900,
         ),
         useMaterial3: true,
       ),
-      darkTheme: ThemeData.dark(),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          brightness: Brightness.dark,
+          seedColor: Colors.blueGrey,
+          onPrimary: Colors.white,
+          onSecondary: Colors.brown.shade900,
+        ),
+        useMaterial3: true,
+      ),
       home: MyHomePage(),
     );
   }
@@ -140,9 +147,6 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBar(
             currentIndex: _selectedTabIndex,
             type: BottomNavigationBarType.fixed,
-            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.8),
-            selectedItemColor: Theme.of(context).colorScheme.primaryFixedDim,
-            unselectedItemColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.6),
             onTap: (index) {
               setState(() {
                 _selectedTabIndex = index;

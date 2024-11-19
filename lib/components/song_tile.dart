@@ -37,7 +37,7 @@ class SongTile extends StatelessWidget {
             itemBuilder: (context) =>
                 buildMoreActionsMenu(context, song, currentPlaylistId),
       ),
-      tileColor: songIndex?.isEven == true ? Theme.of(context).colorScheme.primaryContainer : null,
+      tileColor: songIndex?.isEven == true ? Theme.of(context).colorScheme.surfaceContainerLow : null,
       onTap: disableTap
           ? null
           : () async {

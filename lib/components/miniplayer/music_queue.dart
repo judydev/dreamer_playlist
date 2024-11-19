@@ -50,7 +50,7 @@ class QueueSongTile extends StatelessWidget {
           ),
           child: Container(
             decoration: currentIndex != null && queueIndex == currentIndex ? BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
+              color: Theme.of(context).colorScheme.surfaceContainer,
             ) : null,
             child: ListTileWrapper(
               title: GetitUtil.audioHandler.queue.value[queueIndex].title,

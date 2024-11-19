@@ -24,7 +24,7 @@ class MiniPlayerMode extends StatelessWidget {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryFixedDim,    
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,    
             ),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Flex(
@@ -45,7 +45,7 @@ class MiniPlayerMode extends StatelessWidget {
                         return Text(
                           mediaItem?.title ??
                           'Not playing',
-                      overflow: TextOverflow.ellipsis,
+                          overflow: TextOverflow.ellipsis,
                         );
                       },
                     ),

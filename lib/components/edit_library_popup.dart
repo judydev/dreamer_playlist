@@ -51,35 +51,35 @@ class _EditLibraryPopupState extends State<EditLibraryPopup> {
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: OverflowBar(
-                      alignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton(
-                            onPressed: () {
-                              setState(() {
-                                if (selectedSongIds.length == songs.length) {
-                                  selectedSongIds = [];
-                                } else {
-                                  selectedSongIds = songIds;
-                                }
-                              });
-                            },
-                            child: selectedSongIds.length == songs.length
-                                ? const Text('Unselect All')
-                                : const Text('Select All')),
-                        PopupMenuButton(
-                            position: PopupMenuPosition.under,
-                            child: const Text('Actions'),
-                            itemBuilder: (context) =>
-                                buildMultiSelectMoreActionsMenu(
-                                  context,
-                                  selectedSongs: selectedSongIds.isEmpty
-                                      ? []
-                                      : songs
-                                          .where((song) => selectedSongIds
-                                              .contains(song.id!))
-                                          .toList(),
-                                ))
-                      ]),
+                    alignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            if (selectedSongIds.length == songs.length) {
+                              selectedSongIds = [];
+                            } else {
+                              selectedSongIds = songIds;
+                            }
+                          });
+                        },
+                        child: selectedSongIds.length == songs.length
+                          ? const Text('Unselect All')
+                          : const Text('Select All')),
+                      PopupMenuButton(
+                        position: PopupMenuPosition.under,
+                        child: const Text('Actions'),
+                        itemBuilder: (context) =>
+                          buildMultiSelectMoreActionsMenu(
+                            context,
+                            selectedSongs: selectedSongIds.isEmpty
+                              ? []
+                              : songs
+                                  .where((song) => selectedSongIds
+                                      .contains(song.id!))
+                                  .toList(),
+                          ))
+                    ]),
                 ),
                 Expanded(
                     child: ListView(
