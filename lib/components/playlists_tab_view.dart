@@ -15,11 +15,8 @@ class PlaylistsTabView extends StatelessWidget {
           scrolledUnderElevation: 0,
           backgroundColor: Theme.of(context).colorScheme.surface,
           bottom: PreferredSize(
-            preferredSize: const Size(0, 50),
-            child: Container(
-              color: Theme.of(context).colorScheme.surface,
-              child: NewPlaylistTile(updateAppState: true),
-            ),
+            preferredSize: const Size(0, 80),
+            child: NewPlaylistTile(updateAppState: true),
           ),
         ),
         body: ListView(
@@ -74,7 +71,7 @@ class _PlaylistsListState extends State<PlaylistsList> {
               .entries
               .map((entry) => PlaylistTile(
                   playlist: entry.value,
-                  tileColor: entry.key.isEven ? Theme.of(context).colorScheme.primaryContainer : null
+                  tileColor: entry.key.isEven ? Theme.of(context).colorScheme.surfaceContainerLow : null
                 ))
               .toList(),
         );
