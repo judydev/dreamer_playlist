@@ -84,8 +84,27 @@ class SongTile extends StatelessWidget {
         title: 'Delete from library',
       ),
       onTap: () {
-        Provider.of<SongDataProvider>(context, listen: false)
-              .deleteSong(song);
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Confirm Delete'),
+            content: Text('Delete "${song.title}" from your library?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Provider.of<SongDataProvider>(context, listen: false)
+                      .deleteSong(song);
+                  Navigator.pop(context);
+                },
+                child: const Text('Delete'),
+              ),
+            ],
+          ),
+        );
       },
     ),
     PopupMenuItem<PopupMenuTile>(
