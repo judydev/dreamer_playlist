@@ -103,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     GetitUtil.pageManager.dispose();
-    GetitUtil.appStates.sleepTimer?.cancel();
+    GetitUtil.audioHandler.cancelSleepTimer();
     super.dispose();
   }
 

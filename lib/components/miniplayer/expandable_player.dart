@@ -1,7 +1,5 @@
 // Modified from: https://github.com/dxvid-pts/miniplayer/blob/master/example/lib/widgets/player.dart
 
-import 'dart:async';
-
 import 'package:audio_service/audio_service.dart';
 import 'package:dreamer_playlist/components/miniplayer/mini_player_mode.dart';
 import 'package:dreamer_playlist/components/miniplayer/miniplayer.dart';
@@ -481,21 +479,10 @@ class _SleepTimerButton extends StatelessWidget {
               return;
           }
 
-          GetitUtil.appStates.sleepTimer?.cancel();
-          sleepTimerNotifier.value = duration.inSeconds;
-          GetitUtil.appStates.sleepTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-            if (sleepTimerNotifier.value <= 0) {
-              GetitUtil.audioHandler.audioPlayer.pause();
-              GetitUtil.appStates.sleepTimer = null;
-              timer.cancel();
-              return;
-            }
-            sleepTimerNotifier.value--;
-          });
+          GetitUtil.audioHandler.cancelSleepTimer();
+          GetitUtil.audioHandler.setSleepTimer(duration);
         } else {
-          sleepTimerNotifier.value = 0;
-          GetitUtil.appStates.sleepTimer?.cancel();
-          GetitUtil.appStates.sleepTimer = null;
+          GetitUtil.audioHandler.cancelSleepTimer();
         }
       },
     );

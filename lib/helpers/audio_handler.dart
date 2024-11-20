@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:dreamer_playlist/components/miniplayer/music_queue.dart';
 import 'package:dreamer_playlist/helpers/notifiers.dart';
@@ -321,5 +323,27 @@ class MyAudioHandler extends BaseAudioHandler
       // GetitUtil.pageManager.playlistNotifier.value = sequence;
       updateQueueIndicesNotifier();
     });
+  }
+
+  Timer? _sleepTimer;
+  void setSleepTimer(Duration duration) {
+    _sleepTimer?.cancel();
+    sleepTimerNotifier.value = duration.inSeconds;
+
+    _sleepTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (sleepTimerNotifier.value <= 0) {
+        pause();
+        _sleepTimer = null;
+        timer.cancel();
+        return;
+      }
+      sleepTimerNotifier.value--;
+    });
+  }
+
+  void cancelSleepTimer() {
+    sleepTimerNotifier.value = 0;
+    _sleepTimer?.cancel();
+    _sleepTimer = null;
   }
 }

@@ -1,11 +1,9 @@
-import 'dart:async';
 import 'package:dreamer_playlist/helpers/service_locator.dart';
 
 class AppStates {
   String? currentTab;
   String? currentPlaying;
   String? currentPlaylistId;
-  Timer? sleepTimer;
   // TODO
   String? lastPlayed;
   String language = 'EN';
