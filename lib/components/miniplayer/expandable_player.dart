@@ -138,6 +138,17 @@ class _ExpandablePlayerState extends State<ExpandablePlayer> {
                                                     fontSize: 12)) : const SizedBox.shrink();
                                               }
                                             ),
+                                            // Test
+                                            ValueListenableBuilder<int>(
+                                              valueListenable: futureTimerNotifier,
+                                              builder: (context, futureTimerValue, child) {
+                                                return futureTimerValue > 0 ? Text(
+                                                  'Test Timer: ${convertDurationToTimeDisplay(
+                                                    Duration(seconds: futureTimerValue))}',
+                                                  style: const TextStyle(
+                                                    fontSize: 12)) : const SizedBox.shrink();
+                                              }
+                                            ),
                                             // Song length
                                             Text(
                                                 convertDurationToTimeDisplay(
@@ -452,7 +463,7 @@ class _SleepTimerButton extends StatelessWidget {
         label,
         softWrap: true,
       ),
-      onTap: () {
+      onTap: () async {
         if (label != 'Off') {
           // Set a sleep timer
           Duration duration;
@@ -480,7 +491,7 @@ class _SleepTimerButton extends StatelessWidget {
           }
 
           GetitUtil.audioHandler.cancelSleepTimer();
-          GetitUtil.audioHandler.setSleepTimer(duration);
+          await GetitUtil.audioHandler.setSleepTimer(duration);
         } else {
           GetitUtil.audioHandler.cancelSleepTimer();
         }

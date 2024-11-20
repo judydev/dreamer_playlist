@@ -326,7 +326,7 @@ class MyAudioHandler extends BaseAudioHandler
   }
 
   Timer? _sleepTimer;
-  void setSleepTimer(Duration duration) {
+  Future<void> setSleepTimer(Duration duration) async {
     _sleepTimer?.cancel();
     sleepTimerNotifier.value = duration.inSeconds;
 
@@ -335,15 +335,25 @@ class MyAudioHandler extends BaseAudioHandler
         pause();
         _sleepTimer = null;
         timer.cancel();
+        sleepTimerNotifier.value = 0;
         return;
       }
       sleepTimerNotifier.value--;
     });
+
+    for (int i = 0; i < duration.inSeconds; i++) {
+      futureTimerNotifier.value = duration.inSeconds - i;
+      await Future.delayed(const Duration(seconds: 1));
+    }
+
+    futureTimerNotifier.value = 0;
   }
 
   void cancelSleepTimer() {
     sleepTimerNotifier.value = 0;
     _sleepTimer?.cancel();
     _sleepTimer = null;
+
+    futureTimerNotifier.value = 0;
   }
 }
