@@ -9,7 +9,11 @@ abstract class PermissionService {
 class PermissionHandler implements PermissionService {
   @override
   Future<PermissionStatus> requestStoragePermission() async {
-    return await Permission.storage.request();
+    final permission = Permission.storage;
+    if (await permission.isDenied) {
+      return await permission.request();
+    }
+    return permission.status;
   }
 
   @override
@@ -21,8 +25,8 @@ class PermissionHandler implements PermissionService {
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Permission Denied'),
-          content: Text('You can change this setting in app settings'),
+          title: const Text('Permission Denied'),
+          content: const Text('You can change this setting in app settings'),
           actions: [
             ElevatedButton(
               onPressed: () => openAppSettings(),

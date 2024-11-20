@@ -39,7 +39,7 @@ List<String> acceptedAudioExtensions =
     List.unmodifiable(["m4a", "mp3", "wav", "aiff"]);
 
 Future<bool> openFilePicker(context, String? playlistId) async {
-  getIt<PermissionService>().requestStoragePermission();
+  await getIt<PermissionService>().handleStoragePermission(context);
 
   FilePickerResult? selected = await FilePicker.platform.pickFiles(
     type: FileType.custom,
