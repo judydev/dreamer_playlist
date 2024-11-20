@@ -326,24 +326,41 @@ class MyAudioHandler extends BaseAudioHandler
   }
 
   Timer? _sleepTimer;
-  void setSleepTimer(Duration duration) {
-    _sleepTimer?.cancel();
-    sleepTimerNotifier.value = duration.inSeconds;
+  DateTime? _sleepTimerStart;
 
+  Future<void> setSleepTimer(Duration duration) async {
+    _sleepTimer?.cancel();
+    _sleepTimerStart = DateTime.now();
+
+    // Calculate future time remaining
+    sleepTimerNotifier.value = duration.inSeconds - 1;
     _sleepTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (sleepTimerNotifier.value <= 0) {
-        pause();
-        _sleepTimer = null;
+      if (_sleepTimerStart == null) {
         timer.cancel();
         return;
       }
-      sleepTimerNotifier.value--;
+
+      final elapsed = DateTime.now().difference(_sleepTimerStart!);
+      final remaining = duration - elapsed;
+      
+      if (remaining.isNegative) {
+        pause();
+        timer.cancel();
+        _sleepTimer = null;
+        sleepTimerNotifier.value = 0;
+        _sleepTimerStart = null;
+        return;
+      }
+
+      sleepTimerNotifier.value = remaining.inSeconds;
     });
+
   }
 
   void cancelSleepTimer() {
     sleepTimerNotifier.value = 0;
     _sleepTimer?.cancel();
     _sleepTimer = null;
+    _sleepTimerStart = null;
   }
 }
