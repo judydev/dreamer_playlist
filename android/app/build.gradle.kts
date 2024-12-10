@@ -1,0 +1,1 @@
+android.buildTypes.release.ndk.debugSymbolLevel = { FULL }

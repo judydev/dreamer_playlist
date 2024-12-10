@@ -19,17 +19,17 @@ class DatabaseUtil {
         db.execute(
             'CREATE TABLE $appstateTableName (key TEXT PRIMARY KEY, value TEXT);');
         db.execute(
-            'INSERT INTO $appstateTableName ("key", "value") VALUES("currentTab", "Library")');
+            'INSERT INTO $appstateTableName (key, value) VALUES(\'currentTab\', \'Library\')');
         db.execute(
-            'INSERT INTO $appstateTableName ("key", "value") VALUES("currentPlaying", NULL)');
+            'INSERT INTO $appstateTableName (key, value) VALUES(\'currentPlaying\', NULL)');
         db.execute(
-            'INSERT INTO $appstateTableName ("key", "value") VALUES("currentPlaylistId", NULL)');
+            'INSERT INTO $appstateTableName (key, value) VALUES(\'currentPlaylistId\', NULL)');
         db.execute(
-            'INSERT INTO $appstateTableName ("key", "value") VALUES("lastPlayed", NULL)');
+            'INSERT INTO $appstateTableName (key, value) VALUES(\'lastPlayed\', NULL)');
         db.execute(
-            'INSERT INTO $appstateTableName ("key", "value") VALUES("language", "EN")');
+            'INSERT INTO $appstateTableName (key, value) VALUES(\'language\', \'EN\')');
         db.execute(
-            'INSERT INTO $appstateTableName ("key", "value") VALUES("darkMode", "false")');
+            'INSERT INTO $appstateTableName (key, value) VALUES(\'darkMode\', \'false\')');
         db.execute(
             'CREATE TABLE $songTableName (id VARCHAR(16) PRIMARY KEY, name TEXT NOT NULL, path TEXT, loved BOOL, added INTEGER, lastPlayed INTEGER);');
         db.execute(

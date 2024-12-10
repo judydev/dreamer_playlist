@@ -11,12 +11,12 @@ import 'package:path_provider/path_provider.dart';
 Future<MyAudioHandler> initAudioService() async {
   return await AudioService.init(
     builder: () => MyAudioHandler(),
-    // config: const AudioServiceConfig(
-    //     // androidNotificationChannelId: 'com.mycompany.myapp.audio',
-    //     // androidNotificationChannelName: 'Audio Service Demo',
-    //     // androidNotificationOngoing: true,
-    //     // androidStopForegroundOnPause: true,
-    //     ),
+    config: const AudioServiceConfig(
+      androidNotificationChannelId: 'com.app.dreamer_playlist.audio',
+      androidNotificationChannelName: 'Dreamer Playlist Audio Service',
+      androidNotificationOngoing: true,
+      androidStopForegroundOnPause: true,
+    ),
   );
 }
 
